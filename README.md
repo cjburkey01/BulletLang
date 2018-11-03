@@ -15,7 +15,7 @@ You may use the GitHub download repository button to download this repository or
 
 ## Using the Source
 
-To build/run the source code, [Maven](https://maven.apache.org/) isrequired on the system. Maven will automatically include the [Antl4](http://www.antlr.org/) library, the Compiler/Parsergenerator for **BulletLang**, and other necessary libraries.
+To build/run the source code, [Maven](https://maven.apache.org/) isrequired on the system. Maven will automatically include the [Antlr4](http://www.antlr.org/) library, the Compiler/Parsergenerator for **BulletLang**, and other necessary libraries.
 
 ## Packaging to Jar from Source
 
