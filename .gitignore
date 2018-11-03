@@ -1,0 +1,16 @@
+# Maven
+target
+dependency-reduced-pom.xml
+
+# Idea
+*.iml
+.idea
+
+# Java
+*.class
+bin
+src/main/generated-sources
+
+# Mac
+*.DS_Store
+*/__MacOSX
