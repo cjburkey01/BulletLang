@@ -21,9 +21,20 @@ import static com.cjburkey.bullet.Log.*;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
+@SuppressWarnings("WeakerAccess")
 public class BulletLang {
     
+    // INJECTED BY MAVEN-INJECTION-PLGUIN!
+    // Make sure to run "mvn inject:inject" after
+    // "mvn compile" when building from source
+    public static final String VERSION() {
+        return null;
+    }
+    
     private static Input input;
+    
+    private static File startDirectory;
+    private static File sourceDirectory;
     
     public static void main(String[] args) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> exception(e));
@@ -36,9 +47,18 @@ public class BulletLang {
         if (input == null) {
             throw new RuntimeException("Input not found");
         }
-        if (input.debug) {
+        
+        // Debug prints
+        if (input.debug && !input.printVersion) {
             debug("Debug enabled");
         }
+        if (input.printVersion || input.debug) {
+            info("BulletLang Compiler Version \"{}\"", VERSION());
+        }
+        if (input.printVersion) {
+            return;
+        }
+        
         if (!input.valid || input.inputFile == null || input.outputFile == null) {
             // TODO: REMOVE THIS TEST CODE
             info("Performing test compile on resource \"/test.blt\"");
@@ -71,6 +91,13 @@ public class BulletLang {
     
     @SuppressWarnings("unused")
     private static void compile(InputStream input, OutputStream output) throws IOException {
+        if (startDirectory == null) {
+            startDirectory = new File(System.getProperty("user.home")).getAbsoluteFile();
+        }
+        if (sourceDirectory == null) {
+            sourceDirectory = new File(startDirectory.getAbsolutePath());
+        }
+        
         // Generate token stream
         BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -81,13 +108,14 @@ public class BulletLang {
         
         // Begin parsing
         BProgram mainProgram = ParserVisitor.parse(parser);
-        if (BulletLang.input.debug) {
-            debugPrint(mainProgram);
-        }
     }
     
-    private static void debugPrint(BProgram mainProgram) {
-        debug("Compiled program in namespace \"{}\"", mainProgram.namespace);
+    public static void debugPrint(BProgram mainProgram) {
+        if (!input.debug) {
+            return;
+        }
+        
+        debug("Compiled program module \"{}\"", mainProgram.module);
         
         debug("  Functions ({}): ", mainProgram.functions.size());
         for (BFunction function : mainProgram.functions) {

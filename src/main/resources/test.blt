@@ -1,4 +1,4 @@
-namespace Bill;
+module Test;
 
 variableExample1 = 2;
 variableExample2 : VariableType;

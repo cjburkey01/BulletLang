@@ -10,17 +10,16 @@ import java.util.List;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-@SuppressWarnings("WeakerAccess")
 public class BProgram extends BBase implements IBScopeContainer {
     
-    public final String namespace;
+    public final String module;
     public final List<BFunction> functions = new ArrayList<>();
     public final BScope scope = new BScope();
     
-    public BProgram(String namespace, List<BFunction> functions, List<BStatement> statements, BulletParser.ProgramContext ctx) {
+    public BProgram(String module, List<BFunction> functions, List<BStatement> statements, BulletParser.ProgramContext ctx) {
         super(ctx);
         
-        this.namespace = namespace;
+        this.module = module;
         this.functions.addAll(functions);
         this.scope.statements.addAll(statements);
     }

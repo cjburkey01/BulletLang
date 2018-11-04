@@ -13,7 +13,11 @@ A fast, efficient programming language with syntax as comfortable as Ruby and Ja
 
 Example:
 
-`java -jar /path/BulletLangCompiler.jar --if /example/main.blt --of /example/output.c`
+`java -jar /path/bullet-lang-VERSION.jar --if /example/main.blt --of /example/output.c`
+
+If you set an alias:
+
+`bullet --if /example/main.blt --of /example/output.c`
 
 ## Obtaining Source
 
@@ -25,10 +29,15 @@ To build/run the source code, [Maven](https://maven.apache.org/) isrequired on t
 
 ## Packaging to Jar from Source
 
-In the cloned repository directory, run `mvn clean compile package` to include all the necessary libraries in the executable output Jar file.
+In the cloned repository directory, run `mvn clean compile inject:inject package` to include all the necessary libraries in the executable output Jar file.
+
+* `clean` - cleans up any previous builds (it can be ommitted if this is the first execution of the `mvn` command in this diretory).
+* `compile` - compiles the Antlr source files into Java and the java source files into their `.class` equivalents.
+* `inject:inject` - injects the project information into the alread-compiled Java files.
+* `package` - Builds the class files and dependencies into a single executable Jar file.
 
 ## Running Source Without Packaging
 
 ##### This is probably *not* useful for anyone!!
 
-In the cloned repository directoy, run `mvn clean compile exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without specifying a file to compile or building a jar first
+In the cloned repository directoy, run `mvn clean compile inject:inject exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without specifying a file to compile or building a jar first

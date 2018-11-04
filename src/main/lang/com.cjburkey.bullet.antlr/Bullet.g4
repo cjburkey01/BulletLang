@@ -6,7 +6,7 @@ ML_COMMENT  : '/*' .*? '*/' -> skip ;
 WS          : [ \t\r\n\f]+ -> skip ;
 
 // Key
-NAMESPACE   : 'namespace' ;
+MODULE      : 'module' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
 ELSE        : 'else' ;
@@ -28,9 +28,9 @@ STRING      : '"' ~('\n'|'"')*? '"' ;
 LIT_STRING  : '"""' .*? '"""' ;
 
 // Rules
-program         : namespace programIn EOF ;
+program         : module programIn EOF ;
 
-namespace       : NAMESPACE IDENTIFIER SEMI ;
+module          : MODULE IDENTIFIER SEMI ;
 
 programIn       : function programIn
                 | statement programIn

@@ -6,6 +6,8 @@
     <version>0.0.1</version>
     
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
         <!-- Execution and Compilation -->
         <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <build-helper-maven-plugin.version>1.7</build-helper-maven-plugin.version>
@@ -26,6 +28,9 @@
         
         <!-- Console Output -->
         <log4j.version>2.11.1</log4j.version>
+        
+        <!-- Inject properties into Java source files -->
+        <inject-maven-plugin.version>1.0</inject-maven-plugin.version>
     </properties>
     
     <!-- ANTLR4 Runtime -->
@@ -92,6 +97,29 @@
                 </executions>
             </plugin>
             
+            <!-- Source Property Injector -->
+            <plugin>
+                <groupId>de.m3y.maven</groupId>
+                <artifactId>inject-maven-plugin</artifactId>
+                <version>${inject-maven-plugin.version}</version>
+                <configuration>
+                    <injections>
+                        <injection>
+                            <value>${project.version}</value>
+                            <pointCut>com.cjburkey.bullet.BulletLang.VERSION</pointCut>
+                        </injection>
+                    </injections>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>inject</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <!-- Maven Java Source Compiler -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -101,9 +129,8 @@
                     <target>${compiler.target.version}</target>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <compilerArguments>
-                        <Xlint />
-                    </compilerArguments>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:all</compilerArgument>
                 </configuration>
             </plugin>
             

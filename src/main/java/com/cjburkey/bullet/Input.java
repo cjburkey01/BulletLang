@@ -6,6 +6,7 @@ import picocli.CommandLine;
  * Created by CJ Burkey on 2018/11/03
  */
 @SuppressWarnings("WeakerAccess")
+@CommandLine.Command(name = "bullet")
 class Input implements Runnable {
     
     public static final boolean LENIENT = true;
@@ -26,6 +27,9 @@ class Input implements Runnable {
     
     @CommandLine.Option(required = !LENIENT, names = { "-i", "--if", "--input" }, description = "The input *.blt file", paramLabel = "InputFile")
     String inputFile;
+    
+    @CommandLine.Option(names = { "-s", "--src", "--sourceDir" }, description = "The base directory for required files in the script", paramLabel = "SourceDirectory")
+    String sourceDirectory;
     
     private Input() {
     }

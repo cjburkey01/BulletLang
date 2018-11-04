@@ -1,5 +1,6 @@
 package com.cjburkey.bullet.visitor;
 
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
@@ -31,12 +32,14 @@ public class ParserVisitor {
     private static final FuncParamsVisitor funcParamsVisitor = new FuncParamsVisitor();
     
     public static BProgram parse(BulletParser parser) {
-        return programVisitor.visitProgram(parser.program());
+        BProgram program = programVisitor.visitProgram(parser.program());
+        BulletLang.debugPrint(program);
+        return program;
     }
     
     private static class ProgramVisitor extends BulletBaseVisitor<BProgram> {
         public BProgram visitProgram(BulletParser.ProgramContext ctx) {
-            String namespace = (ctx.namespace() != null && ctx.namespace().IDENTIFIER() != null) ? ctx.namespace().IDENTIFIER().getText() : "";
+            String namespace = (ctx.module() != null && ctx.module().IDENTIFIER() != null) ? ctx.module().IDENTIFIER().getText() : "";
             ProgramIn programContents = programInVisitor.visitProgramIn(ctx.programIn());
             return new BProgram(namespace, programContents.functions, programContents.statements, ctx);
         }
