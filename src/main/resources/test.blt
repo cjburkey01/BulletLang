@@ -1,28 +1,49 @@
+// Comments can start with you slashes, like this
+## Or two hashes, like this
+
+/*
+    Multi-line comments are possible, too,
+    like this!
+*/
+
+// Module name comes first in the file
 module Test;
+
+// Requirements come after module declaration, but are not required
+// These are '.blt' files that will be parsed and loaded before this one
+// If the '.blt' is ommitted, it will be added automatically
 require "core/file1";
 require "core/file2";
 
+// Variable definitions look like variable assignments
 variableExample1 = 2;
+
+// Definitions can have an explicit type declaration to default the value to null
 variableExample2 of VariableType;
+
+// Variables can have an explicit type declaration and a value, though there is generally little reason to do this
+variableExample3 of String = "Hello, I'm Dom";
 
 exampleBoolean = false;
 differentBooleanVariable = true;
 
+// If-statements don't require parenthesis
 if exampleBoolean {
     testFunction;
-} else differentBooleanVariable {
+} else differentBooleanVariable {   // Else-if blocks don't require an "else if", "elif", or similar special keyword
     anotherTestFunction;
 } else {
     finalTestFunction;
 }
 
-variableExample3 of VariableType = "Hello, I'm Dom";
-
-def testFunction() of Timone {
+// Functions are defined with the "def" keyword and parenthesis
+def anotherTestFunction() {
     
 }
 
-def anotherTestFunction() {
+// The return type can be explicitly declared, though it is generally
+// inferred
+def testFunction() of Timone {
     
 }
 
@@ -30,6 +51,11 @@ def finalTestFunction() {
     
 }
 
+// Argument types will be inferred if possible
 def greet(firstName, lastName) {
     print @"Hello, #{firstName} #{lastName}";
+}
+
+class SimpleClass {
+    
 }

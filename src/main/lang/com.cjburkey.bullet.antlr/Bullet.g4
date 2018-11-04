@@ -5,7 +5,7 @@ grammar Bullet;
 }
 
 // Comments
-SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
+SL_COMMENT  : ('##' | '//') ~('\n')* '\n' -> skip ;
 ML_COMMENT  : '/*' .*? '*/' -> skip ;
 
 // Ignore whitespace but allow through if necessary
@@ -14,6 +14,7 @@ WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 // Mid
 MODULE      : 'module' ;
 REQUIRE     : 'require' ;
+CLASS       : 'class' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
 ELSE        : 'else' ;
@@ -52,21 +53,20 @@ requirement     : REQUIRE STRING SEMI ;
 
 programIn       : function programIn
                 | statement programIn
+                | classDef programIn
                 |
                 ;
 
-function        : DEF IDENTIFIER LP arguments? RP functionType LB statements RB ;
+function        : DEF IDENTIFIER LP arguments? RP type? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER (OF IDENTIFIER)?
+argument        : IDENTIFIER type?
                 ;
 
-functionType    : OF IDENTIFIER
-                |
-                ;
+type            : OF IDENTIFIER ;
 
 statements      : statement statements
                 |
@@ -77,14 +77,14 @@ statement       : variableDef SEMI  # StatementVariableDef
                 | expression SEMI   # StatementExpression
                 ;
 
-variableDef     : IDENTIFIER variableVal
-                | IDENTIFIER OF IDENTIFIER
-                | IDENTIFIER OF IDENTIFIER variableVal
+variableDef     : IDENTIFIER type variableVal?
+                | IDENTIFIER variableVal
                 ;
 
 variableVal     : EQ expression ;
 
-expression      : BOOL                                  # Boolean
+expression      : LP expression RP                      # ParenthesisWrap
+                | BOOL                                  # Boolean
                 | INTEGER                               # Integer
                 | FLOAT                                 # Float
                 | STRING                                # String
@@ -99,4 +99,10 @@ funcParams      : expression COM funcParams
 
 ifStatement     : IF expression LB statements RB
                 | ELSE expression? LB statements RB
+                ;
+
+classDef        : CLASS IDENTIFIER (OF types)? LB RB ;
+
+types           : IDENTIFIER COM types
+                | IDENTIFIER
                 ;

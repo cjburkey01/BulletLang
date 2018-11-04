@@ -92,7 +92,7 @@ public class ParserVisitor {
                 return null;
             }
             String name = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
-            String type = (ctx.functionType() != null && ctx.functionType().IDENTIFIER() != null) ? ctx.functionType().IDENTIFIER().getText() : null;
+            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             List<BArgument> arguments = argumentsVisitor.visitArguments(ctx.arguments());
             List<BStatement> statements = statementsVisitor.visitStatements(ctx.statements());
             return new BFunction(name, type, arguments, statements, ctx);
@@ -118,8 +118,8 @@ public class ParserVisitor {
             if (ctx == null) {
                 return null;
             }
-            String name = ctx.IDENTIFIER(0).getText();
-            String type = ctx.IDENTIFIER().size() > 1 ? ctx.IDENTIFIER(1).getText() : null;
+            String name = ctx.IDENTIFIER().getText();
+            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             return new BArgument(name, type, ctx);
         }
     }
@@ -161,8 +161,8 @@ public class ParserVisitor {
             if (ctx == null) {
                 return null;
             }
-            String name = ctx.IDENTIFIER(0).getText();
-            String type = ctx.IDENTIFIER().size() > 1 ? ctx.IDENTIFIER(1).getText() : null;
+            String name = ctx.IDENTIFIER().getText();
+            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             BExpression value = (ctx.variableVal() != null && ctx.variableVal().expression() != null) ? expressionVisitor.visit(ctx.variableVal().expression()) : null;
             return new BVariable(name, type, value, ctx);
         }
@@ -183,6 +183,12 @@ public class ParserVisitor {
     }
     
     private static class ExpressionVisitor extends BulletBaseVisitor<BExpression> {
+        public BExpression visitParenthesisWrap(BulletParser.ParenthesisWrapContext ctx) {
+            if (ctx == null) {
+                return null;
+            }
+            return expressionVisitor.visit(ctx.expression());
+        }
         public BExpression visitBoolean(BulletParser.BooleanContext ctx) {
             if (ctx == null) {
                 return null;
