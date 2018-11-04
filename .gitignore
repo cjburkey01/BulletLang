@@ -4,6 +4,8 @@ dependency-reduced-pom.xml
 
 # Idea
 *.iml
+*.ipr
+*.iws
 .idea
 
 # Java

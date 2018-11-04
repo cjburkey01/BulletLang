@@ -1,0 +1,30 @@
+namespace Bill;
+
+variableExample1 = 2;
+variableExample2 : VariableType;
+
+if exampleBoolean {
+    testFunction;
+} else differentBooleanVariable {
+    anotherTestFunction;
+} else {
+    finalTestFunction;
+}
+
+variableExample3 : VariableType = "Hello, I'm Dom";
+
+def testFunction() : Timone {
+    
+}
+
+def anotherTestFunction() {
+    
+}
+
+def finalTestFunction() {
+    
+}
+
+def greet(firstName, lastName) {
+    print "Hello {} {}", firstName, lastName;
+}

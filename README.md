@@ -9,6 +9,12 @@
 
 A fast, efficient programming language with syntax as comfortable as Ruby and Java that compiles down to the ultra-fast and pretty-efficient [C language](https://en.wikipedia.org/wiki/C_(programming_language).
 
+## Executing Compiler
+
+Example:
+
+`java -jar /path/BulletLangCompiler.jar --if /example/main.blt --of /example/output.c`
+
 ## Obtaining Source
 
 You may use the GitHub download repository button to download this repository or clone it using git.
@@ -25,4 +31,4 @@ In the cloned repository directory, run `mvn clean compile package` to include a
 
 ##### This is probably *not* useful for anyone!!
 
-In the cloned repository directoy, run `mvn clean compile exec:java` to execute the compiler without specifying a file to compile or building a jar first
+In the cloned repository directoy, run `mvn clean compile exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without specifying a file to compile or building a jar first

@@ -20,6 +20,12 @@
         <!-- Bullet Compiler uses ANTLR4 -->
         <antlr.version>4.7.1</antlr.version>
         <antlr.plugin.version>${antlr.version}</antlr.plugin.version>
+        
+        <!-- Command Line Interpretation -->
+        <picocli.version>3.7.0</picocli.version>
+        
+        <!-- Console Output -->
+        <log4j.version>2.11.1</log4j.version>
     </properties>
     
     <!-- ANTLR4 Runtime -->
@@ -28,6 +34,16 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>${antlr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
     </dependencies>
     
@@ -41,6 +57,10 @@
                 <configuration>
                     <sourceDirectory>src/main/lang</sourceDirectory>
                     <outputDirectory>src/main/generated-sources</outputDirectory>
+                    <inputEncoding>utf-8</inputEncoding>
+                    <outputEncoding>utf-8</outputEncoding>
+                    <listener>true</listener>
+                    <visitor>true</visitor>
                 </configuration>
                 <executions>
                     <execution>
