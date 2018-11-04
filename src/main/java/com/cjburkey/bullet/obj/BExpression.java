@@ -16,6 +16,7 @@ public class BExpression extends BBase {
     public boolean isInt = false;
     public boolean isFloat = false;
     public boolean isString = false;
+    public boolean isStringInter = false;
     public boolean isReference = false;
     public boolean isFunctionReference = false;
     
@@ -47,11 +48,12 @@ public class BExpression extends BBase {
         this.isFloat = true;
     }
     
-    public BExpression(String stringVal, BulletParser.StringContext ctx) {
+    public BExpression(String stringVal, boolean isStringInter, BulletParser.StringContext ctx) {
         super(ctx);
         
-        this.stringVal = stringVal.substring(1, stringVal.length() - 1);
+        this.stringVal = stringVal.substring(isStringInter ? 2 : 1, stringVal.length() - 1);
         this.isString = true;
+        this.isStringInter = isStringInter;
     }
     
     public BExpression(String stringVal, BulletParser.LiteralStringContext ctx) {
@@ -77,6 +79,9 @@ public class BExpression extends BBase {
         }
         if (isFloat) {
             return "Float: " + floatVal;
+        }
+        if (isString && isStringInter) {
+            return "Interpolated string: \"" + stringVal.replaceAll("\r?\n\r?", "\\\\n") + "\"";
         }
         if (isString) {
             return "String: \"" + stringVal.replaceAll("\r?\n\r?", "\\\\n") + "\"";

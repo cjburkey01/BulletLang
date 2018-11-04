@@ -205,7 +205,7 @@ public class ParserVisitor {
             if (ctx == null) {
                 return null;
             }
-            return new BExpression(ctx.STRING().getText(), ctx);
+            return new BExpression(ctx.STRING().getText(), ctx.getText().startsWith("@"), ctx);
         }
         public BExpression visitLiteralString(BulletParser.LiteralStringContext ctx) {
             if (ctx == null) {

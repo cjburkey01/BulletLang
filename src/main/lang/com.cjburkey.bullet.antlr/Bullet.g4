@@ -8,7 +8,7 @@ grammar Bullet;
 SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
 ML_COMMENT  : '/*' .*? '*/' -> skip ;
 
-// Ignore whitespace
+// Ignore whitespace but allow through if necessary
 WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 
 // Mid
@@ -34,8 +34,10 @@ DIGIT       : [0-9] ;
 IDENTIFIER  : [A-Za-z_][A-Za-z0-9_]* ;
 
 // Strings
-STRING      : '"' ~('\n' | '"')*? '"' ;
-LIT_STRING  : '"""' .*? '"""' ;
+STRING_IN   : ~('\n' | '"')+? ;
+STR_INTER   : '@"' ;
+STRING      : ('"' | STR_INTER) { iws = false; } STRING_IN? '"' { iws = true; } ;
+LIT_STRING  : '"""' { iws = false; } .*? '"""' { iws = true; } ;
 
 // Rules
 program         : module requirements programIn EOF ;
@@ -82,13 +84,13 @@ variableDef     : IDENTIFIER variableVal
 
 variableVal     : EQ expression ;
 
-expression      : BOOL                          # Boolean
-                | INTEGER                       # Integer
-                | FLOAT                         # Float
-                | STRING                        # String
-                | LIT_STRING                    # LiteralString
-                | IDENTIFIER LP funcParams? RP  # Reference
-                | IDENTIFIER funcParams?        # Reference
+expression      : BOOL                                  # Boolean
+                | INTEGER                               # Integer
+                | FLOAT                                 # Float
+                | STRING                                # String
+                | LIT_STRING                            # LiteralString
+                | IDENTIFIER LP funcParams? RP          # Reference
+                | IDENTIFIER funcParams?                # Reference
                 ;
 
 funcParams      : expression COM funcParams

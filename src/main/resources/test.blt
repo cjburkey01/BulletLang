@@ -31,5 +31,5 @@ def finalTestFunction() {
 }
 
 def greet(firstName, lastName) {
-    print "Hello, #{firstName} #{lastName}";
+    print @"Hello, #{firstName} #{lastName}";
 }
