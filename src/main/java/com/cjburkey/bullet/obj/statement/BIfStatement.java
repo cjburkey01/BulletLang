@@ -2,28 +2,39 @@ package com.cjburkey.bullet.obj.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
-import com.cjburkey.bullet.obj.IBScope;
-import java.util.ArrayList;
+import com.cjburkey.bullet.obj.scope.BScope;
+import com.cjburkey.bullet.obj.scope.IBScopeContainer;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-public class BIfStatement extends BStatement implements IBScope {
+@SuppressWarnings("WeakerAccess")
+public class BIfStatement extends BStatement implements IBScopeContainer {
     
     public boolean isElse;
     public final BExpression condition;
-    public final List<BStatement> statements = new ArrayList<>();
+    public final BScope scope = new BScope();
     
-    public BIfStatement(IBScope parentScope, BulletParser.StatementIfContext ctx) {
-        super(parentScope, ctx);
+    public BIfStatement(boolean isElse, BExpression condition, List<BStatement> statements, BulletParser.IfStatementContext ctx) {
+        super(ctx);
         
-        isElse = ctx.ifStatement().ELSE() != null;
-        condition = ctx.ifStatement().expression() != null ? new BExpression(ctx.ifStatement().expression()) : null;
+        this.isElse = isElse;
+        this.condition = condition;
+        scope.statements.addAll(statements);
     }
     
-    public List<BStatement> getStatements() {
-        return statements;
+    public BScope getScope() {
+        return scope;
+    }
+    
+    public String toString() {
+        if (isElse) {
+            return String.format("Else if \"%s\" then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        } else {
+            return String.format("If \"%s\" then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        }
     }
     
 }

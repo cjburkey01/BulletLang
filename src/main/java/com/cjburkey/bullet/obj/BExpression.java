@@ -13,50 +13,49 @@ public class BExpression extends BBase {
     
     public boolean isInt = false;
     public boolean isFloat = false;
-    public boolean isStringLiteral;
+    public boolean isString;
     public boolean isReference = false;
     public boolean isFunctionReference;
     
     public int intVal = Integer.MIN_VALUE;
     public float floatVal = Float.NEGATIVE_INFINITY;
-    public String stringLiteral = null;
-    public String variableReference = null;
+    public String stringVal = null;
+    public String referenceVal = null;
     public List<BExpression> arguments = new ArrayList<>();
     
-    public BExpression(BulletParser.ExpressionContext ctx) {
+    public BExpression(int intVal, BulletParser.IntegerContext ctx) {
         super(ctx);
         
-        if (ctx instanceof BulletParser.IntegerContext) {
-            intVal = Integer.parseInt(ctx.getText());
-            isInt = true;
-        }
-        if (ctx instanceof BulletParser.FloatContext) {
-            floatVal = Float.parseFloat(ctx.getText());
-            isFloat = true;
-        }
-        if (ctx instanceof BulletParser.StringContext) {
-            stringLiteral = ctx.getText();
-            stringLiteral = stringLiteral.substring(1, stringLiteral.length() - 1);
-            isStringLiteral = true;
-        }
-        if (ctx instanceof BulletParser.LiteralStringContext) {
-            stringLiteral = ctx.getText();
-            stringLiteral = stringLiteral.substring(3, stringLiteral.length() - 3);
-            isStringLiteral = true;
-        }
-        if (ctx instanceof BulletParser.ReferenceContext) {
-            BulletParser.ReferenceContext context = (BulletParser.ReferenceContext) ctx;
-            variableReference = context.IDENTIFIER().getText();
-            isReference = true;
-            if (context.LP() != null && context.RP() != null || context.funcParams() != null) {
-                BulletParser.FuncParamsContext funcParams = context.funcParams();
-                while (funcParams != null) {
-                    arguments.add(new BExpression(funcParams.expression()));
-                    funcParams = funcParams.funcParams();
-                }
-                isFunctionReference = true;
-            }
-        }
+        this.intVal = intVal;
+        this.isInt = true;
+    }
+    
+    public BExpression(float floatVal, BulletParser.FloatContext ctx) {
+        super(ctx);
+        
+        this.floatVal = floatVal;
+        this.isFloat = true;
+    }
+    
+    public BExpression(String stringVal, BulletParser.StringContext ctx) {
+        super(ctx);
+        
+        this.stringVal = stringVal.substring(1, stringVal.length() - 1);
+        this.isString = true;
+    }
+    
+    public BExpression(String stringVal, BulletParser.LiteralStringContext ctx) {
+        super(ctx);
+        
+        this.stringVal = stringVal.substring(3, stringVal.length() - 3);
+        this.isString = true;
+    }
+    
+    public BExpression(String referenceVal, BulletParser.ReferenceContext ctx) {
+        super(ctx);
+        
+        this.referenceVal = referenceVal;
+        this.isReference = true;
     }
     
     public String toString() {
@@ -66,14 +65,14 @@ public class BExpression extends BBase {
         if (isFloat) {
             return "Float: " + floatVal;
         }
-        if (isStringLiteral) {
-            return "String: \"" + stringLiteral.replaceAll("\r?\n\r?", "\\\\n") + "\"";
+        if (isString) {
+            return "String: \"" + stringVal.replaceAll("\r?\n\r?", "\\\\n") + "\"";
         }
         if (isReference && isFunctionReference) {
-            return "Function reference: \"" + variableReference + "\" with args: " + Arrays.toString(arguments.toArray(new BExpression[0]));
+            return "Function reference: \"" + referenceVal + "\" with args: " + Arrays.toString(arguments.toArray(new BExpression[0]));
         }
         if (isReference) {
-            return "Var/Func reference: " + variableReference;
+            return "Var/Func reference: " + referenceVal;
         }
         return "Expression";
     }

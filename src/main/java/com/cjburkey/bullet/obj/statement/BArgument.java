@@ -6,16 +6,17 @@ import com.cjburkey.bullet.obj.BBase;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
+@SuppressWarnings("WeakerAccess")
 public class BArgument extends BBase {
     
     public final String name;
     public final String type;
     
-    public BArgument(BulletParser.ArgumentContext ctx) {
+    public BArgument(String name, String type, BulletParser.ArgumentContext ctx) {
         super(ctx);
         
-        name = ctx.IDENTIFIER(0).getText();
-        type = ctx.IDENTIFIER().size() > 1 ? ctx.IDENTIFIER(1).getText() : null;
+        this.name = name;
+        this.type = type;
     }
     
     public String toString() {

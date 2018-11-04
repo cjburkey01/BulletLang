@@ -59,7 +59,7 @@
                     <outputDirectory>src/main/generated-sources</outputDirectory>
                     <inputEncoding>utf-8</inputEncoding>
                     <outputEncoding>utf-8</outputEncoding>
-                    <listener>true</listener>
+                    <listener>false</listener>
                     <visitor>true</visitor>
                 </configuration>
                 <executions>

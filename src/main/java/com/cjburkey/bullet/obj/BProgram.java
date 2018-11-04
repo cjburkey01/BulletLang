@@ -1,6 +1,8 @@
 package com.cjburkey.bullet.obj;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.obj.scope.BScope;
+import com.cjburkey.bullet.obj.scope.IBScopeContainer;
 import com.cjburkey.bullet.obj.statement.BStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,20 +10,23 @@ import java.util.List;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-public class BProgram extends BBase implements IBScope {
+@SuppressWarnings("WeakerAccess")
+public class BProgram extends BBase implements IBScopeContainer {
     
     public final String namespace;
     public final List<BFunction> functions = new ArrayList<>();
-    public final List<BStatement> statements = new ArrayList<>();
+    public final BScope scope = new BScope();
     
-    public BProgram(BulletParser.ProgramContext ctx) {
+    public BProgram(String namespace, List<BFunction> functions, List<BStatement> statements, BulletParser.ProgramContext ctx) {
         super(ctx);
         
-        namespace = (ctx.namespace() == null || ctx.namespace().IDENTIFIER() == null) ? "" : ctx.namespace().IDENTIFIER().getText();
+        this.namespace = namespace;
+        this.functions.addAll(functions);
+        this.scope.statements.addAll(statements);
     }
     
-    public List<BStatement> getStatements() {
-        return statements;
+    public BScope getScope() {
+        return scope;
     }
     
 }

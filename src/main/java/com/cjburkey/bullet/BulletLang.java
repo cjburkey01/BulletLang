@@ -2,26 +2,19 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.listener.BulletMainListener;
 import com.cjburkey.bullet.obj.BFunction;
 import com.cjburkey.bullet.obj.BProgram;
-import com.cjburkey.bullet.obj.statement.BArgument;
-import com.cjburkey.bullet.obj.statement.BExpressionStatement;
-import com.cjburkey.bullet.obj.statement.BIfStatement;
 import com.cjburkey.bullet.obj.statement.BStatement;
-import com.cjburkey.bullet.obj.statement.BVariable;
+import com.cjburkey.bullet.visitor.ParserVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import static com.cjburkey.bullet.Log.*;
 
@@ -87,42 +80,23 @@ public class BulletLang {
         parser.setBuildParseTree(true);
         
         // Begin parsing
-        ParseTree parseTree = parser.program();
-        ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(new BulletMainListener(), parseTree);
-        
+        BProgram mainProgram = ParserVisitor.parse(parser);
         if (BulletLang.input.debug) {
-            debugPrint();
+            debugPrint(mainProgram);
         }
     }
     
-    private static void debugPrint() {
-        while (!BulletMainListener.programs.empty()) {
-            BProgram program = BulletMainListener.programs.pop();
-            debug("Program in namespace \"{}\" has {} functions and {} statements:", program.namespace, program.functions.size(), program.statements.size());
-            debug("  Functions:");
-            for (BFunction function : program.functions) {
-                debug("    Define function \"{}\"(Arguments: {}) returns \"{}\" and runs {}", function.name, Arrays.toString(function.arguments.toArray(new BArgument[0])), function.type, Arrays.toString(function.statements.toArray(new BStatement[0])));
-            }
-            debug("  Statements:");
-            for (BStatement statement : program.statements) {
-                if (statement instanceof BVariable) {
-                    BVariable variable = (BVariable) statement;
-                    debug("    {}", variable);
-                }
-                if (statement instanceof BIfStatement) {
-                    BIfStatement ifStatement = (BIfStatement) statement;
-                    if (ifStatement.isElse) {
-                        debug("    Else if \"{}\" then {}", ifStatement.condition, Arrays.toString(ifStatement.statements.toArray(new BStatement[0])));
-                    } else {
-                        debug("    If \"{}\" then {}", ifStatement.condition, Arrays.toString(ifStatement.statements.toArray(new BStatement[0])));
-                    }
-                }
-                if (statement instanceof BExpressionStatement) {
-                    BExpressionStatement expressionStatement = (BExpressionStatement) statement;
-                    debug("    Execute expression: \"{}\"", expressionStatement.expression);
-                }
-            }
+    private static void debugPrint(BProgram mainProgram) {
+        debug("Compiled program in namespace \"{}\"", mainProgram.namespace);
+        
+        debug("  Functions ({}): ", mainProgram.functions.size());
+        for (BFunction function : mainProgram.functions) {
+            debug("    Define function {}", function);
+        }
+        
+        debug("  Statements ({}): ", mainProgram.scope.statements.size());
+        for (BStatement statement : mainProgram.scope.statements) {
+            debug("    {}", statement);
         }
     }
     
