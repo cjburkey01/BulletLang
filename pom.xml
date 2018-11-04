@@ -4,6 +4,9 @@
     <groupId>com.cjburkey.bullet</groupId>
     <artifactId>bullet-lang</artifactId>
     <version>0.0.1</version>
+    <description>Bullet language compiler</description>
+    <name>Bullet</name>
+    <inceptionYear>2018</inceptionYear>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,7 +34,84 @@
         
         <!-- Inject properties into Java source files -->
         <inject-maven-plugin.version>1.0</inject-maven-plugin.version>
+        
+        <!-- Building for specific platforms -->
+        <launch4j-maven-plugin.version>1.7.24</launch4j-maven-plugin.version>
+        <launch4j.exe.name>bullet</launch4j.exe.name>
     </properties>
+    
+    <!-- Allow building for specific platforms -->
+    <profiles>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os> 
+                    <family>mac</family>
+                </os>
+            </activation>
+        </profile>
+        <profile>
+            <id>lin</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>Linux</name>
+                </os>
+            </activation>
+        </profile>
+        <profile>
+            <id>win</id>
+            <activation>
+                <property>
+                    <name>build.exe</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                        <version>${launch4j-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>l4j-clui</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>launch4j</goal>
+                                </goals>
+                                <configuration>
+                                    <headerType>console</headerType>
+                                    <outfile>target/${launch4j.exe.name}.exe</outfile>
+                                    <jar>target/${project.artifactId}-${project.version}.jar</jar>
+                                    <errTitle>bullet</errTitle>
+                                    <classPath>
+                                        <mainClass>com.cjburkey.bullet.BulletLang</mainClass>
+                                        <addDependencies>true</addDependencies>
+                                        <preCp>anything</preCp>
+                                    </classPath>
+                                    <jre>
+                                        <minVersion>1.8.0</minVersion>
+                                    </jre>
+                                    <versionInfo>
+                                        <fileVersion>${project.version}.0</fileVersion>
+                                        <txtFileVersion>${project.version}.0</txtFileVersion>
+                                        <productVersion>${project.version}.0</productVersion>
+                                        <txtProductVersion>${project.version}.0</txtProductVersion>
+                                        <fileDescription>${project.description}</fileDescription>
+                                        <copyright>Copyright ${project.inceptionYear} CJ Burkey</copyright>
+                                        <productName>${project.name}</productName>
+                                        <internalName>${project.artifactId}</internalName>
+                                        <originalFilename>original.exe</originalFilename>
+                                    </versionInfo>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     
     <!-- ANTLR4 Runtime -->
     <dependencies>

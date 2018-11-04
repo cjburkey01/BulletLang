@@ -36,6 +36,10 @@ In the cloned repository directory, run `mvn clean compile inject:inject package
 * `inject:inject` - injects the project information into the alread-compiled Java files.
 * `package` - Builds the class files and dependencies into a single executable Jar file.
 
+## Packaging to EXE from Source
+
+Packing to a `.exe` file is as easy as to a Jar file. You can generate a `.exe` file on any operating system supported by [Launch4j](http://launch4j.sourceforge.net/). The `build.exe` argument can be used to trigger the exe creation: `mvn clean compile inject:inject package -Dbuild.exe=true`
+
 ## Running Source Without Packaging
 
 ##### This is probably *not* useful for anyone!!
