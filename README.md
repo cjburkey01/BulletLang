@@ -25,7 +25,7 @@ You may use the GitHub download repository button to download this repository or
 
 ## Using the Source
 
-To build/run the source code, [Maven](https://maven.apache.org/) isrequired on the system. Maven will automatically include the [Antlr4](http://www.antlr.org/) library, the Compiler/Parsergenerator for **BulletLang**, and other necessary libraries.
+To build/run the source code, [Maven](https://maven.apache.org/) is required on the system. Maven will automatically include the [Antlr4](http://www.antlr.org/) library, the Compiler/Parser generator for **BulletLang**, and other necessary libraries.
 
 ## Packaging to Jar from Source
 
@@ -33,7 +33,7 @@ In the cloned repository directory, run `mvn clean compile inject:inject package
 
 * `clean` - cleans up any previous builds (it can be ommitted if this is the first execution of the `mvn` command in this diretory).
 * `compile` - compiles the Antlr source files into Java and the java source files into their `.class` equivalents.
-* `inject:inject` - injects the project information into the alread-compiled Java files.
+* `inject:inject` - injects the project information into the already-compiled Java files.
 * `package` - Builds the class files and dependencies into a single executable Jar file.
 
 ## Packaging to EXE from Source
@@ -44,4 +44,4 @@ Packing to a `.exe` file is as easy as to a Jar file. You can generate a `.exe` 
 
 ##### This is probably *not* useful for anyone!!
 
-In the cloned repository directoy, run `mvn clean compile inject:inject exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without specifying a file to compile or building a jar first
+In the cloned repository directoy, run `mvn clean compile inject:inject exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without building a jar first
