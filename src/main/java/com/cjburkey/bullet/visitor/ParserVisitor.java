@@ -20,6 +20,7 @@ import java.util.List;
 public class ParserVisitor {
     
     private static final ProgramVisitor programVisitor = new ProgramVisitor();
+    private static final RequirementsVisitor requirementsVisitor = new RequirementsVisitor();
     private static final ProgramInVisitor programInVisitor = new ProgramInVisitor();
     private static final FunctionVisitor functionVisitor = new FunctionVisitor();
     private static final ArgumentsVisitor argumentsVisitor = new ArgumentsVisitor();
@@ -40,8 +41,27 @@ public class ParserVisitor {
     private static class ProgramVisitor extends BulletBaseVisitor<BProgram> {
         public BProgram visitProgram(BulletParser.ProgramContext ctx) {
             String namespace = (ctx.module() != null && ctx.module().IDENTIFIER() != null) ? ctx.module().IDENTIFIER().getText() : "";
+            List<String> requiredFiles = ctx.requirements() == null ? new ArrayList<>() : requirementsVisitor.visitRequirements(ctx.requirements());
             ProgramIn programContents = programInVisitor.visitProgramIn(ctx.programIn());
-            return new BProgram(namespace, programContents.functions, programContents.statements, ctx);
+            return new BProgram(namespace, requiredFiles, programContents.functions, programContents.statements, ctx);
+        }
+    }
+    
+    private static class RequirementsVisitor extends BulletBaseVisitor<List<String>> {
+        public List<String> visitRequirements(BulletParser.RequirementsContext ctx) {
+            if (ctx == null) {
+                return new ArrayList<>();
+            }
+            List<String> requirements = ctx.requirements() == null ? new ArrayList<>() : visitRequirements(ctx.requirements());
+            if (ctx.requirement() != null && ctx.requirement().STRING() != null && ctx.requirement().STRING().getText() != null) {
+                String requirement = ctx.requirement().STRING().getText();
+                requirement = requirement.substring(1, requirement.length() - 1);
+                if (!requirement.endsWith(".blt")) {
+                    requirement += ".blt";
+                }
+                requirements.add(0, requirement);
+            }
+            return requirements;
         }
     }
     
@@ -50,7 +70,7 @@ public class ParserVisitor {
             if (ctx == null) {
                 return new ProgramIn();
             }
-            ProgramIn programIn = visitProgramIn(ctx.programIn());
+            ProgramIn programIn = ctx.programIn() == null ? new ProgramIn() : visitProgramIn(ctx.programIn());
             if (ctx.function() != null) {
                 BFunction function = functionVisitor.visitFunction(ctx.function());
                 if (function != null) {
@@ -163,6 +183,12 @@ public class ParserVisitor {
     }
     
     private static class ExpressionVisitor extends BulletBaseVisitor<BExpression> {
+        public BExpression visitBoolean(BulletParser.BooleanContext ctx) {
+            if (ctx == null) {
+                return null;
+            }
+            return new BExpression(ctx.BOOL().getText().equals("true"), ctx);
+        }
         public BExpression visitInteger(BulletParser.IntegerContext ctx) {
             if (ctx == null) {
                 return null;
@@ -207,9 +233,11 @@ public class ParserVisitor {
                 return new ArrayList<>();
             }
             List<BExpression> expressions = visitFuncParams(ctx.funcParams());
-            BExpression expression = expressionVisitor.visit(ctx.expression());
-            if (expression != null) {
-                expressions.add(0, expression);
+            if (ctx.expression() != null) {
+                BExpression expression = expressionVisitor.visit(ctx.expression());
+                if (expression != null) {
+                    expressions.add(0, expression);
+                }
             }
             return expressions;
         }

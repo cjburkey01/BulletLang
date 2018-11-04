@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.obj;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.visitor.SmartStringInn;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,17 +12,26 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class BExpression extends BBase {
     
+    public boolean isBool = false;
     public boolean isInt = false;
     public boolean isFloat = false;
-    public boolean isString;
+    public boolean isString = false;
     public boolean isReference = false;
-    public boolean isFunctionReference;
+    public boolean isFunctionReference = false;
     
+    public boolean boolVal = false;
     public int intVal = Integer.MIN_VALUE;
     public float floatVal = Float.NEGATIVE_INFINITY;
     public String stringVal = null;
     public String referenceVal = null;
-    public List<BExpression> arguments = new ArrayList<>();
+    public final List<BExpression> arguments = new ArrayList<>();
+    
+    public BExpression(boolean boolVal, BulletParser.BooleanContext ctx) {
+        super(ctx);
+        
+        this.boolVal = boolVal;
+        this.isBool = true;
+    }
     
     public BExpression(int intVal, BulletParser.IntegerContext ctx) {
         super(ctx);
@@ -59,6 +69,9 @@ public class BExpression extends BBase {
     }
     
     public String toString() {
+        if (isBool) {
+            return "Boolean: " + boolVal;
+        }
         if (isInt) {
             return "Integer: " + intVal;
         }

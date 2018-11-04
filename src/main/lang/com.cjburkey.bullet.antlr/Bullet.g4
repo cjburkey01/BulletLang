@@ -1,12 +1,19 @@
 grammar Bullet;
 
-// Ignored
+@lexer::members {
+    boolean iws = true;
+}
+
+// Comments
 SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
 ML_COMMENT  : '/*' .*? '*/' -> skip ;
-WS          : [ \t\r\n\f]+ -> skip ;
 
-// Key
+// Ignore whitespace
+WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
+
+// Mid
 MODULE      : 'module' ;
+REQUIRE     : 'require' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
 ELSE        : 'else' ;
@@ -16,21 +23,30 @@ LP          : '(' ;
 RP          : ')' ;
 LB          : '{' ;
 RB          : '}' ;
-COL         : ':' ;
+OF          : 'of' ;
 COM         : ',' ;
 
-// Literals
-IDENTIFIER  : [A-Za-z_][A-Za-z0-9_]* ;
+// Late
+BOOL        : ('true' | 'false') ;
 FLOAT       : INTEGER? '.' INTEGER ;
 INTEGER     : DIGIT+ ;
 DIGIT       : [0-9] ;
-STRING      : '"' ~('\n'|'"')*? '"' ;
+IDENTIFIER  : [A-Za-z_][A-Za-z0-9_]* ;
+
+// Strings
+STRING      : '"' ~('\n' | '"')*? '"' ;
 LIT_STRING  : '"""' .*? '"""' ;
 
 // Rules
-program         : module programIn EOF ;
+program         : module requirements programIn EOF ;
 
 module          : MODULE IDENTIFIER SEMI ;
+
+requirements    : requirement requirements
+                |
+                ;
+
+requirement     : REQUIRE STRING SEMI ;
 
 programIn       : function programIn
                 | statement programIn
@@ -43,10 +59,10 @@ arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER (COL IDENTIFIER)?
+argument        : IDENTIFIER (OF IDENTIFIER)?
                 ;
 
-functionType    : COL IDENTIFIER
+functionType    : OF IDENTIFIER
                 |
                 ;
 
@@ -60,13 +76,14 @@ statement       : variableDef SEMI  # StatementVariableDef
                 ;
 
 variableDef     : IDENTIFIER variableVal
-                | IDENTIFIER COL IDENTIFIER
-                | IDENTIFIER COL IDENTIFIER variableVal
+                | IDENTIFIER OF IDENTIFIER
+                | IDENTIFIER OF IDENTIFIER variableVal
                 ;
 
 variableVal     : EQ expression ;
 
-expression      : INTEGER                       # Integer
+expression      : BOOL                          # Boolean
+                | INTEGER                       # Integer
                 | FLOAT                         # Float
                 | STRING                        # String
                 | LIT_STRING                    # LiteralString

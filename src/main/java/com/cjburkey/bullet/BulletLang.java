@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -107,7 +108,9 @@ public class BulletLang {
         parser.setBuildParseTree(true);
         
         // Begin parsing
+        info("Parsing input");
         BProgram mainProgram = ParserVisitor.parse(parser);
+        info("Finished parsing");
     }
     
     public static void debugPrint(BProgram mainProgram) {
@@ -115,7 +118,7 @@ public class BulletLang {
             return;
         }
         
-        debug("Compiled program module \"{}\"", mainProgram.module);
+        debug("Parsed program module {}", mainProgram);
         
         debug("  Functions ({}): ", mainProgram.functions.size());
         for (BFunction function : mainProgram.functions) {
