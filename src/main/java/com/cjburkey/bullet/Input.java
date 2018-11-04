@@ -5,7 +5,7 @@ import picocli.CommandLine;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "DefaultAnnotationParam"})
 @CommandLine.Command(name = "bullet")
 class Input implements Runnable {
     
@@ -18,6 +18,9 @@ class Input implements Runnable {
     
     @CommandLine.Option(names = { "-d", "-debug" }, description = "Display compilation debug information")
     boolean debug = false;
+    
+    @CommandLine.Option(names = { "-e", "-errors" }, description = "Display full stacktraces of errors")
+    boolean fullErrors;
     
     @CommandLine.Option(names = { "-v", "-version" }, description = "Display the version of the current BulletLang compiler")
     boolean printVersion;
