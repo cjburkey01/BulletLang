@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BFunction;
 import com.cjburkey.bullet.obj.BProgram;
+import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.statement.BStatement;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import java.io.File;
@@ -61,7 +62,7 @@ public class BulletLang {
         
         if (!input.valid || input.inputFile == null || input.outputFile == null) {
             // TODO: REMOVE THIS TEST CODE
-            info("Performing test compile on resource \"/test.blt\"");
+            debug("Performing test compile on resource \"/test.blt\"");
             compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
             return;
         }
@@ -123,9 +124,14 @@ public class BulletLang {
         
         debug("Parsed program module {}", mainProgram);
         
+        debug("  Classes ({}): ", mainProgram.classes.size());
+        for (BClass classDef : mainProgram.classes) {
+            debug("    {}", classDef);
+        }
+        
         debug("  Functions ({}): ", mainProgram.functions.size());
         for (BFunction function : mainProgram.functions) {
-            debug("    Define function {}", function);
+            debug("    {}", function);
         }
         
         debug("  Statements ({}): ", mainProgram.scope.statements.size());

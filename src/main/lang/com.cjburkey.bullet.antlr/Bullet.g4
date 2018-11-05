@@ -101,7 +101,11 @@ ifStatement     : IF expression LB statements RB
                 | ELSE expression? LB statements RB
                 ;
 
-classDef        : CLASS IDENTIFIER (OF types)? LB RB ;
+classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
+
+classMembers    : function classMembers
+                |
+                ;
 
 types           : IDENTIFIER COM types
                 | IDENTIFIER

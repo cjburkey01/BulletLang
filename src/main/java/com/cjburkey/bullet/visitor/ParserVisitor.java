@@ -7,14 +7,16 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
 import com.cjburkey.bullet.obj.BFunction;
 import com.cjburkey.bullet.obj.BProgram;
+import com.cjburkey.bullet.obj.classdef.BClass;
+import com.cjburkey.bullet.obj.classdef.IBClassMember;
 import com.cjburkey.bullet.obj.statement.BArgument;
 import com.cjburkey.bullet.obj.statement.BExpressionStatement;
 import com.cjburkey.bullet.obj.statement.BIfStatement;
 import com.cjburkey.bullet.obj.statement.BStatement;
 import com.cjburkey.bullet.obj.statement.BVariable;
+import com.cjburkey.bullet.visitor.struct.ProgramIn;
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
@@ -34,6 +36,9 @@ public class ParserVisitor {
     private static final IfStatementVisitor ifStatementVisitor = new IfStatementVisitor();
     private static final ExpressionVisitor expressionVisitor = new ExpressionVisitor();
     private static final FuncParamsVisitor funcParamsVisitor = new FuncParamsVisitor();
+    private static final ClassDefVisitor classDefVisitor = new ClassDefVisitor();
+    private static final TypesVisitor typesVisitor = new TypesVisitor();
+    private static final ClassMembersVisitor classMembersVisitor = new ClassMembersVisitor();
     
     public static boolean stop = false;
     
@@ -43,16 +48,16 @@ public class ParserVisitor {
         return program;
     }
     
-    private static class ProgramVisitor extends BaseBulletVisitor<BProgram> {
+    private static class ProgramVisitor extends BaseV<BProgram> {
         public BProgram visitProgram(BulletParser.ProgramContext ctx) {
             String namespace = (ctx.module() != null && ctx.module().IDENTIFIER() != null) ? ctx.module().IDENTIFIER().getText() : "";
             List<String> requiredFiles = ctx.requirements() == null ? new ArrayList<>() : requirementsVisitor.visit(ctx.requirements());
             ProgramIn programContents = programInVisitor.visit(ctx.programIn());
-            return new BProgram(namespace, requiredFiles, programContents.functions, programContents.statements, ctx);
+            return new BProgram(namespace, requiredFiles, programContents.functions, programContents.statements, programContents.classes, ctx);
         }
     }
     
-    private static class RequirementsVisitor extends BaseBulletVisitor<List<String>> {
+    private static class RequirementsVisitor extends BaseV<List<String>> {
         public List<String> visitRequirements(BulletParser.RequirementsContext ctx) {
             if (ctx == null) {
                 return new ArrayList<>();
@@ -70,7 +75,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class ProgramInVisitor extends BaseBulletVisitor<ProgramIn> {
+    private static class ProgramInVisitor extends BaseV<ProgramIn> {
         public ProgramIn visitProgramIn(BulletParser.ProgramInContext ctx) {
             if (ctx == null) {
                 return new ProgramIn();
@@ -86,12 +91,17 @@ public class ParserVisitor {
                 if (statement != null) {
                     programIn.statements.add(0, statement);
                 }
+            } else if (ctx.classDef() != null) {
+                BClass classDef = classDefVisitor.visit(ctx.classDef());
+                if (classDef != null) {
+                    programIn.classes.add(0, classDef);
+                }
             }
             return programIn;
         }
     }
     
-    private static class FunctionVisitor extends BaseBulletVisitor<BFunction> {
+    private static class FunctionVisitor extends BaseV<BFunction> {
         public BFunction visitFunction(BulletParser.FunctionContext ctx) {
             if (ctx == null) {
                 return null;
@@ -100,11 +110,11 @@ public class ParserVisitor {
             String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             List<BArgument> arguments = ctx.arguments() == null ? new ArrayList<>() : argumentsVisitor.visit(ctx.arguments());
             List<BStatement> statements = ctx.statements() == null ? new ArrayList<>() : statementsVisitor.visit(ctx.statements());
-            return new BFunction(name, type, arguments, statements, ctx);
+            return new BFunction(name, type, null, arguments, statements, ctx); // TODO: VISIBILITY
         }
     }
     
-    private static class ArgumentsVisitor extends BaseBulletVisitor<List<BArgument>> {
+    private static class ArgumentsVisitor extends BaseV<List<BArgument>> {
         public List<BArgument> visitArguments(BulletParser.ArgumentsContext ctx) {
             if (ctx == null) {
                 return new ArrayList<>();
@@ -118,7 +128,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class ArgumentVisitor extends BaseBulletVisitor<BArgument> {
+    private static class ArgumentVisitor extends BaseV<BArgument> {
         public BArgument visitArgument(BulletParser.ArgumentContext ctx) {
             if (ctx == null) {
                 return null;
@@ -129,7 +139,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class StatementsVisitor extends BaseBulletVisitor<List<BStatement>> {
+    private static class StatementsVisitor extends BaseV<List<BStatement>> {
         public List<BStatement> visitStatements(BulletParser.StatementsContext ctx) {
             if (ctx == null) {
                 return new ArrayList<>();
@@ -145,7 +155,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class StatementVisitor extends BaseBulletVisitor<BStatement> {
+    private static class StatementVisitor extends BaseV<BStatement> {
         public BStatement visitStatementVariableDef(BulletParser.StatementVariableDefContext ctx) {
             return variableDefVisitor.visit(ctx.variableDef());
         }
@@ -161,7 +171,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class VariableDefVisitor extends BaseBulletVisitor<BVariable> {
+    private static class VariableDefVisitor extends BaseV<BVariable> {
         public BVariable visitVariableDef(BulletParser.VariableDefContext ctx) {
             if (ctx == null) {
                 return null;
@@ -169,11 +179,11 @@ public class ParserVisitor {
             String name = ctx.IDENTIFIER().getText();
             String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             BExpression value = (ctx.variableVal() != null && ctx.variableVal().expression() != null) ? expressionVisitor.visit(ctx.variableVal().expression()) : null;
-            return new BVariable(name, type, value, ctx);
+            return new BVariable(name, type, null, value, ctx); // TODO: VISIBILITY
         }
     }
     
-    private static class IfStatementVisitor extends BaseBulletVisitor<BIfStatement> {
+    private static class IfStatementVisitor extends BaseV<BIfStatement> {
         public BIfStatement visitIfStatement(BulletParser.IfStatementContext ctx) {
             if (ctx == null) {
                 return null;
@@ -187,7 +197,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class ExpressionVisitor extends BaseBulletVisitor<BExpression> {
+    private static class ExpressionVisitor extends BaseV<BExpression> {
         public BExpression visitParenthesisWrap(BulletParser.ParenthesisWrapContext ctx) {
             if (ctx == null) {
                 return null;
@@ -238,7 +248,7 @@ public class ParserVisitor {
         }
     }
     
-    private static class FuncParamsVisitor extends BaseBulletVisitor<List<BExpression>> {
+    private static class FuncParamsVisitor extends BaseV<List<BExpression>> {
         public List<BExpression> visitFuncParams(BulletParser.FuncParamsContext ctx) {
             if (ctx == null) {
                 return new ArrayList<>();
@@ -254,7 +264,47 @@ public class ParserVisitor {
         }
     }
     
-    private static class BaseBulletVisitor<T> extends BulletBaseVisitor<T> {
+    private static class ClassDefVisitor extends BaseV<BClass> {
+        public BClass visitClassDef(BulletParser.ClassDefContext ctx) {
+            if (ctx == null) {
+                return null;
+            }
+            List<String> types = ctx.types() == null ? new ArrayList<>() : typesVisitor.visit(ctx.types());
+            List<IBClassMember> members = ctx.classMembers() == null ? new ArrayList<>() : classMembersVisitor.visit(ctx.classMembers());
+            return new BClass(ctx.IDENTIFIER().getText(), null, types, members, ctx);   // TODO: VISIBILITY
+        }
+    }
+    
+    private static class TypesVisitor extends BaseV<List<String>> {
+        public List<String> visitTypes(BulletParser.TypesContext ctx) {
+            if (ctx == null) {
+                return new ArrayList<>();
+            }
+            List<String> types = ctx.types() == null ? new ArrayList<>() : visit(ctx.types());
+            if (ctx.IDENTIFIER() != null && ctx.IDENTIFIER().getText() != null) {
+                types.add(0, ctx.IDENTIFIER().getText());
+            }
+            return types;
+        }
+    }
+    
+    private static class ClassMembersVisitor extends BaseV<List<IBClassMember>> {
+        public List<IBClassMember> visitClassMembers(BulletParser.ClassMembersContext ctx) {
+            if (ctx == null) {
+                return new ArrayList<>();
+            }
+            List<IBClassMember> members = ctx.classMembers() == null ? new ArrayList<>() : visit(ctx.classMembers());
+            if (ctx.function() != null) {
+                BFunction method = functionVisitor.visit(ctx.function());
+                if (method != null) {
+                    members.add(0, method);
+                }
+            }
+            return members;
+        }
+    }
+    
+    private static class BaseV<T> extends BulletBaseVisitor<T> {
         public T visit(ParseTree tree) {
             if (stop) {
                 Log.error("Parsing failed due to errors");

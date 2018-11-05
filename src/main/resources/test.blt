@@ -57,5 +57,7 @@ def greet(firstName, lastName) {
 }
 
 class SimpleClass {
-    
+    def sayHelloWorld() {
+        print "Hello world!";
+    }
 }

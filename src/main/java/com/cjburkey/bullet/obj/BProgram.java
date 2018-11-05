@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.obj;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.scope.BScope;
 import com.cjburkey.bullet.obj.scope.IBScopeContainer;
 import com.cjburkey.bullet.obj.statement.BStatement;
@@ -17,15 +18,17 @@ public class BProgram extends BBase implements IBScopeContainer {
     public final String module;
     public final List<String> requirements = new ArrayList<>();
     public final List<BFunction> functions = new ArrayList<>();
+    public final List<BClass> classes = new ArrayList<>();
     public final BScope scope = new BScope();
     
-    public BProgram(String module, List<String> requirements, List<BFunction> functions, List<BStatement> statements, BulletParser.ProgramContext ctx) {
+    public BProgram(String module, List<String> requirements, List<BFunction> functions, List<BStatement> statements, List<BClass> classes, BulletParser.ProgramContext ctx) {
         super(ctx);
         
         this.module = module;
         this.requirements.addAll(requirements);
         this.functions.addAll(functions);
         this.scope.statements.addAll(statements);
+        this.classes.addAll(classes);
     }
     
     public BScope getScope() {

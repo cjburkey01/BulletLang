@@ -1,7 +1,6 @@
 package com.cjburkey.bullet.obj;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.visitor.SmartStringInn;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
