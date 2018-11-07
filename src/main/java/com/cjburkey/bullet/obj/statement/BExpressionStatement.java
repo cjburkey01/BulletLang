@@ -18,7 +18,7 @@ public class BExpressionStatement extends BStatement {
     }
     
     public String toString() {
-        return "Execute expression: " + expression;
+        return String.format("Execute expression: [%s]", expression);
     }
     
 }

@@ -27,7 +27,7 @@ public class BClass extends BBase {
     }
     
     public String toString() {
-        return String.format("Class by name \"%s\" inherits from: %s and has members: %s", name, Arrays.toString(types.toArray(new String[0])), Arrays.toString(members.toArray(new IBClassMember[0])));
+        return String.format("Class [%s] inherits from: %s and has members: %s", name, Arrays.toString(types.toArray(new String[0])), Arrays.toString(members.toArray(new IBClassMember[0])));
     }
     
 }

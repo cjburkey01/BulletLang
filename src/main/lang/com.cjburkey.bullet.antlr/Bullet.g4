@@ -5,7 +5,7 @@ grammar Bullet;
 }
 
 // Comments
-SL_COMMENT  : ('##' | '//') ~('\n')* '\n' -> skip ;
+SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
 ML_COMMENT  : '/*' .*? '*/' -> skip ;
 
 // Ignore whitespace but allow through if necessary
@@ -27,12 +27,24 @@ RB          : '}' ;
 OF          : 'of' ;
 COM         : ',' ;
 
+// Operators
+POW         : '**' ;
+ROOT        : '//' ;
+TIMES       : '*' ;
+DIV         : '/' ;
+PLUS        : '+' ;
+MINUS       : '-' ;
+
 // Late
 BOOL        : ('true' | 'false') ;
 FLOAT       : INTEGER? '.' INTEGER ;
 INTEGER     : DIGIT+ ;
 DIGIT       : [0-9] ;
-IDENTIFIER  : [A-Za-z_][A-Za-z0-9_]* ;
+fragment IDA: [A-Za-z_] ;
+fragment IDB: [A-Za-z0-9_] ;
+fragment ID : IDA IDB* ;
+IDENTIFIER  : ID ;
+VAR_TYPE    : ('@' | '@@') ;
 
 // Strings
 STRING_IN   : ~('\n' | '"')+? ;
@@ -77,8 +89,11 @@ statement       : variableDef SEMI  # StatementVariableDef
                 | expression SEMI   # StatementExpression
                 ;
 
-variableDef     : IDENTIFIER type variableVal?
-                | IDENTIFIER variableVal
+//variableDef     : IDENTIFIER type variableVal?
+//                | IDENTIFIER variableVal
+//                ;
+variableDef     : VAR_TYPE? IDENTIFIER type variableVal?
+                | VAR_TYPE? IDENTIFIER variableVal
                 ;
 
 variableVal     : EQ expression ;
@@ -89,8 +104,14 @@ expression      : LP expression RP                      # ParenthesisWrap
                 | FLOAT                                 # Float
                 | STRING                                # String
                 | LIT_STRING                            # LiteralString
+                | expression (POW | ROOT)               # UnaryOp
+                | expression (POW | ROOT) expression    # BinaryOp
+                | MINUS expression                      # UnaryOp
+                | expression (TIMES | DIV) expression   # BinaryOp
+                | expression (PLUS | MINUS) expression  # BinaryOp
                 | IDENTIFIER LP funcParams? RP          # Reference
                 | IDENTIFIER funcParams?                # Reference
+                | VAR_TYPE? IDENTIFIER                  # Reference
                 ;
 
 funcParams      : expression COM funcParams

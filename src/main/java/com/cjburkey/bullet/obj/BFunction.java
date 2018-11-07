@@ -46,6 +46,6 @@ public class BFunction extends BBase implements IBScopeContainer, IBClassMember 
     }
     
     public String toString() {
-        return String.format("Function \"%s\" (Arguments: %s) returns \"%s\" and runs %s", name, Arrays.toString(arguments.toArray(new BArgument[0])), type == null ? '?' : type, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        return String.format("Function [%s] (Arguments (%s): %s) returns [%s] and runs %s", name, arguments.size(), Arrays.toString(arguments.toArray(new BArgument[0])), type == null ? '?' : type, Arrays.toString(scope.statements.toArray(new BStatement[0])));
     }
 }

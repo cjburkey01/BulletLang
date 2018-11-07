@@ -28,7 +28,7 @@ public class BulletLang {
     // INJECTED BY MAVEN-INJECTION-PLGUIN!
     // Make sure to run "mvn inject:inject" after
     // "mvn compile" when building from source
-    public static final String VERSION() {
+    public static String VERSION() {
         return null;
     }
     
@@ -40,7 +40,9 @@ public class BulletLang {
     public static void main(String[] args) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> exception(e));
         input = Input.run(args);
-        start();
+        if (!input.help) {
+            start();
+        }
     }
     
     private static void start() throws IOException {

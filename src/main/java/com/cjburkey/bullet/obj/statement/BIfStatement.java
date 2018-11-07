@@ -30,11 +30,13 @@ public class BIfStatement extends BStatement implements IBScopeContainer {
     }
     
     public String toString() {
-        if (isElse) {
-            return String.format("Else if \"%s\" then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
-        } else {
-            return String.format("If \"%s\" then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        if (isElse && condition != null) {
+            return String.format("Else if [%s] then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
         }
+        if (isElse) {
+            return String.format("Else execute %s", Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        }
+        return String.format("If [%s] then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
     }
     
 }

@@ -5,7 +5,7 @@ import picocli.CommandLine;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-@SuppressWarnings({"WeakerAccess", "DefaultAnnotationParam"})
+@SuppressWarnings({"WeakerAccess", "DefaultAnnotationParam", "unused"})
 @CommandLine.Command(name = "bullet")
 class Input implements Runnable {
     

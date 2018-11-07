@@ -36,7 +36,7 @@ public class BProgram extends BBase implements IBScopeContainer {
     }
     
     public String toString() {
-        return String.format("\"%s\" requires files: %s", module, Arrays.toString(requirements.toArray(new String[0])));
+        return String.format("[%s] requires files: %s", module, Arrays.toString(requirements.toArray(new String[0])));
     }
     
 }

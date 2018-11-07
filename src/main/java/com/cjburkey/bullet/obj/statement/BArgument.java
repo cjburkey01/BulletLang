@@ -6,7 +6,6 @@ import com.cjburkey.bullet.obj.BBase;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-@SuppressWarnings("WeakerAccess")
 public class BArgument extends BBase {
     
     public final String name;
@@ -20,7 +19,7 @@ public class BArgument extends BBase {
     }
     
     public String toString() {
-        return name + " as " + (type == null ? '?' : type);
+        return String.format("[%s] as [%s]", name, type == null ? '?' : type);
     }
     
 }

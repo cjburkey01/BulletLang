@@ -1,48 +1,46 @@
-// Comments can start with you slashes, like this
-## Or two hashes, like this
-
+# Single line comments start with a hash(tag) symbol, like this
 /*
     Multi-line comments are possible, too,
     like this!
 */
 
-// Module name comes first in the file
+# Module name comes first in the file
 module Test;
 
-// Requirements come after module declaration, but are not required
-// These are '.blt' files that will be parsed and loaded before this one
-// If the '.blt' is ommitted, it will be added automatically
+# Requirements come after module declaration, but are not required
+# These are '.blt' files that will be parsed and loaded before this one
+# If the '.blt' is ommitted, it will be added automatically
 require "core/file1";
 require "core/file2";
 
-// Variable definitions look like variable assignments
+# Variable definitions look like variable assignments
 variableExample1 = 2;
 
-// Definitions can have an explicit type declaration to default the value to null
+# Definitions can have an explicit type declaration to default the value to null
 variableExample2 of VariableType;
 
-// Variables can have an explicit type declaration and a value, though there is generally little reason to do this
+# Variables can have an explicit type declaration and a value, though there is generally little reason to do this
 variableExample3 of String = "Hello, I'm Dom";
 
 exampleBoolean = false;
 differentBooleanVariable = true;
 
-// If-statements don't require parenthesis
+# If-statements don't require parenthesis
 if exampleBoolean {
     testFunction;
-} else differentBooleanVariable {   // Else-if blocks don't require an "else if", "elif", or similar special keyword
+} else differentBooleanVariable {   # Else-if blocks don't require an "else if", "elif", or similar special keyword
     anotherTestFunction;
 } else {
     finalTestFunction;
 }
 
-// Functions are defined with the "def" keyword and parenthesis
+# Functions are defined with the "def" keyword and parenthesis
 def anotherTestFunction() {
     
 }
 
-// The return type can be explicitly declared, though it is generally
-// inferred
+# The return type can be explicitly declared, though it is generally
+# inferred
 def testFunction() of Timone {
     
 }
@@ -51,7 +49,7 @@ def finalTestFunction() {
     
 }
 
-// Argument types will be inferred if possible
+# Argument types will be inferred if possible
 def greet(firstName, lastName) {
     print @"Hello, #{firstName} #{lastName}";
 }
@@ -61,3 +59,31 @@ class SimpleClass {
         print "Hello world!";
     }
 }
+
+class Person {
+    def _(firstName, lastName) {
+        @firstName = firstName;
+        @lastName = lastName;
+    }
+    
+    def greet() {
+        print @"Hello, #{@firstName} #{@lastName}!";
+    }
+}
+
+distance = 9.45;
+print 5 + (-(8 * 3) / 5) * ((fib abs (distance)) / 927.67);
+
+# You can square expressions like this:
+print 5**;      # 25
+
+# Or square root them:
+print 25//;     # 5
+
+# Or nth-power them:
+print 2 ** 3;   # 8
+
+# Or nth-root them:
+print 8 // 3;   # 2
+
+print 4 ** 2 + 7 * 2 + 18;  # 48
