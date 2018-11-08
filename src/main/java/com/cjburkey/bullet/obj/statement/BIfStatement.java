@@ -4,7 +4,6 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
 import com.cjburkey.bullet.obj.scope.BScope;
 import com.cjburkey.bullet.obj.scope.IBScopeContainer;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,12 +30,12 @@ public class BIfStatement extends BStatement implements IBScopeContainer {
     
     public String toString() {
         if (isElse && condition != null) {
-            return String.format("Else if [%s] then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+            return String.format("Else if [%s] then execute %s", condition, scope);
         }
         if (isElse) {
-            return String.format("Else execute %s", Arrays.toString(scope.statements.toArray(new BStatement[0])));
+            return String.format("Else execute %s", scope);
         }
-        return String.format("If [%s] then execute %s", condition, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+        return String.format("If [%s] then execute %s", condition, scope);
     }
     
 }

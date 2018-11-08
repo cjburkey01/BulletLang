@@ -15,16 +15,14 @@ public class BVariable extends BStatement implements IBClassMember {
     public final String name;
     public final String type;
     public final BVariableType variableType;
-    public final BVisibility visibility;
     public BExpression value;
     
-    public BVariable(String name, String type, BVariableType variableType, BVisibility visibility, BExpression value, BulletParser.VariableDefContext ctx) {
+    public BVariable(String name, String type, BVariableType variableType, BExpression value, BulletParser.VariableDefContext ctx) {
         super(ctx);
         
         this.name = name;
         this.type = type;
         this.variableType = variableType;
-        this.visibility = visibility;
         this.value = value;
     }
     
@@ -33,7 +31,7 @@ public class BVariable extends BStatement implements IBClassMember {
     }
     
     public BVisibility getVisibility() {
-        return visibility;
+        return BVisibility.PRIVATE;
     }
     
     public String toString() {

@@ -24,6 +24,8 @@ LP          : '(' ;
 RP          : ')' ;
 LB          : '{' ;
 RB          : '}' ;
+LBR         : '[' ;
+RBR         : ']' ;
 OF          : 'of' ;
 COM         : ',' ;
 PER         : '.' ;
@@ -70,7 +72,7 @@ programIn       : function programIn
                 |
                 ;
 
-function        : DEF IDENTIFIER LP arguments? RP type? LB statements RB ;
+function        : attrib? DEF IDENTIFIER LP arguments? RP type? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
@@ -133,5 +135,11 @@ classMembers    : function classMembers
                 ;
 
 types           : IDENTIFIER COM types
+                | IDENTIFIER
+                ;
+
+attrib          : LBR attribIn RBR ;
+
+attribIn        : IDENTIFIER COM attribIn
                 | IDENTIFIER
                 ;

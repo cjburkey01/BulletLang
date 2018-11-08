@@ -41,6 +41,7 @@ public class ParserVisitor {
     private static final ClassDefVisitor classDefVisitor = new ClassDefVisitor();
     private static final TypesVisitor typesVisitor = new TypesVisitor();
     private static final ClassMembersVisitor classMembersVisitor = new ClassMembersVisitor();
+    private static final AttribInVisitor attribInVisitor = new AttribInVisitor();
     
     public static boolean stop = false;
     
@@ -108,11 +109,26 @@ public class ParserVisitor {
             if (ctx == null) {
                 return null;
             }
+            List<String> attribs = ctx.attrib() == null ? new ArrayList<>() : attribInVisitor.visitAttribIn(ctx.attrib().attribIn());
             String name = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
             String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             List<BArgument> arguments = ctx.arguments() == null ? new ArrayList<>() : argumentsVisitor.visit(ctx.arguments());
             List<BStatement> statements = ctx.statements() == null ? new ArrayList<>() : statementsVisitor.visit(ctx.statements());
-            return new BFunction(name, type, null, arguments, statements, ctx); // TODO: VISIBILITY
+            return new BFunction(attribs, name, type, arguments, statements, ctx);
+        }
+    }
+    
+    private static class AttribInVisitor extends BaseV<List<String>> {
+        public List<String> visitAttribIn(BulletParser.AttribInContext ctx) {
+            if (ctx == null || ctx.IDENTIFIER() == null || ctx.IDENTIFIER().getText() == null) {
+                return new ArrayList<>();
+            }
+            List<String> attribs = ctx.attribIn() == null ? new ArrayList<>() : visit(ctx.attribIn());
+            String attrib = ctx.IDENTIFIER().getText();
+            if (attrib != null) {
+                attribs.add(0, attrib);
+            }
+            return attribs;
         }
     }
     
@@ -182,7 +198,7 @@ public class ParserVisitor {
             String name = ctx.IDENTIFIER().getText();
             String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             BExpression value = (ctx.variableVal() != null && ctx.variableVal().expression() != null) ? expressionVisitor.visit(ctx.variableVal().expression()) : null;
-            return new BVariable(name, type, variableType, null, value, ctx); // TODO: VISIBILITY
+            return new BVariable(name, type, variableType, value, ctx);
         }
     }
     
@@ -191,8 +207,8 @@ public class ParserVisitor {
             if (ctx == null) {
                 return null;
             }
-            if (ctx.expression() != null) {
-                BExpression condition = expressionVisitor.visit(ctx.expression());
+            if (ctx.expression() != null || ctx.ELSE() != null) {
+                BExpression condition = ctx.expression() == null ? null : expressionVisitor.visit(ctx.expression());
                 List<BStatement> statements = ctx.statements() == null ? new ArrayList<>() : statementsVisitor.visit(ctx.statements());
                 return new BIfStatement(ctx.ELSE() != null, condition, statements, ctx);
             }
@@ -322,7 +338,7 @@ public class ParserVisitor {
             }
             List<String> types = ctx.types() == null ? new ArrayList<>() : typesVisitor.visit(ctx.types());
             List<IBClassMember> members = ctx.classMembers() == null ? new ArrayList<>() : classMembersVisitor.visit(ctx.classMembers());
-            return new BClass(ctx.IDENTIFIER().getText(), null, types, members, ctx);   // TODO: VISIBILITY
+            return new BClass(ctx.IDENTIFIER().getText(), false, types, members, ctx);      // TODO: VISIBILITY
         }
     }
     

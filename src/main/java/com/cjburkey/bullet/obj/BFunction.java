@@ -15,20 +15,20 @@ import java.util.List;
  * Created by CJ Burkey on 2018/11/03
  */
 @SuppressWarnings("WeakerAccess")
-public class BFunction extends BBase implements IBScopeContainer, IBClassMember {
+public class BFunction extends BBase implements IBScopeContainer, IBClassMember, IBAttribContainer {
     
+    public final BAttribs attribs = new BAttribs();
     public final String name;
     public final String type;
-    public final BVisibility visibility;
     public final List<BArgument> arguments = new ArrayList<>();
     public final BScope scope = new BScope();
     
-    public BFunction(String name, String type, BVisibility visibility, List<BArgument> arguments, List<BStatement> statements, BulletParser.FunctionContext ctx) {
+    public BFunction(List<String> attribs, String name, String type, List<BArgument> arguments, List<BStatement> statements, BulletParser.FunctionContext ctx) {
         super(ctx);
         
+        this.attribs.attribs.addAll(attribs);
         this.name = name;
         this.type = type;
-        this.visibility = visibility;
         this.arguments.addAll(arguments);
         scope.statements.addAll(statements);
     }
@@ -37,15 +37,20 @@ public class BFunction extends BBase implements IBScopeContainer, IBClassMember 
         return scope;
     }
     
+    public BVisibility getVisibility() {
+        return attribs.getVisibility();
+    }
+    
     public String getName() {
         return name;
     }
     
-    public BVisibility getVisibility() {
-        return visibility;
+    public String toString() {
+        return String.format("Function [%s] (%s) (Arguments (%s): %s) returns [%s] and runs %s", name, attribs, arguments.size(), Arrays.toString(arguments.toArray(new BArgument[0])), type == null ? '?' : type, scope);
     }
     
-    public String toString() {
-        return String.format("Function [%s] (Arguments (%s): %s) returns [%s] and runs %s", name, arguments.size(), Arrays.toString(arguments.toArray(new BArgument[0])), type == null ? '?' : type, Arrays.toString(scope.statements.toArray(new BStatement[0])));
+    public BAttribs getAttribs() {
+        return attribs;
     }
+    
 }

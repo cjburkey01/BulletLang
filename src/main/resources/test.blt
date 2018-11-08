@@ -42,11 +42,9 @@ def anotherTestFunction() {
 # The return type can be explicitly declared, though it is generally
 # inferred
 def testFunction() of Timone {
-    
 }
 
 def finalTestFunction() {
-    
 }
 
 # Argument types will be inferred if possible
@@ -72,7 +70,7 @@ class Person {
 }
 
 distance = 9.45;
-print 5 + (-(8 * 3) / 5) * (fib abs(distance) / 927.67);
+print 5 + (-(8 * 3) / 5) * ((fib abs(distance)) / 927.67);
 
 print (fib abs(5)) * 5;
 
