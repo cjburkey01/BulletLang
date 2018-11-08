@@ -26,6 +26,7 @@ public class BExpression extends BBase {
     public int intVal = Integer.MIN_VALUE;
     public float floatVal = Float.NEGATIVE_INFINITY;
     public String stringVal = null;
+    public BExpression parent = null;
     public String referenceVal = null;
     public final List<BExpression> arguments = new ArrayList<>();
     public Operator operator = null;
@@ -68,9 +69,10 @@ public class BExpression extends BBase {
         this.stringVal = stringVal.substring(3, stringVal.length() - 3);
     }
     
-    public BExpression(String referenceVal, BulletParser.ReferenceContext ctx) {
+    public BExpression(BExpression parent, String referenceVal, BulletParser.ReferenceContext ctx) {
         super(ctx);
         
+        this.parent = parent;
         this.isReference = true;
         this.referenceVal = referenceVal;
     }
@@ -112,14 +114,14 @@ public class BExpression extends BBase {
         if (isString) {
             return String.format("String: [\"%s\"]", cleanStringVal());
         }
-        if (isReference && isFunctionReference) {
-            return String.format("Function reference: [%s] with args (%s): %s", referenceVal, arguments.size(), Arrays.toString(arguments.toArray(new BExpression[0])));
-        }
-        if (isReference && isVariableReference) {
-            return String.format("Variable reference: [%s]", referenceVal);
-        }
         if (isReference) {
-            return String.format("Ambiguous reference: [%s]", referenceVal);
+            if (isFunctionReference) {
+                return String.format("Function reference: [%s].[%s] with args (%s): %s", parent == null ? "NONE" : parent, referenceVal, arguments.size(), Arrays.toString(arguments.toArray(new BExpression[0])));
+            }
+            if (isVariableReference) {
+                return String.format("Variable reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
+            }
+            return String.format("Ambiguous reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
         }
         if (isUnaryOp) {
             return String.format("Unary operator: \"%s\" on operand: [%s]", operator, operandA);

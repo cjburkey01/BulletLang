@@ -242,10 +242,17 @@ public class ParserVisitor {
                 return null;
             }
             String name = ctx.IDENTIFIER().getText();
-            BExpression expression = new BExpression(name, ctx);
+            BExpression parent = null;
+            if (ctx.expression() != null) {
+                parent = visit(ctx.expression());
+            }
+            BExpression expression = new BExpression(parent, name, ctx);
             if ((ctx.RP() != null && ctx.LP() != null) || ctx.funcParams() != null) {
                 expression.isFunctionReference = true;
-                expression.arguments.addAll(funcParamsVisitor.visit(ctx.funcParams()));
+                List<BExpression> params = funcParamsVisitor.visit(ctx.funcParams());
+                if (params != null) {
+                    expression.arguments.addAll(params);
+                }
             } else if (ctx.VAR_TYPE() != null) {
                 expression.isVariableReference = true;
             }

@@ -72,7 +72,9 @@ class Person {
 }
 
 distance = 9.45;
-print 5 + (-(8 * 3) / 5) * ((fib abs (distance)) / 927.67);
+print 5 + (-(8 * 3) / 5) * (fib abs(distance) / 927.67);
+
+print (fib abs(5)) * 5;
 
 # You can square expressions like this:
 print 5**;      # 25
@@ -86,4 +88,8 @@ print 2 ** 3;   # 8
 # Or nth-root them:
 print 8 // 3;   # 2
 
-print 4 ** 2 + 7 * 2 + 18;  # 48
+print 4** + 7 * 2 + 18; # 48
+
+# Referencing variables and functions of a class:
+personJim = Person.new "Jim", "Bobby";
+personJim.greet;

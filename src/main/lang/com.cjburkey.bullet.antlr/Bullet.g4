@@ -26,6 +26,7 @@ LB          : '{' ;
 RB          : '}' ;
 OF          : 'of' ;
 COM         : ',' ;
+PER         : '.' ;
 
 // Operators
 POW         : '**' ;
@@ -89,29 +90,32 @@ statement       : variableDef SEMI  # StatementVariableDef
                 | expression SEMI   # StatementExpression
                 ;
 
-//variableDef     : IDENTIFIER type variableVal?
-//                | IDENTIFIER variableVal
-//                ;
 variableDef     : VAR_TYPE? IDENTIFIER type variableVal?
                 | VAR_TYPE? IDENTIFIER variableVal
                 ;
 
 variableVal     : EQ expression ;
 
-expression      : LP expression RP                      # ParenthesisWrap
-                | BOOL                                  # Boolean
-                | INTEGER                               # Integer
-                | FLOAT                                 # Float
-                | STRING                                # String
-                | LIT_STRING                            # LiteralString
-                | expression (POW | ROOT)               # UnaryOp
-                | expression (POW | ROOT) expression    # BinaryOp
-                | MINUS expression                      # UnaryOp
-                | expression (TIMES | DIV) expression   # BinaryOp
-                | expression (PLUS | MINUS) expression  # BinaryOp
-                | IDENTIFIER LP funcParams? RP          # Reference
-                | IDENTIFIER funcParams?                # Reference
-                | VAR_TYPE? IDENTIFIER                  # Reference
+expression      : BOOL                                              # Boolean
+                | INTEGER                                           # Integer
+                | FLOAT                                             # Float
+                | STRING                                            # String
+                | LIT_STRING                                        # LiteralString
+                
+                | expression (POW | ROOT)                           # UnaryOp
+                | expression (POW | ROOT) expression                # BinaryOp
+                | MINUS expression                                  # UnaryOp
+                | expression (TIMES | DIV) expression               # BinaryOp
+                | expression (PLUS | MINUS) expression              # BinaryOp
+                
+                | LP expression RP                                  # ParenthesisWrap
+                
+                | expression PER IDENTIFIER LP funcParams? RP       # Reference
+                | expression PER IDENTIFIER funcParams?             # Reference
+                | expression PER VAR_TYPE? IDENTIFIER               # Reference
+                | IDENTIFIER LP funcParams? RP                      # Reference
+                | IDENTIFIER funcParams?                            # Reference
+                | VAR_TYPE? IDENTIFIER                              # Reference
                 ;
 
 funcParams      : expression COM funcParams
