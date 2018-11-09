@@ -6,8 +6,8 @@ import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
 import com.cjburkey.bullet.obj.BFunction;
+import com.cjburkey.bullet.obj.BOperator;
 import com.cjburkey.bullet.obj.BProgram;
-import com.cjburkey.bullet.obj.Operator;
 import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.classdef.BVariableType;
 import com.cjburkey.bullet.obj.classdef.IBClassMember;
@@ -279,13 +279,13 @@ public class ParserVisitor {
                 return null;
             }
             if (ctx.POW() != null) {
-                return new BExpression(Operator.POW, visit(ctx.expression()), ctx);
+                return new BExpression(BOperator.POW, visit(ctx.expression()), ctx);
             }
             if (ctx.ROOT() != null) {
-                return new BExpression(Operator.ROOT, visit(ctx.expression()), ctx);
+                return new BExpression(BOperator.ROOT, visit(ctx.expression()), ctx);
             }
             if (ctx.MINUS() != null) {
-                return new BExpression(Operator.MINUS, visit(ctx.expression()), ctx);
+                return new BExpression(BOperator.MINUS, visit(ctx.expression()), ctx);
             }
             return null;
         }
@@ -294,22 +294,22 @@ public class ParserVisitor {
                 return null;
             }
             if (ctx.POW() != null) {
-                return new BExpression(Operator.POW, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.POW, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             if (ctx.ROOT() != null) {
-                return new BExpression(Operator.ROOT, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.ROOT, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             if (ctx.TIMES() != null) {
-                return new BExpression(Operator.TIMES, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.TIMES, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             if (ctx.DIV() != null) {
-                return new BExpression(Operator.DIV, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.DIV, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             if (ctx.PLUS() != null) {
-                return new BExpression(Operator.PLUS, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.PLUS, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             if (ctx.MINUS() != null) {
-                return new BExpression(Operator.MINUS, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
+                return new BExpression(BOperator.MINUS, visit(ctx.expression(0)), visit(ctx.expression(1)), ctx);
             }
             return null;
         }

@@ -19,8 +19,6 @@ public class BExpression extends BBase {
     public boolean isReference = false;
     public boolean isFunctionReference = false;
     public boolean isVariableReference = false;
-    public boolean isUnaryOp = false;
-    public boolean isBinaryOp = false;
     
     public boolean boolVal = false;
     public int intVal = Integer.MIN_VALUE;
@@ -29,9 +27,6 @@ public class BExpression extends BBase {
     public BExpression parent = null;
     public String referenceVal = null;
     public final List<BExpression> arguments = new ArrayList<>();
-    public Operator operator = null;
-    public BExpression operandA = null;
-    public BExpression operandB = null;
     
     public BExpression(boolean boolVal, BulletParser.BooleanContext ctx) {
         super(ctx);
@@ -77,21 +72,23 @@ public class BExpression extends BBase {
         this.referenceVal = referenceVal;
     }
     
-    public BExpression(Operator operator, BExpression operand, BulletParser.UnaryOpContext ctx) {
+    public BExpression(BOperator operator, BExpression operand, BulletParser.UnaryOpContext ctx) {
         super(ctx);
         
-        this.isUnaryOp = true;
-        this.operator = operator;
-        operandA = operand;
+        this.isReference = true;
+        this.isFunctionReference = true;
+        this.referenceVal = operator.op;
+        this.parent = operand;
     }
     
-    public BExpression(Operator operator, BExpression operandA, BExpression operandB, BulletParser.BinaryOpContext ctx) {
+    public BExpression(BOperator operator, BExpression operandA, BExpression operandB, BulletParser.BinaryOpContext ctx) {
         super(ctx);
         
-        this.isBinaryOp = true;
-        this.operator = operator;
-        this.operandA = operandA;
-        this.operandB = operandB;
+        this.isReference = true;
+        this.isFunctionReference = true;
+        this.referenceVal = operator.op;
+        this.parent = operandA;
+        this.arguments.add(operandB);
     }
     
     public String cleanStringVal() {
@@ -122,12 +119,6 @@ public class BExpression extends BBase {
                 return String.format("Variable reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
             }
             return String.format("Ambiguous reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
-        }
-        if (isUnaryOp) {
-            return String.format("Unary operator: \"%s\" on operand: [%s]", operator, operandA);
-        }
-        if (isBinaryOp) {
-            return String.format("Binary operator: \"%s\" on operands: [%s, %s]", operator, operandA, operandB);
         }
         return "INVALID_EXPRESSION";
     }
