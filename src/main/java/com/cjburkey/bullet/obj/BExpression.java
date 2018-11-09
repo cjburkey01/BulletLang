@@ -113,12 +113,12 @@ public class BExpression extends BBase {
         }
         if (isReference) {
             if (isFunctionReference) {
-                return String.format("Function reference: [%s].[%s] with args (%s): %s", parent == null ? "NONE" : parent, referenceVal, arguments.size(), Arrays.toString(arguments.toArray(new BExpression[0])));
+                return String.format("Function reference: [%s] -> [%s] with args (%s): %s", parent == null ? "NONE" : parent, referenceVal, arguments.size(), Arrays.toString(arguments.toArray(new BExpression[0])));
             }
             if (isVariableReference) {
-                return String.format("Variable reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
+                return String.format("Variable reference: [%s] -> [%s]", parent == null ? "NONE" : parent, referenceVal);
             }
-            return String.format("Ambiguous reference: [%s].[%s]", parent == null ? "NONE" : parent, referenceVal);
+            return String.format("Ambiguous reference: [%s] -> [%s]", parent == null ? "NONE" : parent, referenceVal);
         }
         return "INVALID_EXPRESSION";
     }

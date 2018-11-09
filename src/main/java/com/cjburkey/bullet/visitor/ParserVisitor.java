@@ -110,7 +110,30 @@ public class ParserVisitor {
                 return null;
             }
             List<String> attribs = ctx.attrib() == null ? new ArrayList<>() : attribInVisitor.visitAttribIn(ctx.attrib().attribIn());
-            String name = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
+            
+            String name = null;
+            if (ctx.IDENTIFIER() != null) {
+                name = ctx.IDENTIFIER().getText();
+            }
+            if (ctx.PLUS() != null) {
+                name = ctx.PLUS().getText();
+            }
+            if (ctx.MINUS() != null) {
+                name = ctx.MINUS().getText();
+            }
+            if (ctx.TIMES() != null) {
+                name = ctx.TIMES().getText();
+            }
+            if (ctx.DIV() != null) {
+                name = ctx.DIV().getText();
+            }
+            if (ctx.POW() != null) {
+                name = ctx.POW().getText();
+            }
+            if (ctx.ROOT() != null) {
+                name = ctx.ROOT().getText();
+            }
+            
             String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
             List<BArgument> arguments = ctx.arguments() == null ? new ArrayList<>() : argumentsVisitor.visit(ctx.arguments());
             List<BStatement> statements = ctx.statements() == null ? new ArrayList<>() : statementsVisitor.visit(ctx.statements());

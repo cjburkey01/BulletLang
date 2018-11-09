@@ -67,6 +67,16 @@ class Person {
     def greet() {
         print @"Hello, #{@firstName} #{@lastName}!";
     }
+    
+    # Binary operators can be overridden
+    def +(spouse) {
+        print @"#{@firstName} #{@lastName} married to #{spouse.@firstName} #{spouse.@lastName}";
+    }
+    
+    # As well as unary operators
+    def -() {
+        print @"Dead #{@firstName} #{@lastName}";
+    }
 }
 
 distance = 9.45;
@@ -91,3 +101,10 @@ print 4** + 7 * 2 + 18; # 48
 # Referencing variables and functions of a class:
 personJim = Person.new "Jim", "Bobby";
 personJim.greet;
+
+personJimette = Person.new "Jimette", "Francis";
+personJimette.greet;
+
+print personJim + personJimette;
+
+print -personJim;

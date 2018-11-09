@@ -72,7 +72,7 @@ programIn       : function programIn
                 |
                 ;
 
-function        : attrib? DEF IDENTIFIER LP arguments? RP type? LB statements RB ;
+function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) LP arguments? RP type? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
