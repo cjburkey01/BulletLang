@@ -14,6 +14,7 @@ import com.cjburkey.bullet.obj.classdef.IBClassMember;
 import com.cjburkey.bullet.obj.statement.BArgument;
 import com.cjburkey.bullet.obj.statement.BExpressionStatement;
 import com.cjburkey.bullet.obj.statement.BIfStatement;
+import com.cjburkey.bullet.obj.statement.BReturnStatement;
 import com.cjburkey.bullet.obj.statement.BStatement;
 import com.cjburkey.bullet.obj.statement.BVariable;
 import com.cjburkey.bullet.visitor.struct.ProgramIn;
@@ -207,6 +208,13 @@ public class ParserVisitor {
             BExpression expression = expressionVisitor.visit(ctx.expression());
             if (expression != null) {
                 return new BExpressionStatement(expression, ctx.expression());
+            }
+            return null;
+        }
+        public BStatement visitStatementReturn(BulletParser.StatementReturnContext ctx) {
+            BExpression expression = expressionVisitor.visit(ctx.expression());
+            if (expression != null) {
+                return new BReturnStatement(expression, ctx);
             }
             return null;
         }

@@ -69,13 +69,21 @@ class Person {
     }
     
     # Binary operators can be overridden
-    def +(spouse) {
-        print @"#{@firstName} #{@lastName} married to #{spouse.@firstName} #{spouse.@lastName}";
+    def +(other) {
+        return @"#{@firstName} #{@lastName} and #{other.firstName} #{other.lastName}";
     }
     
     # As well as unary operators
     def -() {
-        print @"Dead #{@firstName} #{@lastName}";
+        return @"Deceased #{@firstName} #{@lastName}";
+    }
+    
+    # Getters
+    def firstName() {
+        @firstName
+    }
+    def lastName() {
+        @lastName
     }
 }
 
@@ -99,12 +107,19 @@ print 8 // 3;   # 2
 print 4** + 7 * 2 + 18; # 48
 
 # Referencing variables and functions of a class:
-personJim = Person.new "Jim", "Bobby";
-personJim.greet;
+personJimmy = Person.new "Jimmy", "Bobby";
+personJimmy.greet;
 
 personJimette = Person.new "Jimette", "Francis";
 personJimette.greet;
 
-print personJim + personJimette;
+print personJimmy + personJimette;
 
-print -personJim;
+print -personJimmy;
+
+# Values can be returned using "return <EXPRESSION>;"
+# or "<EXPRESSION>" without the semicolon:
+def add(a, b) { # Type declarations are not required for these arguments because the methods are type-inspecific.
+                # As long as 'a' implements the '+' operator and accepts a parameter of type 'b', compilation will succeed.
+    a + b
+}

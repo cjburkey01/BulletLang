@@ -19,6 +19,7 @@ DEF         : 'def' ;
 SEMI        : ';' ;
 ELSE        : 'else' ;
 IF          : 'if' ;
+RETURN      : 'return' ;
 EQ          : '=' ;
 LP          : '(' ;
 RP          : ')' ;
@@ -87,9 +88,11 @@ statements      : statement statements
                 |
                 ;
 
-statement       : variableDef SEMI  # StatementVariableDef
-                | ifStatement       # StatementIf
-                | expression SEMI   # StatementExpression
+statement       : variableDef SEMI          # StatementVariableDef
+                | ifStatement               # StatementIf
+                | expression SEMI           # StatementExpression
+                | RETURN expression SEMI    # StatementReturn
+                | expression                # StatementReturn   // Allow raw expression returns (shorthand)
                 ;
 
 variableDef     : VAR_TYPE? IDENTIFIER type variableVal?

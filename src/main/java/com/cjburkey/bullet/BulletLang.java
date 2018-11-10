@@ -2,6 +2,7 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.compiler.Compiler;
 import com.cjburkey.bullet.obj.BFunction;
 import com.cjburkey.bullet.obj.BProgram;
 import com.cjburkey.bullet.obj.classdef.BClass;
@@ -13,6 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -34,8 +37,8 @@ public class BulletLang {
     
     private static Input input;
     
-    private static File startDirectory;
-    private static File sourceDirectory;
+    private static File startDirectory = null;
+    private static File sourceDirectory = null;
     
     public static void main(String[] args) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> exception(e));
@@ -51,6 +54,18 @@ public class BulletLang {
             throw new RuntimeException("Input not found");
         }
         
+        if (input.sourceDirectory != null) {
+            sourceDirectory = new File(input.sourceDirectory);
+        }
+        
+        if (startDirectory == null) {
+            startDirectory = new File(System.getProperty("user.home")).getAbsoluteFile();
+        }
+        if (sourceDirectory == null) {
+            sourceDirectory = new File(startDirectory.getAbsolutePath());
+        }
+        BulletLang compiler = new BulletLang();
+        
         // Debug prints
         if (input.debug && !input.printVersion) {
             debug("Debug enabled");
@@ -65,7 +80,7 @@ public class BulletLang {
         if (!input.valid || input.inputFile == null || input.outputFile == null) {
             // TODO: REMOVE THIS TEST CODE
             debug("Performing test compile on resource \"/test.blt\"");
-            compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
+            compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
             return;
         }
         
@@ -89,18 +104,15 @@ public class BulletLang {
         info("Compiling \"{}\" to \"{}\"", input.inputFile, input.outputFile);
         
         // Compile input file
-        compile(new FileInputStream(inputFile), new FileOutputStream(new File(input.outputFile)));
+        compiler.compile(new FileInputStream(inputFile), new FileOutputStream(new File(input.outputFile)));
     }
     
     @SuppressWarnings("unused")
-    private static void compile(InputStream input, OutputStream output) throws IOException {
-        if (startDirectory == null) {
-            startDirectory = new File(System.getProperty("user.home")).getAbsoluteFile();
-        }
-        if (sourceDirectory == null) {
-            sourceDirectory = new File(startDirectory.getAbsolutePath());
-        }
-        
+    public void compile(InputStream input, OutputStream output) throws IOException {
+        BProgram program = compileRaw(input, false, true);
+    }
+    
+    public BProgram compileRaw(InputStream input, boolean skipVerify, boolean resolveRequirements) throws IOException {
         // Generate token stream
         BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -113,10 +125,46 @@ public class BulletLang {
         
         // Begin parsing
         info("Parsing input");
-        BProgram mainProgram = ParserVisitor.parse(parser);
-        if (!ParserVisitor.stop) {
-            info("Finished parsing");
+        BProgram program = ParserVisitor.parse(parser);
+        if (ParserVisitor.stop) {
+            return null;
         }
+        if (resolveRequirements) {
+            boolean missing = false;
+            List<File> reqd = new ArrayList<>();
+            for (String requirement : program.requirements) {
+                File requiredFile = new File(sourceDirectory, requirement);
+                reqd.add(requiredFile);
+                if (!requiredFile.exists()) {
+                    error("Missing required file: \"{}\" at \"{}\"", requirement, requiredFile.getAbsolutePath());
+                    missing = true;
+                }
+            }
+            if (missing) {
+                error("Unable to proceed with compilation because required source file could not be located");
+                return null;
+            }
+            for (File req : reqd) {
+                BProgram reqdp = compileRaw(new FileInputStream(req), true, true);
+                if (reqdp == null) {
+                    return null;
+                }
+                // Merge required functions, classes, and statements into requiring program
+                program.functions.addAll(reqdp.functions);
+                program.classes.addAll(reqdp.classes);
+                program.scope.statements.addAll(reqdp.scope.statements);
+            }
+        }
+        info("Finished parsing");
+        if (skipVerify) {
+            return program;
+        }
+        info("Compiling parsed program");
+        if (Compiler.compile(program)) {
+            info("Finished compiling");
+            return program;
+        }
+        return null;
     }
     
     public static void debugPrint(BProgram mainProgram) {
