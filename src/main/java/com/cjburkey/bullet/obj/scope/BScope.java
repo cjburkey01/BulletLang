@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
+@SuppressWarnings("unused")
 public final class BScope {
     
     public final List<BStatement> statements = new ArrayList<>();

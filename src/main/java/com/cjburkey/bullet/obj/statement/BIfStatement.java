@@ -21,7 +21,7 @@ public class BIfStatement extends BStatement implements IBScopeContainer {
         
         this.isElse = isElse;
         this.condition = condition;
-        scope.statements.addAll(statements);
+        load(scope.statements, statements);
     }
     
     public BScope getScope() {

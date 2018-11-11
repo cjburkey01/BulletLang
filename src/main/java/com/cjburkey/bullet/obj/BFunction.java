@@ -30,7 +30,7 @@ public class BFunction extends BBase implements IBScopeContainer, IBClassMember,
         this.name = name;
         this.type = type;
         this.arguments.addAll(arguments);
-        scope.statements.addAll(statements);
+        load(scope.statements, statements);
     }
     
     public BScope getScope() {

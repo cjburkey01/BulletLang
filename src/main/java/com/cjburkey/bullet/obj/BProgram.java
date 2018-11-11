@@ -23,9 +23,9 @@ public class BProgram extends BBase implements IBScopeContainer {
         super(ctx);
         
         this.requirements.addAll(requirements);
-        this.functions.addAll(functions);
-        this.scope.statements.addAll(statements);
-        this.classes.addAll(classes);
+        load(this.functions, functions);
+        load(this.scope.statements, statements);
+        load(this.classes, classes);
     }
     
     public BScope getScope() {
