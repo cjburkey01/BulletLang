@@ -8,13 +8,13 @@
                 <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL" />
                 <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
             </Filters>
-            <PatternLayout pattern="[%logger] [%d{HH:mm:ss}] [%level] %msg%n" />
+            <PatternLayout pattern="[%logger] [%d{HH:mm:ss}] %highlight{[%level] %msg}{FATAL=red, ERROR=bright red, WARN=yellow, INFO=bright white, DEBUG=white, TRACE=bright cyan}%n" />
         </Console>
         <Console name="console_warn_err_fatal" target="SYSTEM_ERR">
             <Filters>
                 <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY" />
             </Filters>
-            <PatternLayout pattern="[%logger] [%d{HH:mm:ss}] [%level] %msg%n" />
+            <PatternLayout pattern="[%logger] [%d{HH:mm:ss}] %highlight{[%level] %msg}{FATAL=red, ERROR=bright red, WARN=yellow, INFO=bright white, DEBUG=white, TRACE=bright cyan}%n" />
         </Console>
     </Appenders>
     <Loggers>

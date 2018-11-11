@@ -12,19 +12,16 @@ import java.util.List;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-@SuppressWarnings("WeakerAccess")
 public class BProgram extends BBase implements IBScopeContainer {
     
-    public final String module;
     public final List<String> requirements = new ArrayList<>();
     public final List<BFunction> functions = new ArrayList<>();
     public final List<BClass> classes = new ArrayList<>();
     public final BScope scope = new BScope();
     
-    public BProgram(String module, List<String> requirements, List<BFunction> functions, List<BStatement> statements, List<BClass> classes, BulletParser.ProgramContext ctx) {
+    public BProgram(List<String> requirements, List<BFunction> functions, List<BStatement> statements, List<BClass> classes, BulletParser.ProgramContext ctx) {
         super(ctx);
         
-        this.module = module;
         this.requirements.addAll(requirements);
         this.functions.addAll(functions);
         this.scope.statements.addAll(statements);
@@ -36,7 +33,7 @@ public class BProgram extends BBase implements IBScopeContainer {
     }
     
     public String toString() {
-        return String.format("[%s] requires files: %s", module, Arrays.toString(requirements.toArray(new String[0])));
+        return String.format("Module requires files: %s", Arrays.toString(requirements.toArray(new String[0])));
     }
     
 }

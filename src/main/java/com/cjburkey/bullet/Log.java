@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Log {
     
+    static {
+        System.setProperty("log4j.skipJansi", "false");
+    }
+    
     public static final Logger logger = LogManager.getLogger("bullet-lang");
     
     public static void debug(Object msg, Object... data) {

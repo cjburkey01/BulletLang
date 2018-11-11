@@ -12,7 +12,6 @@ ML_COMMENT  : '/*' .*? '*/' -> skip ;
 WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 
 // Mid
-MODULE      : 'module' ;
 REQUIRE     : 'require' ;
 CLASS       : 'class' ;
 DEF         : 'def' ;
@@ -57,9 +56,7 @@ STRING      : ('"' | STR_INTER) { iws = false; } STRING_IN? '"' { iws = true; } 
 LIT_STRING  : '"""' { iws = false; } .*? '"""' { iws = true; } ;
 
 // Rules
-program         : module requirements programIn EOF ;
-
-module          : MODULE IDENTIFIER SEMI ;
+program         : requirements programIn EOF ;
 
 requirements    : requirement requirements
                 |

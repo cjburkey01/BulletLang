@@ -134,17 +134,22 @@ public class BulletLang {
             List<File> reqd = new ArrayList<>();
             for (String requirement : program.requirements) {
                 File requiredFile = new File(sourceDirectory, requirement);
-                reqd.add(requiredFile);
                 if (!requiredFile.exists()) {
-                    error("Missing required file: \"{}\" at \"{}\"", requirement, requiredFile.getAbsolutePath());
-                    missing = true;
+                    requiredFile = new File(requirement);       // Try an absolute directory if it's not in the source directory
+                    if (!requiredFile.exists()) {
+                        error("Missing required file: \"{}\" in source directory or as an absolute path", requirement);
+                        missing = true;
+                        continue;
+                    }
                 }
+                reqd.add(requiredFile);
             }
             if (missing) {
-                error("Unable to proceed with compilation because required source file could not be located");
+                error("Unable to proceed with compilation because required source file(s) could not be located");
                 return null;
             }
             for (File req : reqd) {
+                info("Merging \"{}\" into compilation", req.getAbsolutePath());
                 BProgram reqdp = compileRaw(new FileInputStream(req), true, true);
                 if (reqdp == null) {
                     return null;
@@ -152,22 +157,24 @@ public class BulletLang {
                 // Merge required functions, classes, and statements into requiring program
                 program.functions.addAll(reqdp.functions);
                 program.classes.addAll(reqdp.classes);
-                program.scope.statements.addAll(reqdp.scope.statements);
+                program.scope.statements.addAll(0, reqdp.scope.statements);
+                info("Merged module into compilation");
             }
         }
-        info("Finished parsing");
+        info("Finished parsing and merging");
         if (skipVerify) {
             return program;
         }
         info("Compiling parsed program");
         if (Compiler.compile(program)) {
             info("Finished compiling");
+            debugSpam(program);
             return program;
         }
         return null;
     }
     
-    public static void debugPrint(BProgram mainProgram) {
+    public static void debugSpam(BProgram mainProgram) {
         if (!input.debug || ParserVisitor.stop) {
             return;
         }

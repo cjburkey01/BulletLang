@@ -47,17 +47,14 @@ public class ParserVisitor {
     public static boolean stop = false;
     
     public static BProgram parse(BulletParser parser) {
-        BProgram program = programVisitor.visit(parser.program());
-        BulletLang.debugPrint(program);
-        return program;
+        return programVisitor.visit(parser.program());
     }
     
     private static class ProgramVisitor extends BaseV<BProgram> {
         public BProgram visitProgram(BulletParser.ProgramContext ctx) {
-            String namespace = (ctx.module() != null && ctx.module().IDENTIFIER() != null) ? ctx.module().IDENTIFIER().getText() : "";
             List<String> requiredFiles = ctx.requirements() == null ? new ArrayList<>() : requirementsVisitor.visit(ctx.requirements());
             ProgramIn programContents = programInVisitor.visit(ctx.programIn());
-            return new BProgram(namespace, requiredFiles, programContents.functions, programContents.statements, programContents.classes, ctx);
+            return new BProgram(requiredFiles, programContents.functions, programContents.statements, programContents.classes, ctx);
         }
     }
     

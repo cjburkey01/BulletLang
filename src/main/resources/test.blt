@@ -4,14 +4,10 @@
     like this!
 */
 
-# Module name comes first in the file
-module Test;
-
 # Requirements come after module declaration, but are not required
 # These are '.blt' files that will be parsed and loaded before this one
 # If the '.blt' is ommitted, it will be added automatically
 require "core/file1";
-require "core/file2";
 
 # Variable definitions look like variable assignments
 variableExample1 = 2;
