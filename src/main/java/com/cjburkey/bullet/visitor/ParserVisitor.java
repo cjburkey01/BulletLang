@@ -1,11 +1,11 @@
 package com.cjburkey.bullet.visitor;
 
-import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BExpression;
 import com.cjburkey.bullet.obj.BFunction;
+import com.cjburkey.bullet.obj.BNamespace;
 import com.cjburkey.bullet.obj.BOperator;
 import com.cjburkey.bullet.obj.BProgram;
 import com.cjburkey.bullet.obj.classdef.BClass;
@@ -17,6 +17,7 @@ import com.cjburkey.bullet.obj.statement.BIfStatement;
 import com.cjburkey.bullet.obj.statement.BReturnStatement;
 import com.cjburkey.bullet.obj.statement.BStatement;
 import com.cjburkey.bullet.obj.statement.BVariable;
+import com.cjburkey.bullet.visitor.struct.Content;
 import com.cjburkey.bullet.visitor.struct.ProgramIn;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ public class ParserVisitor {
     
     private static final ProgramVisitor programVisitor = new ProgramVisitor();
     private static final RequirementsVisitor requirementsVisitor = new RequirementsVisitor();
+    private static final ContentVisitor contentVisitor = new ContentVisitor();
+    private static final NamespaceVisitor namespaceVisitor = new NamespaceVisitor();
+    private static final NamespaceInVisitor namespaceInVisitor = new NamespaceInVisitor();
     private static final ProgramInVisitor programInVisitor = new ProgramInVisitor();
     private static final FunctionVisitor functionVisitor = new FunctionVisitor();
     private static final ArgumentsVisitor argumentsVisitor = new ArgumentsVisitor();
@@ -52,9 +56,12 @@ public class ParserVisitor {
     
     private static class ProgramVisitor extends BaseV<BProgram> {
         public BProgram visitProgram(BulletParser.ProgramContext ctx) {
+            if (ctx == null || ctx.programIn() == null) {
+                return null;
+            }
             List<String> requiredFiles = ctx.requirements() == null ? new ArrayList<>() : requirementsVisitor.visit(ctx.requirements());
             ProgramIn programContents = programInVisitor.visit(ctx.programIn());
-            return new BProgram(requiredFiles, programContents.functions, programContents.statements, programContents.classes, ctx);
+            return new BProgram(requiredFiles, programContents, ctx);
         }
     }
     
@@ -64,7 +71,7 @@ public class ParserVisitor {
                 return new ArrayList<>();
             }
             List<String> requirements = ctx.requirements() == null ? new ArrayList<>() : visit(ctx.requirements());
-            if (ctx.requirement() != null && ctx.requirement().STRING() != null && ctx.requirement().STRING().getText() != null) {
+            if (ctx.requirement() != null && ctx.requirement().STRING() != null) {
                 String requirement = ctx.requirement().STRING().getText();
                 requirement = requirement.substring(1, requirement.length() - 1);
                 if (!requirement.endsWith(".blt")) {
@@ -82,23 +89,51 @@ public class ParserVisitor {
                 return new ProgramIn();
             }
             ProgramIn programIn = ctx.programIn() == null ? new ProgramIn() : visit(ctx.programIn());
-            if (ctx.function() != null) {
-                BFunction function = functionVisitor.visit(ctx.function());
-                if (function != null) {
-                    programIn.functions.add(0, function);
-                }
+            if (ctx.namespace() != null) {
+                programIn.namespaces.add(0, namespaceVisitor.visit(ctx.namespace()));
             } else if (ctx.statement() != null) {
-                BStatement statement = statementVisitor.visit(ctx.statement());
-                if (statement != null) {
-                    programIn.statements.add(0, statement);
-                }
-            } else if (ctx.classDef() != null) {
-                BClass classDef = classDefVisitor.visit(ctx.classDef());
-                if (classDef != null) {
-                    programIn.classes.add(0, classDef);
-                }
+                programIn.statements.add(0, statementVisitor.visit(ctx.statement()));
+            } else if (ctx.content() != null) {
+                programIn.contents.add(0, contentVisitor.visit(ctx.content()));
             }
             return programIn;
+        }
+    }
+    
+    private static class ContentVisitor extends BaseV<Content> {
+        public Content visitContent(BulletParser.ContentContext ctx) {
+            if (ctx == null) {
+                return null;
+            }
+            Content content = new Content();
+            content.function = ctx.function() != null ? functionVisitor.visit(ctx.function()) : null;
+            content.classDec = ctx.classDef() != null ? classDefVisitor.visit(ctx.classDef()) : null;
+            return content;
+        }
+    }
+    
+    private static class NamespaceVisitor extends BaseV<BNamespace> {
+        public BNamespace visitNamespace(BulletParser.NamespaceContext ctx) {
+            if (ctx == null || ctx.IDENTIFIER() == null) {
+                return null;
+            }
+            String name = ctx.IDENTIFIER().getText();
+            List<Content> contents = ctx.namespaceIn() == null ? new ArrayList<>() : namespaceInVisitor.visit(ctx.namespaceIn());
+            return new BNamespace(name, contents, ctx);
+        }
+    }
+    
+    private static class NamespaceInVisitor extends BaseV<List<Content>> {
+        public List<Content> visitNamespaceIn(BulletParser.NamespaceInContext ctx) {
+            if (ctx == null) {
+                return null;
+            }
+            List<Content> contents = ctx.namespaceIn() == null ? new ArrayList<>() : namespaceInVisitor.visit(ctx.namespaceIn());
+            Content content = ctx.content() != null ? contentVisitor.visit(ctx.content()) : null;
+            if (content != null) {
+                contents.add(0, content);
+            }
+            return contents;
         }
     }
     
@@ -132,7 +167,7 @@ public class ParserVisitor {
                 name = ctx.ROOT().getText();
             }
             
-            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
+            String type = (ctx.typeDef() != null && ctx.typeDef().typeName() != null) ? ctx.typeDef().typeName().getText() : null;
             List<BArgument> arguments = ctx.arguments() == null ? new ArrayList<>() : argumentsVisitor.visit(ctx.arguments());
             List<BStatement> statements = ctx.statements() == null ? new ArrayList<>() : statementsVisitor.visit(ctx.statements());
             return new BFunction(attribs, name, type, arguments, statements, ctx);
@@ -173,7 +208,7 @@ public class ParserVisitor {
                 return null;
             }
             String name = ctx.IDENTIFIER().getText();
-            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
+            String type = (ctx.typeDef() != null && ctx.typeDef().typeName() != null) ? ctx.typeDef().typeName().getText() : null;
             return new BArgument(name, type, ctx);
         }
     }
@@ -224,7 +259,7 @@ public class ParserVisitor {
             }
             BVariableType variableType = (ctx.VAR_TYPE() == null || ctx.VAR_TYPE().getText() == null) ? BVariableType.STANDARD : BVariableType.get(ctx.VAR_TYPE().getText().length());
             String name = ctx.IDENTIFIER().getText();
-            String type = (ctx.type() != null && ctx.type().IDENTIFIER() != null) ? ctx.type().IDENTIFIER().getText() : null;
+            String type = (ctx.typeDef() != null && ctx.typeDef().typeName() != null) ? ctx.typeDef().typeName().getText() : null;
             BExpression value = (ctx.variableVal() != null && ctx.variableVal().expression() != null) ? expressionVisitor.visit(ctx.variableVal().expression()) : null;
             return new BVariable(name, type, variableType, value, ctx);
         }
@@ -393,6 +428,11 @@ public class ParserVisitor {
                 BFunction method = functionVisitor.visit(ctx.function());
                 if (method != null) {
                     members.add(0, method);
+                }
+            } else if (ctx.variableDef() != null) {
+                BVariable variableDef = variableDefVisitor.visit(ctx.variableDef());
+                if (variableDef != null) {
+                    members.add(0, variableDef);
                 }
             }
             return members;

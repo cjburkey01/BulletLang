@@ -16,12 +16,21 @@ public abstract class BBase {
     
     private IBScopeContainer parent = null;
     private boolean isValid = true;
+    private BNamespace namespace = null;
     
     public BBase(ParserRuleContext ctx) {
         startLine = ctx.start.getLine();
         startCharPos = ctx.start.getCharPositionInLine();
         endLine = ctx.stop.getLine();
         endCharPos = ctx.stop.getCharPositionInLine();
+    }
+    
+    public BNamespace getNamespace() {
+        return namespace;
+    }
+    
+    public void setNamespace(BNamespace namespace) {
+        this.namespace = namespace;
     }
     
     public boolean getIsValid() {

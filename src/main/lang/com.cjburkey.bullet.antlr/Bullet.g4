@@ -13,6 +13,7 @@ WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 
 // Mid
 REQUIRE     : 'require' ;
+NAMESPACE   : 'namespace' ;
 CLASS       : 'class' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
@@ -64,22 +65,34 @@ requirements    : requirement requirements
 
 requirement     : REQUIRE STRING SEMI ;
 
-programIn       : function programIn
+programIn       : namespace programIn
                 | statement programIn
-                | classDef programIn
+                | content programIn
                 |
                 ;
 
-function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) LP arguments? RP type? LB statements RB ;
+namespace       : NAMESPACE IDENTIFIER LB namespaceIn RB ;
+
+namespaceIn     : content namespaceIn
+                | 
+                ;
+
+content         : function
+                | classDef
+                ;
+
+function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) LP arguments? RP typeDef? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER type?
+argument        : IDENTIFIER typeDef?
                 ;
 
-type            : OF IDENTIFIER ;
+typeName        : IDENTIFIER ;
+
+typeDef         : OF typeName ;
 
 statements      : statement statements
                 |
@@ -92,7 +105,7 @@ statement       : variableDef SEMI          # StatementVariableDef
                 | expression                # StatementReturn   // Allow raw expression returns (shorthand)
                 ;
 
-variableDef     : VAR_TYPE? IDENTIFIER type variableVal?
+variableDef     : VAR_TYPE? IDENTIFIER typeDef variableVal?
                 | VAR_TYPE? IDENTIFIER variableVal
                 ;
 
@@ -130,7 +143,8 @@ ifStatement     : IF expression LB statements RB
 
 classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
 
-classMembers    : function classMembers
+classMembers    : variableDef SEMI classMembers
+                | function classMembers
                 |
                 ;
 

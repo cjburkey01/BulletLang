@@ -117,5 +117,24 @@ print -personJimmy;
 # or "<EXPRESSION>" without the semicolon:
 def add(a, b) { # Type declarations are not required for these arguments because the methods are type-inspecific.
                 # As long as 'a' implements the '+' operator and accepts a parameter of type 'b', compilation will succeed.
+                # This function will return a type of whatever the '+' operator on 'a' returns when given a type of 'b'.
     a + b
+}
+
+# Namespaces can be used to organize classes and functions, but cannot execute code in the outer scope
+namespace Bob {
+    def five() {
+        5
+    }
+    
+    class HelloWorldExample {
+        @number of Int32;
+        
+        def setNum(number) {    # Argument type is inferred because the declaration is a 32 bit integer
+            @number = number;
+        }
+        def getNum() {
+            return @number;
+        }
+    }
 }

@@ -1,10 +1,9 @@
 package com.cjburkey.bullet.obj;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.scope.BScope;
 import com.cjburkey.bullet.obj.scope.IBScopeContainer;
-import com.cjburkey.bullet.obj.statement.BStatement;
+import com.cjburkey.bullet.visitor.struct.ProgramIn;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,20 +11,26 @@ import java.util.List;
 /**
  * Created by CJ Burkey on 2018/11/03
  */
-public class BProgram extends BBase implements IBScopeContainer {
+public class BProgram extends BNamespace implements IBScopeContainer {
     
     public final List<String> requirements = new ArrayList<>();
-    public final List<BFunction> functions = new ArrayList<>();
-    public final List<BClass> classes = new ArrayList<>();
+    public final List<BNamespace> namespaces = new ArrayList<>();
     public final BScope scope = new BScope();
     
-    public BProgram(List<String> requirements, List<BFunction> functions, List<BStatement> statements, List<BClass> classes, BulletParser.ProgramContext ctx) {
-        super(ctx);
+    public BProgram(List<String> requirements, ProgramIn content, BulletParser.ProgramContext ctx) {
+        super("", content.contents, ctx);
         
         this.requirements.addAll(requirements);
-        load(this.functions, functions);
-        load(this.scope.statements, statements);
-        load(this.classes, classes);
+        load(this.scope.statements, content.statements);
+        load(this.namespaces, content.namespaces);
+    }
+    
+    public <T extends BBase> void load(List<T> dest, List<T> origin) {
+        for (T t : origin) {
+            dest.add(t);
+            t.setParent(this);
+            t.setNamespace(this);
+        }
     }
     
     public BScope getScope() {
@@ -33,7 +38,7 @@ public class BProgram extends BBase implements IBScopeContainer {
     }
     
     public String toString() {
-        return String.format("Module requires files: %s", Arrays.toString(requirements.toArray(new String[0])));
+        return String.format("Module requires files: %s and has %s namespaces", Arrays.toString(requirements.toArray(new String[0])), namespaces.size());
     }
     
 }

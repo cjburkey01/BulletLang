@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.compiler.Compiler;
 import com.cjburkey.bullet.obj.BFunction;
+import com.cjburkey.bullet.obj.BNamespace;
 import com.cjburkey.bullet.obj.BProgram;
 import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.statement.BStatement;
@@ -129,6 +130,7 @@ public class BulletLang {
         if (ParserVisitor.stop) {
             return null;
         }
+        debugSpam(program);
         if (resolveRequirements) {
             boolean missing = false;
             List<File> reqd = new ArrayList<>();
@@ -154,10 +156,9 @@ public class BulletLang {
                 if (reqdp == null) {
                     return null;
                 }
-                // Merge required functions, classes, and statements into requiring program
+                // Merge required functions, classes, and namespaces
                 program.functions.addAll(reqdp.functions);
                 program.classes.addAll(reqdp.classes);
-                program.scope.statements.addAll(0, reqdp.scope.statements);
                 info("Merged module into compilation");
             }
         }
@@ -180,6 +181,11 @@ public class BulletLang {
         }
         
         debug("Parsed program module {}", mainProgram);
+        
+        debug("  Namespaces ({}): ", mainProgram.namespaces.size());
+        for (BNamespace namespace : mainProgram.namespaces) {
+            debug("    {}", namespace);
+        }
         
         debug("  Classes ({}): ", mainProgram.classes.size());
         for (BClass classDef : mainProgram.classes) {
