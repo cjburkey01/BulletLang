@@ -6,7 +6,7 @@ grammar Bullet;
 
 // Comments
 SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
-ML_COMMENT  : '/*' .*? '*/' -> skip ;
+ML_COMMENT  : '/#' .*? '#/' -> skip ;
 
 // Ignore whitespace but allow through if necessary
 WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
@@ -81,7 +81,7 @@ content         : function
                 | classDef
                 ;
 
-function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) LP arguments? RP typeDef? LB statements RB ;
+function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDef? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument

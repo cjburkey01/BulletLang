@@ -67,21 +67,24 @@ public class BulletLang {
         }
         BulletLang compiler = new BulletLang();
         
+        debug = input.debug;
+        
         // Debug prints
         if (input.debug && !input.printVersion) {
             debug("Debug enabled");
         }
-        if (input.printVersion || input.debug) {
-            info("BulletLang Compiler Version \"{}\"", VERSION());
-        }
+        info("BulletLang Compiler Version \"{}\"", VERSION());
         if (input.printVersion) {
             return;
         }
         
         if (!input.valid || input.inputFile == null || input.outputFile == null) {
-            // TODO: REMOVE THIS TEST CODE
-            debug("Performing test compile on resource \"/test.blt\"");
-            compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
+            error("Invalid input file");
+            if (input.debug) {
+                // TODO: REMOVE THIS TEST CODE
+                debug("Performing test compile on resource \"/test.blt\" because no valid input file was found and debug is enabled");
+                compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
+            }
             return;
         }
         
@@ -111,6 +114,9 @@ public class BulletLang {
     @SuppressWarnings("unused")
     public void compile(InputStream input, OutputStream output) throws IOException {
         BProgram program = compileRaw(input, false, true);
+        if (program != null && output == null) {
+            error("Stopping compilation because there is no valid output file");
+        }
     }
     
     public BProgram compileRaw(InputStream input, boolean skipVerify, boolean resolveRequirements) throws IOException {
@@ -130,7 +136,6 @@ public class BulletLang {
         if (ParserVisitor.stop) {
             return null;
         }
-        debugSpam(program);
         if (resolveRequirements) {
             boolean missing = false;
             List<File> reqd = new ArrayList<>();
