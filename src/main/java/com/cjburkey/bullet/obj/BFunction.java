@@ -15,7 +15,7 @@ import java.util.List;
  * Created by CJ Burkey on 2018/11/03
  */
 @SuppressWarnings("WeakerAccess")
-public class BFunction extends BBase implements IBScopeContainer, IBClassMember, IBAttribContainer {
+public class BFunction extends BBase implements IBScopeContainer, IBAttribContainer, IBClassMember {
     
     public final BAttribs attribs = new BAttribs();
     public final String name;
@@ -30,7 +30,19 @@ public class BFunction extends BBase implements IBScopeContainer, IBClassMember,
         this.name = name;
         this.type = type;
         this.arguments.addAll(arguments);
+        for (BArgument argument : arguments) {
+            argument.function = this;
+        }
         load(scope.statements, statements);
+        scope.setParent(this);
+    }
+    
+    public void setNamespace(BNamespace namespace) {
+        super.setNamespace(namespace);
+        for (BArgument argument : arguments) {
+            argument.setNamespace(namespace);
+        }
+        scope.setNamespace(namespace);
     }
     
     public BScope getScope() {

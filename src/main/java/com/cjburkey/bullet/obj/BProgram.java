@@ -25,14 +25,6 @@ public class BProgram extends BNamespace implements IBScopeContainer {
         load(this.namespaces, content.namespaces);
     }
     
-    public <T extends BBase> void load(List<T> dest, List<T> origin) {
-        for (T t : origin) {
-            dest.add(t);
-            t.setParent(this);
-            t.setNamespace(this);
-        }
-    }
-    
     public BScope getScope() {
         return scope;
     }

@@ -2,6 +2,7 @@ package com.cjburkey.bullet.obj.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.obj.BBase;
+import com.cjburkey.bullet.obj.BFunction;
 import java.util.Objects;
 
 /**
@@ -9,6 +10,7 @@ import java.util.Objects;
  */
 public class BArgument extends BBase {
     
+    public BFunction function;
     public final String name;
     public final String type;
     

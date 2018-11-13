@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Created by CJ Burkey on 2018/11/03
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public abstract class BBase {
+public abstract class BBase implements IBBase {
     
     public final int startLine;
     public final int endLine;

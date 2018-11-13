@@ -167,12 +167,13 @@ public class BulletLang {
                 info("Merged module into compilation");
             }
         }
-        info("Finished parsing and merging");
+        info("Finished parsing");
         if (skipVerify) {
             return program;
         }
         info("Compiling parsed program");
-        if (Compiler.compile(program)) {
+        Compiler compiler = new Compiler(program);
+        if (compiler.compile()) {
             info("Finished compiling");
             debugSpam(program);
             return program;

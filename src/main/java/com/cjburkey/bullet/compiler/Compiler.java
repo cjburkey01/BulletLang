@@ -1,14 +1,18 @@
 package com.cjburkey.bullet.compiler;
 
+import com.cjburkey.bullet.compiler.error.ErrorCompile;
+import com.cjburkey.bullet.compiler.error.ErrorDuplicateFunction;
+import com.cjburkey.bullet.compiler.error.ErrorInvalidClassMember;
 import com.cjburkey.bullet.obj.BFunction;
 import com.cjburkey.bullet.obj.BNamespace;
 import com.cjburkey.bullet.obj.BProgram;
 import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.classdef.IBClassMember;
+import com.cjburkey.bullet.obj.scope.IBScopeContainer;
 import com.cjburkey.bullet.obj.statement.BArgument;
+import com.cjburkey.bullet.obj.statement.BVariable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,148 +21,174 @@ import static com.cjburkey.bullet.Log.*;
 /**
  * Created by CJ Burkey on 2018/11/09
  */
-@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+@SuppressWarnings({"WeakerAccess", "RedundantIfStatement"})
 public class Compiler {
     
-    public static boolean compile(BProgram program) {
-        if (!verify(program)) {
-            return false;
+    private final BProgram program;
+    public final List<ErrorCompile> errors = new ArrayList<>();
+    
+    public Compiler(BProgram program) {
+        this.program = program;
+    }
+    
+    public boolean compile() {
+        if (!verify()) {
+            return true;
         }
         return false;
     }
     
-    private static boolean verify(BProgram program) {
-        if (!Namespace.verifyNamespaces(program.namespaces)) {
-            return false;
-        }
-        if (!Function.verifyFunctions(program.functions)) {
-            return false;
-        }
-        if (!Class.verifyClasses(program.classes)) {
+    private boolean verify() {
+        if (!clean()) {
             return false;
         }
         return true;
     }
     
-    private static final class Namespace {
-        private static boolean verifyNamespaces(List<BNamespace> namespaces) {
-            Map<String, BNamespace> namespaceMap = new HashMap<>();
-            
-            // Merge duplicate namespaces
-            for (BNamespace namespace : namespaces) {
-                if (namespaceMap.containsKey(namespace.name)) {
-                    debug("Found addon for namespace: [{}]", namespace.name);
-                    BNamespace at = namespaceMap.get(namespace.name);
-                    at.functions.addAll(namespace.functions);
-                    at.classes.addAll(namespace.classes);
-                } else {
-                    namespaceMap.put(namespace.name, namespace);
-                }
-            }
-            namespaces.clear();
-            
-            // Verify and re-add valid namespaces
-            for (BNamespace namespace : namespaceMap.values()) {
-                if (!verifyNamespace(namespace)) {
-                    return false;
-                }
-                namespaces.add(namespace);
+    private boolean trueOnError() {
+        if (errors.size() > 0) {
+            error("Errors were encountered during compilation:");
+            for (ErrorCompile error : errors) {
+                error("  {}", error.message);
             }
             return true;
         }
+        return false;
+    }
+    
+    // -- CLEANING -- //
+    // Preceeds compilation error detection, though errors may be found during cleaning.
+    // Prepares program to be verified
+    
+    private boolean clean() {
+        cleanNamespaces(program.namespaces);
+        if (trueOnError()) return false;
         
-        private static boolean verifyNamespace(BNamespace namespace) {
-            if (!Function.verifyFunctions(namespace.functions)) {
-                return false;
+        cleanFunctions(program, program, program.functions);
+        if (trueOnError()) return false;
+        
+        cleanClasses(program, program, program.classes);
+        if (trueOnError()) return false;
+        return true;
+    }
+    
+    private void cleanNamespaces(List<BNamespace> parentNamespaces) {
+        Map<String, BNamespace> namespaces = new LinkedHashMap<>();
+        
+        // Merge namespaces of the same name
+        for (BNamespace namespace : parentNamespaces) {
+            if (namespaces.containsKey(namespace.name)) {
+                debug("Merging namespace: [{}]", namespace.name);
+                BNamespace at = namespaces.get(namespace.name);
+                at.functions.addAll(namespace.functions);
+                at.classes.addAll(namespace.classes);
+            } else {
+                namespaces.put(namespace.name, namespace);
             }
-            if (!Class.verifyClasses(namespace.classes)) {
-                return false;
+        }
+        
+        // Make sure namespaces' members have correct namespace and parent
+        for (BNamespace namespace : namespaces.values()) {
+            namespace.setNamespace(program);
+            namespace.setParent(program);
+            for (BFunction function : namespace.functions) {
+                function.setNamespace(namespace);
+                function.setParent(namespace);
             }
-            return true;
+            for (BClass classDef : namespace.classes) {
+                classDef.setNamespace(namespace);
+                classDef.setParent(namespace);
+            }
+        }
+        
+        // Re-add merged namespaces 
+        parentNamespaces.clear();
+        parentNamespaces.addAll(namespaces.values());
+        
+        // Clean child functions and classes
+        for (BNamespace namespace : parentNamespaces) {
+            cleanFunctions(namespace, namespace, namespace.functions);
+            cleanClasses(namespace, namespace, namespace.classes);
         }
     }
     
-    private static final class Function {
-        private static boolean verifyFunctions(List<BFunction> functions) {
-            Map<String, List<BFunction>> functionMap = new HashMap<>();
-            
-            // Fail upon duplicate function
-            for (BFunction function : functions) {
-                List<BFunction> at;
-                if (functionMap.containsKey(function.name)) {
-                    at = functionMap.get(function.name);
-                } else {
-                    at = new ArrayList<>();
-                    functionMap.put(function.name, at);
+    private void cleanFunctions(IBScopeContainer parent, BNamespace namespace, List<BFunction> parentFunctions) {
+        Map<String, BFunction> functions = new LinkedHashMap<>();
+        
+        // Check for functions with the same names and argument types
+        for (BFunction function : parentFunctions) {
+            if (functions.containsKey(function.name)) {
+                List<String> argsA = new ArrayList<>();
+                List<String> argsB = new ArrayList<>();
+                for (BArgument argument : function.arguments) {
+                    argsA.add(argument.type);
                 }
-                for (BFunction atIn : at) {
-                    List<String> argTypes = new ArrayList<>();
-                    List<String> argTypesAt = new ArrayList<>();
-                    for (BArgument arg : function.arguments) {
-                        argTypes.add(arg.type);
-                    }
-                    for (BArgument arg : atIn.arguments) {
-                        argTypesAt.add(arg.type);
-                    }
-                    if (argTypes.equals(argTypesAt)) {
-                        error("Duplicate function: [{}] with arguments of types: {}", function.name, Arrays.toString(argTypes.toArray(new String[0])));
-                        return false;
-                    }
+                for (BArgument argument : functions.get(function.name).arguments) {
+                    argsB.add(argument.type);
                 }
-                at.add(function);
+                if (argsA.equals(argsB)) {
+                    errors.add(new ErrorDuplicateFunction(function.name, argsA));
+                }
+            } else {
+                functions.put(function.name, function);
             }
-            
-            // Verify functions
-            for (List<BFunction> functionss : functionMap.values()) {
-                for (BFunction function : functionss) {
-                    if (!verifyFunction(function)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
         
-        // TODO: VERIFY FUNCTIONS
-        private static boolean verifyFunction(BFunction function) {
-            return false;
+        // Set namespaces and parents for functions
+        for (BFunction function : functions.values()) {
+            function.setParent(parent);
+            function.setNamespace(namespace);
+        }
+        
+        // Re-add valid for possible further compilation functions
+        // (Might allow further error detection, don't verify already-errored functions)
+        parentFunctions.clear();
+        parentFunctions.addAll(functions.values());
+    }
+    
+    private void cleanClasses(IBScopeContainer parent, BNamespace namespace, List<BClass> parentClasses) {
+        Map<String, BClass> classes = new LinkedHashMap<>();
+        
+        // Merge classes of the same name
+        for (BClass classDef : parentClasses) {
+            if (classes.containsKey(classDef.name)) {
+                debug("Merging class: [{}]", classDef.name);
+                classes.get(classDef.name).members.addAll(classDef.members);
+            } else {
+                classes.put(classDef.name, classDef);
+            }
+        }
+        
+        // Make sure class' members have correct namespace and parent
+        for (BClass classDef : classes.values()) {
+            classDef.setNamespace(namespace);
+            classDef.setParent(parent);
+        }
+        
+        // Re-add merged classes
+        parentClasses.clear();
+        parentClasses.addAll(classes.values());
+        
+        // Clean child functions and variables
+        for (BClass classDef : parentClasses) {
+            List<BFunction> functions = new ArrayList<>();
+            List<BVariable> variables = new ArrayList<>();
+            for (IBClassMember member : classDef.members) {
+                if (member instanceof BFunction) {
+                    functions.add((BFunction) member);
+                } else if (member instanceof BVariable) {
+                    variables.add((BVariable) member);
+                } else {
+                    errors.add(new ErrorInvalidClassMember(member));
+                }
+            }
+            cleanFunctions(classDef, namespace, functions);
+            cleanVariables(classDef, namespace, variables);
         }
     }
     
-    private static final class Class {
-        private static boolean verifyClasses(List<BClass> classes) {
-            Map<String, BClass> classMap = new HashMap<>();
-            
-            // Merge duplicate classes
-            for (BClass classDef : classes) {
-                if (classMap.containsKey(classDef.name)) {
-                    debug("Found addon for namespace: [{}]", classDef.name);
-                    BClass at = classMap.get(classDef.name);
-                    at.members.addAll(classDef.members);
-                } else {
-                    classMap.put(classDef.name, classDef);
-                }
-            }
-            classes.clear();
-            
-            // Verify and re-add valid classes
-            for (BClass classDef : classMap.values()) {
-                if (!verifyClass(classDef)) {
-                    return false;
-                }
-                classes.add(classDef);
-            }
-            return true;
-        }
+    private void cleanVariables(IBScopeContainer parent, BNamespace namespace, List<BVariable> parentVariables) {
         
-        private static boolean verifyClass(BClass classDef) {
-            return verifyClassMembers(classDef.members);
-        }
-        
-        // TODO: VERIFY MEMBERS
-        private static boolean verifyClassMembers(List<IBClassMember> members) {
-            return false;
-        }
     }
     
 }
