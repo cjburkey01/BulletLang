@@ -6,6 +6,7 @@ package com.cjburkey.bullet.obj.classdef;
 public enum BVisibility {
     
     PRIVATE,
-    RESTRICT
+    RESTRICT,
+    PUBLIC,
     
 }

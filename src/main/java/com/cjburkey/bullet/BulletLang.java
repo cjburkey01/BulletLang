@@ -168,6 +168,10 @@ public class BulletLang {
             }
         }
         info("Finished parsing");
+        
+        // TODO: TEST CODE
+        debugSpam(program);
+        
         if (skipVerify) {
             return program;
         }

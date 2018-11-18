@@ -260,8 +260,9 @@ public class ParserVisitor {
             BVariableType variableType = (ctx.VAR_TYPE() == null || ctx.VAR_TYPE().getText() == null) ? BVariableType.STANDARD : BVariableType.get(ctx.VAR_TYPE().getText().length());
             String name = ctx.IDENTIFIER().getText();
             String type = (ctx.typeDef() != null && ctx.typeDef().typeName() != null) ? ctx.typeDef().typeName().getText() : null;
-            BExpression value = (ctx.variableVal() != null && ctx.variableVal().expression() != null) ? expressionVisitor.visit(ctx.variableVal().expression()) : null;
-            return new BVariable(name, type, variableType, value, ctx);
+            BExpression value = ctx.expression() != null ? expressionVisitor.visit(ctx.expression()) : null;
+            boolean isDeclaration = ctx.DEC() != null || ctx.COLON() != null;
+            return new BVariable(isDeclaration, name, type, variableType, value, ctx);
         }
     }
     

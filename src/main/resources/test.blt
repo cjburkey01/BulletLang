@@ -7,19 +7,21 @@
 # Requirements come after module declaration, but are not required
 # These are '.blt' files that will be parsed and loaded before this one
 # If the '.blt' is ommitted, it will be added automatically
-require "core/file1";
+require "file1";
 
-# Variable definitions look like variable assignments
-variableExample1 = 2;
+# Variable definitions look like variable assignments but with the ':=' (assignment operator)
+variableExample1 := 2;
+variableExample1 := 2;
 
-# Definitions can have an explicit type declaration to default the value to null
-variableExample2 of VariableType;
+# A variable can be declared with no value by preceeding it with a colon
+:variableExample2 of Int32;
 
 # Variables can have an explicit type declaration and a value, though there is generally little reason to do this
-variableExample3 of String = "Hello, I'm Dom";
+variableExample3 of String := "Hello, I'm Dom";
 
-exampleBoolean = false;
-differentBooleanVariable = true;
+exampleBoolean := false;
+differentBooleanVariable := true;
+differentBooleanVariable = false;
 
 # If-statements don't require parenthesis
 if exampleBoolean {
@@ -58,8 +60,8 @@ class SimpleClass {
 
 class Person {
     def _(firstName, lastName) {
-        @firstName = firstName;
-        @lastName = lastName;
+        @firstName := firstName;
+        @lastName := lastName;
     }
     
     def greet {
@@ -85,7 +87,7 @@ class Person {
     }
 }
 
-distance = 9.45;
+distance := 9.45;
 print 5 + (-(8 * 3) / 5) * ((fib abs(distance)) / 927.67);
 
 print (fib abs(5)) * 5;
@@ -105,10 +107,10 @@ print 8 // 3;   # 2
 print 4** + 7 * 2 + 18; # 48
 
 # Referencing variables and functions of a class:
-personJimmy = Person.new "Jimmy", "Bobby";
+personJimmy := Person.new "Jimmy", "Bobby";
 personJimmy.greet;
 
-personJimette = Person.new "Jimette", "Francis";
+personJimette := Person.new "Jimette", "Francis";
 personJimette.greet;
 
 print personJimmy + personJimette;      # "Jimmy Bobby and Jimette Francis"
@@ -130,7 +132,7 @@ namespace Bob {
     }
     
     class HelloWorldExample {
-        @number of Int32;
+        :@number of Int32;
         
         def setNum(number) {    # Argument type is inferred because the declaration is a 32 bit integer
             @number = number;

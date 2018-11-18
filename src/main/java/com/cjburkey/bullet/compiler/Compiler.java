@@ -1,5 +1,6 @@
 package com.cjburkey.bullet.compiler;
 
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.compiler.error.ErrorCompile;
 import com.cjburkey.bullet.compiler.error.ErrorDuplicateFunction;
 import com.cjburkey.bullet.compiler.error.ErrorInvalidClassMember;
@@ -8,8 +9,10 @@ import com.cjburkey.bullet.obj.BNamespace;
 import com.cjburkey.bullet.obj.BProgram;
 import com.cjburkey.bullet.obj.classdef.BClass;
 import com.cjburkey.bullet.obj.classdef.IBClassMember;
+import com.cjburkey.bullet.obj.scope.BScope;
 import com.cjburkey.bullet.obj.scope.IBScopeContainer;
 import com.cjburkey.bullet.obj.statement.BArgument;
+import com.cjburkey.bullet.obj.statement.BStatement;
 import com.cjburkey.bullet.obj.statement.BVariable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -68,6 +71,9 @@ public class Compiler {
         if (trueOnError()) return false;
         
         cleanClasses(program, program, program.classes);
+        if (trueOnError()) return false;
+        
+        cleanScope(program, program, program.scope);
         if (trueOnError()) return false;
         return true;
     }
@@ -161,8 +167,8 @@ public class Compiler {
         
         // Make sure class' members have correct namespace and parent
         for (BClass classDef : classes.values()) {
-            classDef.setNamespace(namespace);
             classDef.setParent(parent);
+            classDef.setNamespace(namespace);
         }
         
         // Re-add merged classes
@@ -187,8 +193,43 @@ public class Compiler {
         }
     }
     
+    // TODO: THIS ISN'T WORKING FOR SOME REASON
     private void cleanVariables(IBScopeContainer parent, BNamespace namespace, List<BVariable> parentVariables) {
+        Map<String, BVariable> variables = new LinkedHashMap<>();
+        for (BVariable variable : parentVariables) {
+            if (!variable.declaration) {
+                errors.add(new ErrorCompile(String.format("Variable value assignment in class without declaration: [%s]", variable.name)));
+            } else if (variables.containsKey(variable.name)) {
+                // TODO: ALLOW VARIABLE SHADOWING
+                errors.add(new ErrorCompile(String.format("Duplicate variable declaration: [%s]", variable.name)));
+            } else {
+                variables.put(variable.name, variable);
+            }
+        }
         
+        for (BVariable variable : variables.values()) {
+            variable.setParent(parent);
+            variable.setNamespace(namespace);
+        }
+        
+        parentVariables.clear();
+        parentVariables.addAll(variables.values());
+    }
+    
+    // TODO: DO MORE IN HERE
+    private void cleanScope(IBScopeContainer parent, BNamespace namespace, BScope parentScope) {
+        List<BVariable> variables = new ArrayList<>();
+        
+        for (BStatement statement : parentScope.statements) {
+            if (statement instanceof BVariable) {
+                variables.add((BVariable) statement);
+            }
+        }
+        
+        parentScope.setParent(parent);
+        parentScope.setNamespace(namespace);
+        
+        cleanVariables(parent, namespace, variables);
     }
     
 }

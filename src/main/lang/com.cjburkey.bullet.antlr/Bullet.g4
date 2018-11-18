@@ -20,6 +20,8 @@ SEMI        : ';' ;
 ELSE        : 'else' ;
 IF          : 'if' ;
 RETURN      : 'return' ;
+COLON       : ':' ;
+DEC         : ':=' ;
 EQ          : '=' ;
 LP          : '(' ;
 RP          : ')' ;
@@ -105,11 +107,14 @@ statement       : variableDef SEMI          # StatementVariableDef
                 | expression                # StatementReturn   // Allow raw expression returns (shorthand)
                 ;
 
-variableDef     : VAR_TYPE? IDENTIFIER typeDef variableVal?
-                | VAR_TYPE? IDENTIFIER variableVal
+//  Variable format:
+//      [':']['@']['@']<NAME> ['of' <TYPE>] [<':=' / '='> <EXPRESSION>]
+variableDef     : VAR_TYPE? IDENTIFIER typeDef DEC expression   // Declaration using ':='
+                | VAR_TYPE? IDENTIFIER DEC expression           // Value declaration
+                | COLON? VAR_TYPE? IDENTIFIER EQ expression     // Value assignment or declaration
+                | COLON VAR_TYPE? IDENTIFIER typeDef            // Value declaration
+                | VAR_TYPE? IDENTIFIER EQ expression            // Value assignment
                 ;
-
-variableVal     : EQ expression ;
 
 expression      : BOOL                                              # Boolean
                 | INTEGER                                           # Integer

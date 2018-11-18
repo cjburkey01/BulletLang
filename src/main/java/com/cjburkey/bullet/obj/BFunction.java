@@ -50,7 +50,8 @@ public class BFunction extends BBase implements IBScopeContainer, IBAttribContai
     }
     
     public BVisibility getVisibility() {
-        return attribs.getVisibility();
+        BVisibility attribVis = attribs.getVisibility();
+        return attribVis == null ? BVisibility.PUBLIC : attribVis;
     }
     
     public String getName() {
