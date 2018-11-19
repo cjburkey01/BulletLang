@@ -1,5 +1,7 @@
 # BulletLang
 
+A language as easy as Ruby and Java but as efficient as C, Go, C#, and more!
+
 #### Versions
 
 * Source version: `0.0.1`
@@ -7,7 +9,8 @@
 
 ## About
 
-A fast, efficient programming language with syntax as comfortable as Ruby and Java that compiles down to the ultra-fast and pretty-efficient [C language](https://en.wikipedia.org/wiki/C_(programming_language).
+A fast, efficient programming language with syntax as comfortable as Ruby and Java that compiles down to the ultra-fast and pretty-efficient [C language]("https://en.wikipedia.org/wiki/C_(programming_language").
+
 
 ## Executing Compiler
 
