@@ -79,42 +79,43 @@ namespaceIn     : content namespaceIn
                 | 
                 ;
 
-content         : function
+content         : functionDec
                 | classDef
                 ;
 
-function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDef? LB statements RB ;
+functionDec     : DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDec? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER typeDef?
+argument        : IDENTIFIER typeDec?
                 ;
 
 typeName        : IDENTIFIER ;
 
-typeDef         : OF typeName ;
+typeDec         : OF typeName ;
 
 statements      : statement statements
                 |
                 ;
 
-statement       : variableDef SEMI          # StatementVariableDef
+statement       : variableDec SEMI          # StatementVariableDef
+                | variableAssign SEMI       # StatementVariableAssign
                 | ifStatement               # StatementIf
                 | expression SEMI           # StatementExpression
                 | RETURN expression SEMI    # StatementReturn
                 | expression                # StatementReturn   // Allow raw expression returns (shorthand)
                 ;
 
-//  Variable format:
-//      [':']['@']['@']<NAME> ['of' <TYPE>] [<':=' / '='> <EXPRESSION>]
-variableDef     : VAR_TYPE? IDENTIFIER typeDef DEC expression   // Declaration using ':='
-                | VAR_TYPE? IDENTIFIER DEC expression           // Value declaration
-                | COLON? VAR_TYPE? IDENTIFIER EQ expression     // Value assignment or declaration
-                | COLON VAR_TYPE? IDENTIFIER typeDef            // Value declaration
-                | VAR_TYPE? IDENTIFIER EQ expression            // Value assignment
+// Possible variable types:
+//      [@]<name> [of <type>] := <value>
+//      :[@]variable of Type
+variableDec     : VAR_TYPE? IDENTIFIER typeDec? DEC expression  // Declaration using ':='
+                | COLON VAR_TYPE? IDENTIFIER typeDec            // No-value declaration
                 ;
+
+variableAssign  : VAR_TYPE? IDENTIFIER EQ expression ;
 
 expression      : BOOL                                              # Boolean
                 | INTEGER                                           # Integer
@@ -128,14 +129,14 @@ expression      : BOOL                                              # Boolean
                 | expression (TIMES | DIV) expression               # BinaryOp
                 | expression (PLUS | MINUS) expression              # BinaryOp
                 
-                | LP expression RP                                  # ParenthesisWrap
+                | LP expression RP                                  # ParenthesisWrap   // Like in math
                 
-                | expression PER IDENTIFIER LP funcParams? RP       # Reference
-                | expression PER IDENTIFIER funcParams?             # Reference
-                | expression PER VAR_TYPE? IDENTIFIER               # Reference
-                | IDENTIFIER LP funcParams? RP                      # Reference
-                | IDENTIFIER funcParams?                            # Reference
-                | VAR_TYPE? IDENTIFIER                              # Reference
+                | expression PER IDENTIFIER LP funcParams? RP       # Reference         // Definitely function
+                | expression PER IDENTIFIER funcParams?             # Reference         // Function or variable
+                | expression PER VAR_TYPE? IDENTIFIER               # Reference         // Variable
+                | IDENTIFIER LP funcParams? RP                      # Reference         // Definitely function
+                | IDENTIFIER funcParams?                            # Reference         // Function or variable
+                | VAR_TYPE? IDENTIFIER                              # Reference         // Variable
                 ;
 
 funcParams      : expression COM funcParams
@@ -146,19 +147,12 @@ ifStatement     : IF expression LB statements RB
                 | ELSE expression? LB statements RB
                 ;
 
-classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
+classDef        : CLASS IDENTIFIER (OF types)? LB classMembers? RB ;
 
-classMembers    : variableDef SEMI classMembers
-                | function classMembers
-                |
+classMembers    : variableDec SEMI classMembers
+                | functionDec classMembers
                 ;
 
 types           : IDENTIFIER COM types
-                | IDENTIFIER
-                ;
-
-attrib          : LBR attribIn RBR ;
-
-attribIn        : IDENTIFIER COM attribIn
                 | IDENTIFIER
                 ;

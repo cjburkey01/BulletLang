@@ -1,5 +1,7 @@
 package com.cjburkey.bullet;
 
+import com.cjburkey.bullet.antlr.BulletLexer;
+import com.cjburkey.bullet.antlr.BulletParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 import static com.cjburkey.bullet.Log.*;
 
@@ -18,7 +22,7 @@ public class BulletLang {
     
     // INJECTED BY MAVEN-INJECTION-PLGUIN!
     // Make sure to run "mvn inject:inject" after
-    // "mvn compile" when building from source
+    // "mvn compile" when building from source!
     public static String VERSION() {
         return null;
     }
@@ -99,8 +103,19 @@ public class BulletLang {
     }
     
     @SuppressWarnings("unused")
-    public void compile(InputStream input, OutputStream output) {
+    public void compile(InputStream input, OutputStream output) throws IOException {
+        // Initialize the lexer to be fed into the parser
+        BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         
+        // Initialize parser
+        BulletParser parser = new BulletParser(tokenStream);
+        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
+        parser.removeErrorListeners();                  // Clear the default error listener
+        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
+        
+        // Begin parsing
+        info("Parsing input");
     }
     
 }
