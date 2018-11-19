@@ -1,25 +1,12 @@
 package com.cjburkey.bullet;
 
-import com.cjburkey.bullet.antlr.BulletLexer;
-import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.compiler.Compiler;
-import com.cjburkey.bullet.obj.BFunction;
-import com.cjburkey.bullet.obj.BNamespace;
-import com.cjburkey.bullet.obj.BProgram;
-import com.cjburkey.bullet.obj.classdef.BClass;
-import com.cjburkey.bullet.obj.statement.BStatement;
-import com.cjburkey.bullet.visitor.ParserVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 import static com.cjburkey.bullet.Log.*;
 
@@ -112,105 +99,8 @@ public class BulletLang {
     }
     
     @SuppressWarnings("unused")
-    public void compile(InputStream input, OutputStream output) throws IOException {
-        BProgram program = compileRaw(input, false, true);
-        if (program != null && output == null) {
-            error("Stopping compilation because there is no valid output file");
-        }
-    }
-    
-    public BProgram compileRaw(InputStream input, boolean skipVerify, boolean resolveRequirements) throws IOException {
-        // Generate token stream
-        BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+    public void compile(InputStream input, OutputStream output) {
         
-        // Initialize parser
-        BulletParser parser = new BulletParser(tokenStream);
-        parser.setBuildParseTree(true);
-        parser.removeErrorListeners();
-        parser.addErrorListener(new ErrorHandler());
-        
-        // Begin parsing
-        info("Parsing input");
-        BProgram program = ParserVisitor.parse(parser);
-        if (ParserVisitor.stop) {
-            return null;
-        }
-        if (resolveRequirements) {
-            boolean missing = false;
-            List<File> reqd = new ArrayList<>();
-            for (String requirement : program.requirements) {
-                File requiredFile = new File(sourceDirectory, requirement);
-                if (!requiredFile.exists()) {
-                    requiredFile = new File(requirement);       // Try an absolute directory if it's not in the source directory
-                    if (!requiredFile.exists()) {
-                        error("Missing required file: \"{}\" in source directory or as an absolute path", requirement);
-                        missing = true;
-                        continue;
-                    }
-                }
-                reqd.add(requiredFile);
-            }
-            if (missing) {
-                error("Unable to proceed with compilation because required source file(s) could not be located");
-                return null;
-            }
-            for (File req : reqd) {
-                info("Merging \"{}\" into compilation", req.getAbsolutePath());
-                BProgram reqdp = compileRaw(new FileInputStream(req), true, true);
-                if (reqdp == null) {
-                    return null;
-                }
-                // Merge required functions, classes, and namespaces
-                program.functions.addAll(reqdp.functions);
-                program.classes.addAll(reqdp.classes);
-                info("Merged module into compilation");
-            }
-        }
-        info("Finished parsing");
-        
-        // TODO: TEST CODE
-        debugSpam(program);
-        
-        if (skipVerify) {
-            return program;
-        }
-        info("Compiling parsed program");
-        Compiler compiler = new Compiler(program);
-        if (compiler.compile()) {
-            info("Finished compiling");
-            debugSpam(program);
-            return program;
-        }
-        return null;
-    }
-    
-    public static void debugSpam(BProgram mainProgram) {
-        if (!input.debug || ParserVisitor.stop) {
-            return;
-        }
-        
-        debug("Parsed program module {}", mainProgram);
-        
-        debug("  Namespaces ({}): ", mainProgram.namespaces.size());
-        for (BNamespace namespace : mainProgram.namespaces) {
-            debug("    {}", namespace);
-        }
-        
-        debug("  Classes ({}): ", mainProgram.classes.size());
-        for (BClass classDef : mainProgram.classes) {
-            debug("    {}", classDef);
-        }
-        
-        debug("  Functions ({}): ", mainProgram.functions.size());
-        for (BFunction function : mainProgram.functions) {
-            debug("    {}", function);
-        }
-        
-        debug("  Statements ({}): ", mainProgram.scope.statements.size());
-        for (BStatement statement : mainProgram.scope.statements) {
-            debug("    {}", statement);
-        }
     }
     
 }
