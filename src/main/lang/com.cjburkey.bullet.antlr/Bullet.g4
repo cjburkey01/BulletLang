@@ -59,6 +59,8 @@ STRING      : ('"' | STR_INTER) { iws = false; } STRING_IN? '"' { iws = true; } 
 LIT_STRING  : '"""' { iws = false; } .*? '"""' { iws = true; } ;
 
 // Rules
+name            : IDENTIFIER ;
+
 program         : requirements programIn EOF ;
 
 requirements    : requirement requirements
@@ -73,7 +75,7 @@ programIn       : namespace programIn
                 |
                 ;
 
-namespace       : NAMESPACE IDENTIFIER LB namespaceIn RB ;
+namespace       : NAMESPACE name LB namespaceIn RB ;
 
 namespaceIn     : content namespaceIn
                 | 
@@ -81,16 +83,16 @@ namespaceIn     : content namespaceIn
 
 content         : variableDec
                 | functionDec
-                | classDef
+                | classDec
                 ;
 
-functionDec     : DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDec? LB statements RB ;
+functionDec     : DEF (name | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDec? LB statements RB ;
 
 arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER typeDec? ;
+argument        : name typeDec? ;
 
 typeDec         : OF IDENTIFIER ;
 
@@ -98,43 +100,45 @@ statements      : statement statements
                 |
                 ;
 
-statement       : variableDec               # StatementVariableDef
+statement       : variableDec               # StatementVariableDec
                 | variableAssign SEMI       # StatementVariableAssign
                 | ifStatement               # StatementIf
                 | expression SEMI           # StatementExpression
                 | RETURN expression SEMI    # StatementReturn
-                | expression                # StatementReturn   // Allow raw expression returns (shorthand)
+                | expression                # StatementReturn       // Allow raw expression returns (shorthand)
                 ;
+
+variableRef     : VAR_TYPE? name ;
 
 // Possible variable types:
 //      [@[@]]<name> [of <type>] := <value>
 //      :[@[@]]variable of Type
-variableDec     : VAR_TYPE? IDENTIFIER typeDec? DEC expression SEMI     // Declaration using ':='
-                | COLON VAR_TYPE? IDENTIFIER typeDec SEMI               // No-value declaration
+variableDec     : variableRef typeDec? DEC expression SEMI          // Declaration using ':='
+                | COLON VAR_TYPE? name typeDec SEMI                 // No-value declaration
                 ;
 
-variableAssign  : VAR_TYPE? IDENTIFIER EQ expression ;
+variableAssign  : variableRef EQ expression ;
 
-expression      : BOOL                                              # Boolean
-                | INTEGER                                           # Integer
-                | FLOAT                                             # Float
-                | STRING                                            # String
-                | LIT_STRING                                        # LiteralString
+expression      : BOOL                                          # Boolean
+                | INTEGER                                       # Integer
+                | FLOAT                                         # Float
+                | STRING                                        # String
+                | LIT_STRING                                    # LiteralString
                 
-                | expression (POW | ROOT)                           # UnaryOp
-                | expression (POW | ROOT) expression                # BinaryOp
-                | MINUS expression                                  # UnaryOp
-                | expression (TIMES | DIV) expression               # BinaryOp
-                | expression (PLUS | MINUS) expression              # BinaryOp
+                | expression (POW | ROOT)                       # UnaryOp
+                | expression (POW | ROOT) expression            # BinaryOp
+                | MINUS expression                              # UnaryOp       // This must be out of order for op-precedence
+                | expression (TIMES | DIV) expression           # BinaryOp
+                | expression (PLUS | MINUS) expression          # BinaryOp
                 
-                | LP expression RP                                  # ParenthesisWrap   // Like in math
+                | LP expression RP                              # ParenthesisWrap
                 
-                | expression PER IDENTIFIER LP funcParams? RP       # Reference         // Definitely function
-                | expression PER IDENTIFIER funcParams?             # Reference         // Function or variable
-                | expression PER VAR_TYPE? IDENTIFIER               # Reference         // Variable
-                | IDENTIFIER LP funcParams? RP                      # Reference         // Definitely function
-                | IDENTIFIER funcParams?                            # Reference         // Function or variable
-                | VAR_TYPE? IDENTIFIER                              # Reference         // Variable
+                | expression PER name LP funcParams? RP         # FunctionReference
+                | expression PER variableRef                    # Reference             // Variable or function
+                | expression PER name funcParams                # FunctionReference
+                | name LP funcParams? RP                        # FunctionReference
+                | variableRef                                   # Reference             // Variable or function
+                | name funcParams                               # FunctionReference
                 ;
 
 funcParams      : expression COM funcParams
@@ -145,7 +149,7 @@ ifStatement     : IF expression LB statements RB
                 | ELSE expression? LB statements RB
                 ;
 
-classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
+classDec        : CLASS name (OF types)? LB classMembers RB ;
 
 classMembers    : variableDec classMembers
                 | functionDec classMembers

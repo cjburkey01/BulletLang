@@ -2,23 +2,434 @@ package com.cjburkey.bullet.visitor;
 
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
+import com.cjburkey.bullet.parser.AContent;
+import com.cjburkey.bullet.parser.AIfStatement;
+import com.cjburkey.bullet.parser.AName;
+import com.cjburkey.bullet.parser.AOperator;
+import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.AVariableAssign;
+import com.cjburkey.bullet.parser.AVariableDec;
+import com.cjburkey.bullet.parser.AVariableRef;
+import com.cjburkey.bullet.parser.classDec.AClassMembers;
+import com.cjburkey.bullet.parser.expression.ABinaryOperator;
+import com.cjburkey.bullet.parser.expression.ABoolean;
+import com.cjburkey.bullet.parser.expression.AExpression;
+import com.cjburkey.bullet.parser.expression.AFloat;
+import com.cjburkey.bullet.parser.expression.AInteger;
+import com.cjburkey.bullet.parser.expression.AReference;
+import com.cjburkey.bullet.parser.expression.AString;
+import com.cjburkey.bullet.parser.expression.AUnaryOperator;
+import com.cjburkey.bullet.parser.function.AArgument;
+import com.cjburkey.bullet.parser.function.AArguments;
+import com.cjburkey.bullet.parser.function.AFuncParams;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
+import com.cjburkey.bullet.parser.namespace.ANamespace;
+import com.cjburkey.bullet.parser.namespace.ANamespaceIn;
 import com.cjburkey.bullet.parser.program.AProgram;
+import com.cjburkey.bullet.parser.program.AProgramIn;
+import com.cjburkey.bullet.parser.requirement.ARequirement;
+import com.cjburkey.bullet.parser.requirement.ARequirements;
+import com.cjburkey.bullet.parser.statement.AStatement;
+import com.cjburkey.bullet.parser.statement.AStatementExpression;
+import com.cjburkey.bullet.parser.statement.AStatementIf;
+import com.cjburkey.bullet.parser.statement.AStatementReturn;
+import com.cjburkey.bullet.parser.statement.AStatementVariableAssign;
+import com.cjburkey.bullet.parser.statement.AStatementVariableDec;
+import com.cjburkey.bullet.parser.statement.AStatements;
 import java.util.Optional;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * Created by CJ Burkey on 2018/11/03
  */
+@SuppressWarnings("WeakerAccess")
 public class ParserVisitor {
     
+    // Visitor instances (to prevent repeat instantiation)
+    public static final ProgramVisitor _programVisitor = new ProgramVisitor();
+    public static final RequirementsVisitor _requirementsVisitor = new RequirementsVisitor();
+    public static final RequirementVisitor _requirementVisitor = new RequirementVisitor();
+    public static final ProgramInVisitor _programInVisitor = new ProgramInVisitor();
+    public static final NamespaceVisitor _namespaceVisitor = new NamespaceVisitor();
+    public static final NameVisitor _nameVisitor = new NameVisitor();
+    public static final NamespaceInVisitor _namespaceInVisitor = new NamespaceInVisitor();
+    public static final ContentVisitor _contentVisitor = new ContentVisitor();
+    public static final VariableDecVisitor _variableDecVisitor = new VariableDecVisitor();
+    public static final VariableRefVisitor _variableRefVisitor = new VariableRefVisitor();
+    public static final TypeDecVisitor _typeDecVisitor = new TypeDecVisitor();
+    public static final ExpressionVisitor _expressionVisitor = new ExpressionVisitor();
+    public static final BooleanVisitor _booleanVisitor = new BooleanVisitor();
+    public static final IntegerVisitor _integerVisitor = new IntegerVisitor();
+    public static final FloatVisitor _floatVisitor = new FloatVisitor();
+    public static final StringVisitor _stringVisitor = new StringVisitor();
+    public static final UnaryOpVisitor _unaryOpVisitor = new UnaryOpVisitor();
+    public static final BinaryOpVisitor _binaryOpVisitor = new BinaryOpVisitor();
+    public static final ReferenceVisitor _referenceVisitor = new ReferenceVisitor();
+    public static final FuncParamsVisitor _funcParamsVisitor = new FuncParamsVisitor();
+    public static final FunctionDecVisitor _functionDecVisitor = new FunctionDecVisitor();
+    public static final ArgumentsVisitor _argumentsVisitor = new ArgumentsVisitor();
+    public static final ArgumentVisitor _argumentVisitor = new ArgumentVisitor();
+    public static final StatementsVisitor _statementsVisitor = new StatementsVisitor();
+    public static final StatementVisitor _statementVisitor = new StatementVisitor();
+    public static final StatementVariableDecVisitor _statementVariableDecVisitor = new StatementVariableDecVisitor();
+    public static final StatementVariableAssignVisitor _statementVariableAssignVisitor = new StatementVariableAssignVisitor();
+    public static final VariableAssignVisitor _variableAssignVisitor = new VariableAssignVisitor();
+    public static final StatementIfVisitor _statementIfVisitor = new StatementIfVisitor();
+    public static final IfStatementVisitor _ifStatementVisitor = new IfStatementVisitor();
+    public static final StatementExpressionVisitor _statementExpressionVisitor = new StatementExpressionVisitor();
+    public static final StatementReturnVisitor _statementReturnVisitor = new StatementReturnVisitor();
+    public static final ClassDecVisitor _classDecVisitor = new ClassDecVisitor();
+    public static final TypesVisitor _typesVisitor = new TypesVisitor();
+    public static final ClassMembersVisitor _classMembersVisitor = new ClassMembersVisitor();
+    
+    // Calls the program visitor on the supplied program context
+    public static Optional<AProgram> parseProgram(BulletParser.ProgramContext ctx) {
+        return _programVisitor.visit(ctx);
+    }
+    
+    // Visit the outer program, this starts the entire parse process
     private static class ProgramVisitor extends B<AProgram> {
         public Optional<AProgram> visitProgram(BulletParser.ProgramContext ctx) {
+            final Optional<ARequirements> requirements = _requirementsVisitor.visit(ctx.requirements());
+            final Optional<AProgramIn> programIn = _programInVisitor.visit(ctx.programIn());
+            return Optional.of(new AProgram(requirements, programIn, ctx));
+        }
+    }
+    
+    // Visit a list of requirements in the input program
+    private static class RequirementsVisitor extends B<ARequirements> {
+        public Optional<ARequirements> visitRequirements(BulletParser.RequirementsContext ctx) {
+            // No null check needed for requirements because our custom base class will return Optional.empty() if the
+            // input is null
+            final ARequirements requirements = visit(ctx.requirements()).orElseGet(() -> new ARequirements(ctx));
+            _requirementVisitor.visit(ctx.requirement()).ifPresent(requirements.requirements::add);
+            return Optional.of(requirements);
+        }
+    }
+    
+    // Visit a single requirement inside of a list of requirements
+    private static class RequirementVisitor extends B<ARequirement> {
+        public Optional<ARequirement> visitRequirement(BulletParser.RequirementContext ctx) {
+            // This dank Optional.map function allows us to check if STRING() returns null and return a
+            // requirement based on that, rather than a separate if statement/ternary operator
+            return Optional.ofNullable(ctx.STRING()).map(string -> new ARequirement(string.getText(), ctx));
+        }
+    }
+    
+    // Visit the contents of the program
+    private static class ProgramInVisitor extends B<AProgramIn> {
+        public Optional<AProgramIn> visitProgramIn(BulletParser.ProgramInContext ctx) {
+            final AProgramIn programIn = visit(ctx.programIn()).orElseGet(() -> new AProgramIn(ctx));
+            _namespaceVisitor.visit(ctx.namespace()).ifPresent(programIn.namespaces::add);
+            _contentVisitor.visit(ctx.content()).ifPresent(programIn.contents::add);
+            _statementVisitor.visit(ctx.statement()).ifPresent(programIn.statements::add);
+            return Optional.of(programIn);
+        }
+    }
+    
+    // Visit a namespace declaration and its contents
+    private static class NamespaceVisitor extends B<ANamespace> {
+        public Optional<ANamespace> visitNamespace(BulletParser.NamespaceContext ctx) {
+            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<ANamespaceIn> namespaceIn = _namespaceInVisitor.visit(ctx.namespaceIn());
+            if (name.isPresent() && namespaceIn.isPresent()) {
+                return Optional.of(new ANamespace(name.get(), namespaceIn.get(), ctx));
+            }
             return Optional.empty();
         }
     }
     
+    private static class NameVisitor extends B<AName> {
+        public Optional<AName> visitName(BulletParser.NameContext ctx) {
+            return Optional.ofNullable(ctx.IDENTIFIER()).map(identifier -> new AName(identifier.getText(), ctx));
+        }
+    }
+    
+    private static class NamespaceInVisitor extends B<ANamespaceIn> {
+        public Optional<ANamespaceIn> visitNamespaceIn(BulletParser.NamespaceInContext ctx) {
+            final ANamespaceIn namespaceIn = _namespaceInVisitor.visit(ctx.namespaceIn()).orElseGet(() -> new ANamespaceIn(ctx));
+            _contentVisitor.visit(ctx.content()).ifPresent(namespaceIn.contents::add);
+            return Optional.of(namespaceIn);
+        }
+    }
+    
+    private static class ContentVisitor extends B<AContent> {
+        public Optional<AContent> visitContent(BulletParser.ContentContext ctx) {
+            final Optional<AVariableDec> variableDec = _variableDecVisitor.visit(ctx.variableDec());
+            final Optional<AFunctionDec> functionDec = _functionDecVisitor.visit(ctx.functionDec());
+            final Optional<AClassDec> classDec = _classDecVisitor.visit(ctx.classDec());
+            if (variableDec.isPresent() || functionDec.isPresent() || classDec.isPresent()) {
+                return Optional.of(new AContent(variableDec, functionDec, classDec, ctx));
+            }
+            return Optional.empty();
+        }
+    }
+    
+    private static class VariableDecVisitor extends B<AVariableDec> {
+        public Optional<AVariableDec> visitVariableDec(BulletParser.VariableDecContext ctx) {
+            final Optional<AVariableRef> variableRef = _variableRefVisitor.visit(ctx.variableRef());
+            final Optional<ATypeDec> typeDec = _typeDecVisitor.visit(ctx.typeDec());
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            // Variable name is the only thing "required" during parsing (during compilation, if neither
+            // typeDec or expression are present, then there will be problems)
+            return variableRef.map(variable -> new AVariableDec(variable, typeDec, expression, ctx));
+        }
+    }
+    
+    private static class VariableRefVisitor extends B<AVariableRef> {
+        public Optional<AVariableRef> visitVariableRef(BulletParser.VariableRefContext ctx) {
+            final int variableType = ctx.VAR_TYPE() == null ? 0 : ctx.VAR_TYPE().getText().length();
+            return _nameVisitor.visit(ctx.name()).map(name -> new AVariableRef(variableType, name, ctx));
+        }
+    }
+    
+    private static class TypeDecVisitor extends B<ATypeDec> {
+        public Optional<ATypeDec> visitTypeDec(BulletParser.TypeDecContext ctx) {
+            return Optional.ofNullable(ctx.IDENTIFIER()).map(identifier -> new ATypeDec(identifier.getText(), ctx));
+        }
+    }
+    
+    private static class ExpressionVisitor extends B<AExpression> {
+        // We have to map the visits to get the inheriting classes of AExpression
+        // to become Optional<AExpression> as Optional<ABoolean>, etc, do not
+        // inherit from Optional<AExpression>
+        public Optional<AExpression> visitBoolean(BulletParser.BooleanContext ctx) {
+            return _booleanVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitInteger(BulletParser.IntegerContext ctx) {
+            return _integerVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitFloat(BulletParser.FloatContext ctx) {
+            return _floatVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitString(BulletParser.StringContext ctx) {
+            return _stringVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitLiteralString(BulletParser.LiteralStringContext ctx) {
+            return _stringVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitUnaryOp(BulletParser.UnaryOpContext ctx) {
+            return _unaryOpVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitBinaryOp(BulletParser.BinaryOpContext ctx) {
+            return _binaryOpVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AExpression> visitParenthesisWrap(BulletParser.ParenthesisWrapContext ctx) {
+            return visit(ctx.expression());
+        }
+        public Optional<AExpression> visitReference(BulletParser.ReferenceContext ctx) {
+            return _referenceVisitor.visit(ctx).map(val -> val);
+        }
+    }
+    
+    private static class BooleanVisitor extends B<ABoolean> {
+        public Optional<ABoolean> visitBoolean(BulletParser.BooleanContext ctx) {
+            return Optional.ofNullable(ctx.BOOL()).map(bool -> new ABoolean(Boolean.parseBoolean(bool.getText()), ctx));
+        }
+    }
+    
+    private static class IntegerVisitor extends B<AInteger> {
+        public Optional<AInteger> visitInteger(BulletParser.IntegerContext ctx) {
+            return Optional.ofNullable(ctx.INTEGER()).map(integer -> new AInteger(integer.getText(), ctx));
+        }
+    }
+    
+    private static class FloatVisitor extends B<AFloat> {
+        public Optional<AFloat> visitFloat(BulletParser.FloatContext ctx) {
+            return Optional.ofNullable(ctx.FLOAT()).map(floating -> new AFloat(floating.getText(), ctx));
+        }
+    }
+    
+    private static class StringVisitor extends B<AString> {
+        public Optional<AString> visitString(BulletParser.StringContext ctx) {
+            return Optional.ofNullable(ctx.STRING()).map(string -> new AString(string.getText(), ctx));
+        }
+        public Optional<AString> visitLiteralString(BulletParser.LiteralStringContext ctx) {
+            return Optional.ofNullable(ctx.LIT_STRING()).map(string -> new AString(string.getText(), ctx));
+        }
+    }
+    
+    private static class UnaryOpVisitor extends B<AUnaryOperator> {
+        public Optional<AUnaryOperator> visitUnaryOp(BulletParser.UnaryOpContext ctx) {
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            final Optional<AOperator> operator = AOperator.from(ctx);
+            if (expression.isPresent() && operator.isPresent()) {
+                return Optional.of(new AUnaryOperator(expression.get(), operator.get(), ctx));
+            }
+            return Optional.empty();
+        }
+    }
+    
+    private static class BinaryOpVisitor extends B<ABinaryOperator> {
+        public Optional<ABinaryOperator> visitBinaryOp(BulletParser.BinaryOpContext ctx) {
+            final Optional<AExpression> expressionA = _expressionVisitor.visit(ctx.expression(0));
+            final Optional<AExpression> expressionB = _expressionVisitor.visit(ctx.expression(1));
+            final Optional<AOperator> operator = AOperator.from(ctx);
+            if (expressionA.isPresent() && expressionB.isPresent() && operator.isPresent()) {
+                return Optional.of(new ABinaryOperator(expressionA.get(), expressionB.get(), operator.get(), ctx));
+            }
+            return Optional.empty();
+        }
+    }
+    
+    private static class ReferenceVisitor extends B<AReference> {
+        public Optional<AReference> visitReference(BulletParser.ReferenceContext ctx) {
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            final Optional<AVariableRef> variableRef = _variableRefVisitor.visit(ctx.variableRef());
+            return variableRef.map(variable -> new AReference(expression, variable, ctx));
+        }
+        public Optional<AReference> visitFunctionReference(BulletParser.FunctionReferenceContext ctx) {
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<AFuncParams> funcParams = _funcParamsVisitor.visit(ctx.funcParams());
+            return name.map(aName -> new AReference(expression, aName, funcParams, ctx));
+        }
+    }
+    
+    private static class FuncParamsVisitor extends B<AFuncParams> {
+        public Optional<AFuncParams> visitFuncParams(BulletParser.FuncParamsContext ctx) {
+            final AFuncParams funcParams = visit(ctx.funcParams()).orElseGet(() -> new AFuncParams(ctx));
+            _expressionVisitor.visit(ctx.expression()).ifPresent(funcParams.expressions::add);
+            return Optional.of(funcParams);
+        }
+    }
+    
+    private static class FunctionDecVisitor extends B<AFunctionDec> {
+        public Optional<AFunctionDec> visitFunctionDec(BulletParser.FunctionDecContext ctx) {
+            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<AOperator> operator = AOperator.from(ctx);
+            final Optional<AArguments> arguments = _argumentsVisitor.visit(ctx.arguments());
+            final Optional<AStatements> statements = _statementsVisitor.visit(ctx.statements());
+            if (name.isPresent() || operator.isPresent()) {
+                return Optional.of(new AFunctionDec(name, operator, arguments, statements, ctx));
+            }
+            return Optional.empty();
+        }
+    }
+    
+    private static class ArgumentsVisitor extends B<AArguments> {
+        public Optional<AArguments> visitArguments(BulletParser.ArgumentsContext ctx) {
+            final AArguments arguments = visit(ctx.argument()).orElseGet(() -> new AArguments(ctx));
+            _argumentVisitor.visit(ctx.argument()).ifPresent(arguments.arguments::add);
+            return Optional.of(arguments);
+        }
+    }
+    
+    private static class ArgumentVisitor extends B<AArgument> {
+        public Optional<AArgument> visitArgument(BulletParser.ArgumentContext ctx) {
+            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<ATypeDec> typeDec = _typeDecVisitor.visit(ctx.typeDec());
+            return name.map(aName -> new AArgument(aName, typeDec, ctx));
+        }
+    }
+    
+    private static class StatementsVisitor extends B<AStatements> {
+        public Optional<AStatements> visitStatements(BulletParser.StatementsContext ctx) {
+            final AStatements statements = visit(ctx.statements()).orElseGet(() -> new AStatements(ctx));
+            _statementVisitor.visit(ctx.statement()).ifPresent(statements.statements::add);
+            return Optional.of(statements);
+        }
+    }
+    
+    private static class StatementVisitor extends B<AStatement> {
+        public Optional<AStatement> visitStatementVariableDec(BulletParser.StatementVariableDecContext ctx) {
+            return _statementVariableDecVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AStatement> visitStatementVariableAssign(BulletParser.StatementVariableAssignContext ctx) {
+            return _statementVariableAssignVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AStatement> visitStatementIf(BulletParser.StatementIfContext ctx) {
+            return _statementIfVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AStatement> visitStatementExpression(BulletParser.StatementExpressionContext ctx) {
+            return _statementExpressionVisitor.visit(ctx).map(val -> val);
+        }
+        public Optional<AStatement> visitStatementReturn(BulletParser.StatementReturnContext ctx) {
+            return _statementReturnVisitor.visit(ctx).map(val -> val);
+        }
+    }
+    
+    private static class StatementVariableDecVisitor extends B<AStatementVariableDec> {
+        public Optional<AStatementVariableDec> visitStatementVariableDec(BulletParser.StatementVariableDecContext ctx) {
+            return _variableDecVisitor.visit(ctx.variableDec()).map(variable -> new AStatementVariableDec(variable, ctx));
+        }
+    }
+    
+    private static class StatementVariableAssignVisitor extends B<AStatementVariableAssign> {
+        public Optional<AStatementVariableAssign> visitStatementVariableAssign(BulletParser.StatementVariableAssignContext ctx) {
+            return _variableAssignVisitor.visit(ctx.variableAssign()).map(variable -> new AStatementVariableAssign(variable, ctx));
+        }
+    }
+    
+    private static class VariableAssignVisitor extends B<AVariableAssign> {
+        public Optional<AVariableAssign> visitVariableAssign(BulletParser.VariableAssignContext ctx) {
+            final Optional<AVariableRef> variableRef = _variableRefVisitor.visit(ctx.variableRef());
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            if (variableRef.isPresent() && expression.isPresent()) {
+                return Optional.of(new AVariableAssign(variableRef.get(), expression.get(), ctx));
+            }
+            return Optional.empty();
+        }
+    }
+    
+    private static class StatementIfVisitor extends B<AStatementIf> {
+        public Optional<AStatementIf> visitStatementIf(BulletParser.StatementIfContext ctx) {
+            return _ifStatementVisitor.visit(ctx.ifStatement()).map(ifStatement -> new AStatementIf(ifStatement, ctx));
+        }
+    }
+    
+    private static class IfStatementVisitor extends B<AIfStatement> {
+        public Optional<AIfStatement> visitIfStatement(BulletParser.IfStatementContext ctx) {
+            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            final Optional<AStatements> statements = _statementsVisitor.visit(ctx.statements());
+            return statements.map(aStatements -> new AIfStatement(ctx.ELSE() != null, expression, aStatements, ctx));
+        }
+    }
+    
+    private static class StatementExpressionVisitor extends B<AStatementExpression> {
+        public Optional<AStatementExpression> visitStatementExpression(BulletParser.StatementExpressionContext ctx) {
+            return _expressionVisitor.visit(ctx.expression()).map(expression -> new AStatementExpression(expression, ctx));
+        }
+    }
+    
+    private static class StatementReturnVisitor extends B<AStatementReturn> {
+        public Optional<AStatementReturn> visitStatementReturn(BulletParser.StatementReturnContext ctx) {
+            return _expressionVisitor.visit(ctx.expression()).map(expression -> new AStatementReturn(expression, ctx));
+        }
+    }
+    
+    private static class ClassDecVisitor extends B<AClassDec> {
+        public Optional<AClassDec> visitClassDec(BulletParser.ClassDecContext ctx) {
+            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<ATypes> types = _typesVisitor.visit(ctx.types());
+            final Optional<AClassMembers> classMembers = _classMembersVisitor.visit(ctx.classMembers());
+            return name.map(aName -> new AClassDec(aName, types, classMembers, ctx));
+        }
+    }
+    
+    private static class TypesVisitor extends B<ATypes> {
+        public Optional<ATypes> visitTypes(BulletParser.TypesContext ctx) {
+            final ATypes types = visit(ctx.types()).orElseGet(() -> new ATypes(ctx));
+            Optional.ofNullable(ctx.IDENTIFIER()).ifPresent(identifier -> types.types.add(identifier.getText()));
+            return Optional.of(types);
+        }
+    }
+    
+    private static class ClassMembersVisitor extends B<AClassMembers> {
+        public Optional<AClassMembers> visitClassMembers(BulletParser.ClassMembersContext ctx) {
+            final AClassMembers types = visit(ctx.classMembers()).orElseGet(() -> new AClassMembers(ctx));
+            _variableDecVisitor.visit(ctx.variableDec()).ifPresent(types.variableDecs::add);
+            _functionDecVisitor.visit(ctx.functionDec()).ifPresent(types.functionDecs::add);
+            return Optional.of(types);
+        }
+    }
+    
+    // The base, will allow handling of actions during any visit call
+    // Could be used to detect past errors, etc.
     private static class B<T> extends BulletBaseVisitor<Optional<T>> {
-        public Optional<T> visit(ParseTree tree) {
+        public Optional<T> visit(final ParseTree tree) {
             if (tree == null) {
                 return Optional.empty();
             }

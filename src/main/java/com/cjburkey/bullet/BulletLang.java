@@ -2,6 +2,7 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.visitor.ParserVisitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -116,6 +117,7 @@ public class BulletLang {
         
         // Begin parsing
         info("Parsing input");
+        ParserVisitor.parseProgram(parser.program());
     }
     
 }

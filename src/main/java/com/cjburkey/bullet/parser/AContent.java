@@ -1,6 +1,8 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
 import java.util.Optional;
 
 /**
@@ -13,24 +15,13 @@ public class AContent extends ABase {
     public final Optional<AFunctionDec> functionDec;
     public final Optional<AClassDec> classDec;
     
-    private AContent(AVariableDec variableDec, AFunctionDec functionDec, AClassDec classDec, BulletParser.ContentContext ctx) {
+    public AContent(Optional<AVariableDec> variableDec, Optional<AFunctionDec> functionDec, Optional<AClassDec> classDec,
+                    BulletParser.ContentContext ctx) {
         super(ctx);
         
-        this.variableDec = variableDec == null ? Optional.empty() : Optional.of(variableDec);
-        this.functionDec = functionDec == null ? Optional.empty() : Optional.of(functionDec);
-        this.classDec = classDec == null ? Optional.empty() : Optional.of(classDec);
-    }
-    
-    public AContent(AVariableDec variableDec, BulletParser.ContentContext ctx) {
-        this(variableDec, null, null, ctx);
-    }
-    
-    public AContent(AFunctionDec functionDec, BulletParser.ContentContext ctx) {
-        this(null, functionDec, null, ctx);
-    }
-    
-    public AContent(AClassDec classDec, BulletParser.ContentContext ctx) {
-        this(null, null, classDec, ctx);
+        this.variableDec = variableDec;
+        this.functionDec = functionDec;
+        this.classDec = classDec;
     }
     
 }

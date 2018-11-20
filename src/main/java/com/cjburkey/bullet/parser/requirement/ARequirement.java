@@ -6,15 +6,14 @@ import com.cjburkey.bullet.parser.ABase;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings("WeakerAccess")
-public class BRequirement extends ABase {
+public class ARequirement extends ABase {
     
-    public final String location;
+    public final String string;
     
-    public BRequirement(String location, BulletParser.ReferenceContext ctx) {
+    public ARequirement(String string, BulletParser.RequirementContext ctx) {
         super(ctx);
         
-        this.location = location;
+        this.string = string;
     }
     
 }

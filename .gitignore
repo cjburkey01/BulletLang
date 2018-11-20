@@ -15,4 +15,4 @@ src/main/generated-sources
 
 # Mac
 *.DS_Store
-*/__MacOSX
+*/__MacOSX/*
