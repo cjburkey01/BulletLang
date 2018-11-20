@@ -68,8 +68,8 @@ requirements    : requirement requirements
 requirement     : REQUIRE STRING SEMI ;
 
 programIn       : namespace programIn
-                | statement programIn
                 | content programIn
+                | statement programIn
                 |
                 ;
 
@@ -79,7 +79,8 @@ namespaceIn     : content namespaceIn
                 | 
                 ;
 
-content         : functionDec
+content         : variableDec
+                | functionDec
                 | classDef
                 ;
 
@@ -89,18 +90,15 @@ arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER typeDec?
-                ;
+argument        : IDENTIFIER typeDec? ;
 
-typeName        : IDENTIFIER ;
-
-typeDec         : OF typeName ;
+typeDec         : OF IDENTIFIER ;
 
 statements      : statement statements
                 |
                 ;
 
-statement       : variableDec SEMI          # StatementVariableDef
+statement       : variableDec               # StatementVariableDef
                 | variableAssign SEMI       # StatementVariableAssign
                 | ifStatement               # StatementIf
                 | expression SEMI           # StatementExpression
@@ -109,10 +107,10 @@ statement       : variableDec SEMI          # StatementVariableDef
                 ;
 
 // Possible variable types:
-//      [@]<name> [of <type>] := <value>
-//      :[@]variable of Type
-variableDec     : VAR_TYPE? IDENTIFIER typeDec? DEC expression  // Declaration using ':='
-                | COLON VAR_TYPE? IDENTIFIER typeDec            // No-value declaration
+//      [@[@]]<name> [of <type>] := <value>
+//      :[@[@]]variable of Type
+variableDec     : VAR_TYPE? IDENTIFIER typeDec? DEC expression SEMI     // Declaration using ':='
+                | COLON VAR_TYPE? IDENTIFIER typeDec SEMI               // No-value declaration
                 ;
 
 variableAssign  : VAR_TYPE? IDENTIFIER EQ expression ;
@@ -147,10 +145,11 @@ ifStatement     : IF expression LB statements RB
                 | ELSE expression? LB statements RB
                 ;
 
-classDef        : CLASS IDENTIFIER (OF types)? LB classMembers? RB ;
+classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
 
-classMembers    : variableDec SEMI classMembers
+classMembers    : variableDec classMembers
                 | functionDec classMembers
+                |
                 ;
 
 types           : IDENTIFIER COM types

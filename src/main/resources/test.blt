@@ -1,0 +1,7 @@
+five := 5;
+
+def six() {
+    6
+}
+
+print five + six;
