@@ -5,6 +5,8 @@ import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.AVariableRef;
 import com.cjburkey.bullet.parser.function.AFuncParams;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
 /**
@@ -41,6 +43,17 @@ public class AReference extends AExpression {
         this.funcParams = Optional.of(new AFuncParams(ctx));
         
         this.funcParams.get().expressions.add(expressionB);
+    }
+    
+    public AReference(Optional<AExpression> expression, AOperator operator, Optional<AFuncParams> funcParams,
+                         BulletParser.FunctionReferenceContext ctx) {
+        super(ctx);
+        
+        this.isFunctionRef = true;
+        this.expression = expression;
+        this.name = Optional.of(new AName(operator, ctx));
+        this.variableRef = Optional.empty();
+        this.funcParams = funcParams;
     }
     
     public AReference(Optional<AExpression> expression, AName name, Optional<AFuncParams> funcParams,
@@ -80,6 +93,14 @@ public class AReference extends AExpression {
         variableRef.ifPresent(aVariableRef -> output.append(aVariableRef.debug(indent + indent())));
         funcParams.ifPresent(aFuncParams -> output.append(aFuncParams.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        ObjectArrayList<BulletVerifyError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
+        name.ifPresent(aName -> output.addAll(aName.verify()));
+        variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.verify()));
+        funcParams.ifPresent(aFuncParams -> output.addAll(aFuncParams.verify()));
+        return output;
     }
     
 }

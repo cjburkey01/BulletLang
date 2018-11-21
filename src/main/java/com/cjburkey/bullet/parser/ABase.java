@@ -1,5 +1,8 @@
 package com.cjburkey.bullet.parser;
 
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Collection;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
@@ -22,6 +25,14 @@ public abstract class ABase {
     }
     
     public abstract String getFormattedDebug(int indent);
+    public abstract ObjectArrayList<BulletVerifyError> verify();
+    
+    @SuppressWarnings("unchecked")
+    protected static ObjectArrayList<BulletVerifyError> verifyLists(Collection<? extends ABase>... lists) {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        for (Collection<? extends ABase> list : lists) list.forEach(element -> output.addAll(element.verify()));
+        return output;
+    }
     
     public static String getIndent(int amt) {
         StringBuilder output = new StringBuilder();

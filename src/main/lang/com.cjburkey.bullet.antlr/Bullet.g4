@@ -189,6 +189,7 @@ expression      // Literals
                 | expression PER name LP funcParams? RP         # FunctionReference
                 | expression PER variableRef                    # Reference             // Variable or function
                 | expression PER name funcParams                # FunctionReference
+                | expression PER op funcParams?                 # FunctionReference
                 | name LP funcParams? RP                        # FunctionReference
                 | variableRef                                   # Reference             // Variable or function
                 | name funcParams                               # FunctionReference

@@ -1,3 +1,4 @@
+/#
 class Person {
     def _(firstName of String, lastName of String) {
         @@people = @@people + 1;
@@ -58,4 +59,12 @@ print bob - sue;        # Prints `Bob Johnson without Sue Timmy`
 print bob * sue;        # Prints `Bob Johnson married to Sue Timmy`
 print bob / sue;        # Prints `Bob Johnson divorced Sue Timmy`
 print bob ** sue;       # Prints `Bob Johnson's child with Sue Timmy`
+print (-bob);           # Prints `Deceased Bob Johnson` (Parenthesis required because `print` would be mistaked for a term)
 print sue - -bob;       # Prints `Sue Timmy without Deceased Bob Johnson`
+
+# You can directly call operator methods too (though there is no reason to do so):
+print bob.+(sue);
+#/
+
+# One possible reason to use the method call would be to avoid parenthesis:
+print bob.-;    # Instead of `print (-bob);`

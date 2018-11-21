@@ -294,7 +294,9 @@ public class ParserVisitor {
             final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
             final Optional<AName> name = _nameVisitor.visit(ctx.name());
             final Optional<AFuncParams> funcParams = _funcParamsVisitor.visit(ctx.funcParams());
-            return name.map(aName -> new AReference(expression, aName, funcParams, ctx));
+            final Optional<AOperator> operator = AOperator.from(ctx.op());
+            return operator.map(aOperator -> Optional.of(new AReference(expression, aOperator, funcParams, ctx)))
+                    .orElseGet(() -> name.map(aName -> new AReference(expression, aName, funcParams, ctx)));
         }
     }
     
@@ -406,7 +408,11 @@ public class ParserVisitor {
     
     public static final class StatementReturnVisitor extends B<AStatementReturn> {
         public Optional<AStatementReturn> visitStatementReturn(BulletParser.StatementReturnContext ctx) {
-            return _expressionVisitor.visit(ctx.expression()).map(expression -> new AStatementReturn(expression, ctx));
+            if (ctx.expression() == null) return Optional.empty();
+            Optional<AExpression> exp = _expressionVisitor.visit(ctx.expression());
+            //noinspection OptionalAssignedToNull
+            if (exp == null) return Optional.empty();   // Weird possibility somehow
+            return exp.map(expression -> new AStatementReturn(expression, ctx));
         }
     }
     

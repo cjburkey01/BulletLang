@@ -4,6 +4,8 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
 /**
@@ -34,6 +36,13 @@ public class AClassDec extends ABase {
         types.ifPresent(aTypes -> output.append(aTypes.debug(indent + indent())));
         classMembers.ifPresent(aClassMembers -> output.append(aClassMembers.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        ObjectArrayList<BulletVerifyError> output = name.verify();
+        types.ifPresent(aTypes -> output.addAll(aTypes.verify()));
+        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.verify()));
+        return output;
     }
     
 }

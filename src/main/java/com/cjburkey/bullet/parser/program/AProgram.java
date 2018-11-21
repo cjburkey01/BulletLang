@@ -2,6 +2,8 @@ package com.cjburkey.bullet.parser.program;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
 /**
@@ -28,6 +30,12 @@ public class AProgram extends ABase {
         requirements.ifPresent(aRequirements -> output.append(aRequirements.debug(indent + indent())));
         programIn.ifPresent(aProgramIn -> output.append(aProgramIn.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        ObjectArrayList<BulletVerifyError> output = requirements.map(ARequirements::verify).orElseGet(ObjectArrayList::new);
+        output.addAll(programIn.map(AProgramIn::verify).orElseGet(ObjectArrayList::new));
+        return output;
     }
     
 }

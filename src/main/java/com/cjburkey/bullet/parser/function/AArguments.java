@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.function;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -25,6 +26,11 @@ public class AArguments extends ABase {
             output.append(argument.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return verifyLists(arguments);
     }
     
 }

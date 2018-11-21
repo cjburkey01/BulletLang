@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -28,6 +29,10 @@ public class ATypes extends ABase {
             output.append('\n');
         }
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return new ObjectArrayList<>();
     }
     
 }

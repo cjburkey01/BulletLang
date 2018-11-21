@@ -3,7 +3,9 @@ package com.cjburkey.bullet;
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.program.AProgram;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -119,9 +121,23 @@ public class BulletLang {
         Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
         if (!program.isPresent() || ErrorHandler.hasErrored()) {
             error("Failed to parse input");
-        } else {
+            return;
+        }
+        if (debug) {
             debugPrint(program.get());
         }
+        info("Parsed input");
+        
+        info("Verifying");
+        ObjectArrayList<BulletVerifyError> errors = program.get().verify();
+        if (!errors.isEmpty()) {
+            for (BulletVerifyError error : errors) {
+                error(error.printText);
+            }
+            error("Failed to verify");
+            return;
+        }
+        info("Verification successful");
     }
     
     private void debugPrint(AProgram program) {

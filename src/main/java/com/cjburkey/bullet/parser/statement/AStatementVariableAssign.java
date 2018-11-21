@@ -2,6 +2,8 @@ package com.cjburkey.bullet.parser.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AVariableAssign;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -19,6 +21,10 @@ public class AStatementVariableAssign extends AStatement {
     
     public String getFormattedDebug(int indent) {
         return variableAssign.debug(indent);
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return variableAssign.verify();
     }
     
 }

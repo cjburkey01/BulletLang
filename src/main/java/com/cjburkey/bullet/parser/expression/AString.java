@@ -2,8 +2,10 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,6 +100,10 @@ public class AString extends AExpression {
         }
         
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return new ObjectArrayList<>();
     }
     
     private static void onInvalidSmartString(String text) {

@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.function;
 
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.expression.AExpression;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -25,6 +26,11 @@ public class AFuncParams extends ABase {
             output.append(expression.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return verifyLists(expressions);
     }
     
 }

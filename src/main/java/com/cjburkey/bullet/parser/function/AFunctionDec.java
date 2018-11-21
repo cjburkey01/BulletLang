@@ -5,6 +5,8 @@ import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.statement.AStatements;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
 /**
@@ -39,6 +41,16 @@ public class AFunctionDec extends ABase {
         arguments.ifPresent(aArguments -> output.append(aArguments.debug(indent + indent())));
         statements.ifPresent(aStatements -> output.append(aStatements.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        ObjectArrayList<BulletVerifyError> output = name.map(AName::verify).orElseGet(ObjectArrayList::new);
+        arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
+        statements.ifPresent(aStatements -> output.addAll(aStatements.verify()));
+        if (!name.isPresent() && !operator.isPresent()) {
+            output.add(new BulletVerifyError("Invalid function lacking name", ctx));
+        }
+        return output;
     }
     
 }

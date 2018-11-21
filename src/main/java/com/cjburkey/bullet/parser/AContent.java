@@ -3,6 +3,8 @@ package com.cjburkey.bullet.parser;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
+import com.cjburkey.bullet.verify.BulletVerifyError;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
 /**
@@ -34,6 +36,16 @@ public class AContent extends ABase {
         functionDec.ifPresent(aFunctionDec -> output.append(aFunctionDec.debug(indent + indent())));
         classDec.ifPresent(aClassDec -> output.append(aClassDec.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public ObjectArrayList<BulletVerifyError> verify() {
+        ObjectArrayList<BulletVerifyError> output = variableDec.map(ABase::verify).orElseGet(ObjectArrayList::new);
+        functionDec.ifPresent(aFunctionDec -> output.addAll(aFunctionDec.verify()));
+        classDec.ifPresent(aClassDec -> output.addAll(aClassDec.verify()));
+        if (!variableDec.isPresent() && !functionDec.isPresent() && !classDec.isPresent()) {
+            output.add(new BulletVerifyError("No valid content elements", ctx));
+        }
+        return output;
     }
     
 }

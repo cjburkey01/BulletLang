@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.namespace;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AContent;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -30,6 +31,11 @@ public class ANamespaceIn extends ABase {
             output.append(content.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public ObjectArrayList<BulletVerifyError> verify() {
+        return verifyLists(contents);
     }
     
 }
