@@ -16,4 +16,8 @@ public class AStatementExpression extends AStatement {
         this.expression = expression;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "StatementExpression:\n" + expression.debug(indent + indent());
+    }
+    
 }

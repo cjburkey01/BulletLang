@@ -17,4 +17,20 @@ public class ANamespaceIn extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("NamespaceIn:\n");
+        
+        indent += indent();
+        
+        output.append(getIndent(indent));
+        output.append("Contents:\n");
+        for (AContent content : contents) {
+            output.append(content.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

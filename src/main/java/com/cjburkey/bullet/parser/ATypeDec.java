@@ -15,4 +15,8 @@ public class ATypeDec extends ABase {
         this.identifier = identifier;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "TypeDec:\n" + getIndent(indent + indent()) + identifier + '\n';
+    }
+    
 }

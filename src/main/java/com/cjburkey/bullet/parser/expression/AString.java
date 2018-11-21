@@ -21,4 +21,8 @@ public class AString extends AExpression {
         this.string = string;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "String:\n" + getIndent(indent + indent()) + string + '\n';
+    }
+    
 }

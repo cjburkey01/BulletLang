@@ -16,4 +16,16 @@ public class AStatements extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Statements:\n");
+        
+        for (AStatement statement : statements) {
+            output.append(statement.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

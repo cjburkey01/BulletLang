@@ -21,4 +21,9 @@ public class ABinaryOperator extends AExpression {
         this.operator = operator;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "BinaryOperator:\n" + expressionA.debug(indent + indent()) +
+                expressionB.getFormattedDebug(indent + 2) + operator.debug(indent + indent());
+    }
+    
 }

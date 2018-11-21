@@ -19,4 +19,8 @@ public class AUnaryOperator extends AExpression {
         this.operator = operator;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "UnaryOperator:\n" + expression.debug(indent + indent()) + operator.debug(indent + indent());
+    }
+    
 }

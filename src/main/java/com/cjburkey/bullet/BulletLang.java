@@ -2,6 +2,7 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -74,7 +76,7 @@ public class BulletLang {
             error("Invalid input file");
             if (input.debug) {
                 // TODO: REMOVE THIS TEST CODE
-                debug("Performing test compile on resource \"/test.blt\" because no valid input file was found and debug is enabled");
+                debug("Performing test compile on resource \"/test2.blt\" because no valid input file was found and debug is enabled");
                 compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
             }
             return;
@@ -117,7 +119,24 @@ public class BulletLang {
         
         // Begin parsing
         info("Parsing input");
-        ParserVisitor.parseProgram(parser.program());
+        Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
+        if (!program.isPresent()) {
+            error("Failed to parse input");
+        } else {
+            debugPrint(program.get());
+        }
+    }
+    
+    private void debugPrint(AProgram program) {
+        info("Debug print...");
+        System.out.println();
+        String out = program.debug(0);
+        while (out.endsWith("\n")) {
+            out = out.substring(0, out.length() - 1);
+        }
+        System.out.println(out);
+        System.out.println();
+        info("Finished print");
     }
     
 }

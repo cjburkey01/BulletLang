@@ -23,4 +23,20 @@ public class AIfStatement extends ABase {
         this.statements = statements;
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("IfStatement:\n");
+        output.append(getIndent(indent + indent()));
+        output.append("IsElse:\n");
+        output.append(getIndent(indent + indent() * 2));
+        output.append(isElse);
+        output.append('\n');
+        
+        expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
+        output.append(statements.debug(indent + indent()));
+        return output.toString();
+    }
+    
 }

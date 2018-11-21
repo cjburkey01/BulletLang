@@ -19,4 +19,8 @@ public class AVariableAssign extends ABase {
         this.expression = expression;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Program:\n" + variableRef.debug(indent + indent()) + expression.debug(indent + indent());
+    }
+    
 }

@@ -23,13 +23,8 @@ public enum AOperator {
         this.token = token;
     }
     
-    public static Optional<AOperator> fromToken(String token) {
-        for (AOperator operator : values()) {
-            if (operator.token.equals(token)) {
-                return Optional.of(operator);
-            }
-        }
-        return Optional.empty();
+    public String debug(int indent) {
+        return ABase.getIndent(indent) + "Operator:\n" + ABase.getIndent(indent + ABase.indent()) + this + '\n';
     }
     
     public static Optional<AOperator> from(BulletParser.UnaryOpContext ctx) {

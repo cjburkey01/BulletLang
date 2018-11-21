@@ -16,4 +16,16 @@ public class AArguments extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Arguments:\n");
+        
+        for (AArgument argument : arguments) {
+            output.append(argument.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

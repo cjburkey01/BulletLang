@@ -15,4 +15,8 @@ public class AName extends ABase {
         this.identifier = identifier;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Name:\n" + getIndent(indent + indent()) + identifier + '\n';
+    }
+    
 }

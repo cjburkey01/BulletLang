@@ -19,6 +19,11 @@ public class AVariableRef extends ABase {
         this.name = name;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "VariableRef:\n" + getIndent(indent + indent()) + "VariableType:\n" +
+                getIndent(indent + indent() * 2) +  variableType + '\n' + name.debug(indent + indent());
+    }
+    
     public enum AVariableType {
         GLOBAL,
         LOCAL,

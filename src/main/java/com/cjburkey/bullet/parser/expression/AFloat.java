@@ -25,4 +25,8 @@ public class AFloat extends AExpression {
         this.valid = isValid;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Float:\n" + getIndent(indent + indent()) + floating + '\n';
+    }
+    
 }

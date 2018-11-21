@@ -28,4 +28,17 @@ public class AFunctionDec extends ABase {
         this.statements = statements;
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("FunctionDec:\n");
+        
+        name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
+        operator.ifPresent(aOperator -> output.append(aOperator.debug(indent + indent())));
+        arguments.ifPresent(aArguments -> output.append(aArguments.debug(indent + indent())));
+        statements.ifPresent(aStatements -> output.append(aStatements.debug(indent + indent())));
+        return output.toString();
+    }
+    
 }

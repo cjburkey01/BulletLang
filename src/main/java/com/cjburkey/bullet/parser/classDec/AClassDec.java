@@ -24,4 +24,16 @@ public class AClassDec extends ABase {
         this.classMembers = classMembers;
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Class:\n");
+        
+        output.append(name.getFormattedDebug(indent + indent()));
+        types.ifPresent(aTypes -> output.append(aTypes.debug(indent + indent())));
+        classMembers.ifPresent(aClassMembers -> output.append(aClassMembers.debug(indent + indent())));
+        return output.toString();
+    }
+    
 }

@@ -1,4 +1,4 @@
-package com.cjburkey.bullet.parser.requirement;
+package com.cjburkey.bullet.parser.program.requirement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
@@ -14,6 +14,10 @@ public class ARequirement extends ABase {
         super(ctx);
         
         this.string = string;
+    }
+    
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + string + '\n';
     }
     
 }

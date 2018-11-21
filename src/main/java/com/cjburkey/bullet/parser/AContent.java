@@ -24,4 +24,16 @@ public class AContent extends ABase {
         this.classDec = classDec;
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Content:\n");
+        
+        variableDec.ifPresent(aVariableDec -> output.append(aVariableDec.debug(indent + indent())));
+        functionDec.ifPresent(aFunctionDec -> output.append(aFunctionDec.debug(indent + indent())));
+        classDec.ifPresent(aClassDec -> output.append(aClassDec.debug(indent + indent())));
+        return output.toString();
+    }
+    
 }

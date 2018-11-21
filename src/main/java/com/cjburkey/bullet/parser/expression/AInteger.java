@@ -25,4 +25,8 @@ public class AInteger extends AExpression {
         this.valid = isValid;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Integer:\n" + getIndent(indent + indent()) + integer + '\n';
+    }
+    
 }

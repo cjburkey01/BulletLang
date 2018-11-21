@@ -21,4 +21,30 @@ public class AProgramIn extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("ProgramIn:\n");
+        
+        indent += indent();
+        
+        output.append(getIndent(indent));
+        output.append("Namespaces:\n");
+        for (ANamespace namespace : namespaces) {
+            output.append(namespace.debug(indent + indent()));
+        }
+        output.append(getIndent(indent));
+        output.append("Contents:\n");
+        for (AContent content : contents) {
+            output.append(content.debug(indent + indent()));
+        }
+        output.append(getIndent(indent));
+        output.append("Statements:\n");
+        for (AStatement statement : statements) {
+            output.append(statement.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

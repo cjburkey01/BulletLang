@@ -22,4 +22,15 @@ public class AArgument extends ABase {
         this.typeDec = typeDec;
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Argument:\n");
+        
+        output.append(name.getFormattedDebug(indent + indent()));
+        typeDec.ifPresent(aTypeDec -> output.append(aTypeDec.debug(indent + indent())));
+        return output.toString();
+    }
+    
 }

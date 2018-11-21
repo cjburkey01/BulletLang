@@ -13,4 +13,24 @@ public abstract class ABase {
         this.ctx = ctx;
     }
     
+    public final String debug(int indent) {
+        String output = getFormattedDebug(indent);
+        if (!output.endsWith("\n")) {
+            output += '\n';
+        }
+        return output;
+    }
+    
+    public abstract String getFormattedDebug(int indent);
+    
+    public static String getIndent(int amt) {
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < amt; i ++) output.append(i % indent() == 0 ? '|' : ' ');
+        return output.toString();
+    }
+    
+    public static int indent() {
+        return 2;
+    }
+    
 }

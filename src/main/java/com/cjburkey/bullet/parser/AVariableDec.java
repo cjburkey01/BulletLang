@@ -14,12 +14,25 @@ public class AVariableDec extends ABase {
     public final Optional<ATypeDec> typeDec;
     public final Optional<AExpression> expression;
     
-    public AVariableDec(AVariableRef variableRef, Optional<ATypeDec> typeDec, Optional<AExpression> expression, BulletParser.VariableDecContext ctx) {
+    public AVariableDec(AVariableRef variableRef, Optional<ATypeDec> typeDec, Optional<AExpression> expression,
+                        BulletParser.VariableDecContext ctx) {
         super(ctx);
         
         this.variableRef = variableRef;
         this.typeDec = typeDec;
         this.expression = expression;
+    }
+    
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("VariableDec:\n");
+        
+        output.append(variableRef.debug(indent + indent()));
+        typeDec.ifPresent(aTypeDec -> output.append(aTypeDec.debug(indent + indent())));
+        expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
+        return output.toString();
     }
     
 }

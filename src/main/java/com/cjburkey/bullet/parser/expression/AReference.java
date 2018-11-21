@@ -39,4 +39,22 @@ public class AReference extends AExpression {
         this.funcParams = Optional.empty();
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Reference:\n");
+        output.append(getIndent(indent + indent()));
+        output.append("IsFunctionRef:\n");
+        output.append(getIndent(indent + indent() * 2));
+        output.append(isFunctionRef);
+        output.append('\n');
+        
+        expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
+        name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
+        variableRef.ifPresent(aVariableRef -> output.append(aVariableRef.debug(indent + indent())));
+        funcParams.ifPresent(aFuncParams -> output.append(aFuncParams.debug(indent + indent())));
+        return output.toString();
+    }
+    
 }

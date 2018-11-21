@@ -17,4 +17,8 @@ public class AStatementIf extends AStatement {
         this.ifStatement = ifStatement;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "StatementIf:\n" + ifStatement.debug(indent + indent());
+    }
+    
 }

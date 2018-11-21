@@ -17,4 +17,15 @@ public class AFuncParams extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("FuncParams:\n");
+        for (AExpression expression : expressions) {
+            output.append(expression.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

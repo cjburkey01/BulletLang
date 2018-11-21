@@ -20,4 +20,8 @@ public class ANamespace extends ABase {
         this.namespaceIn = namespaceIn;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Namespace:\n" + name.debug(indent + indent()) + namespaceIn.debug(indent + indent());
+    }
+    
 }

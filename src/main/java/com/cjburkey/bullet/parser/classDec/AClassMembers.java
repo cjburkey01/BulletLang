@@ -19,4 +19,19 @@ public class AClassMembers extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("ClassMembers:\n");
+        
+        for (AVariableDec variableDec : variableDecs) {
+            output.append(variableDec.debug(indent + indent()));
+        }
+        for (AFunctionDec functionDec : functionDecs) {
+            output.append(functionDec.debug(indent + indent()));
+        }
+        return output.toString();
+    }
+    
 }

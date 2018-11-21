@@ -1,7 +1,26 @@
-five := 5;
-
-def six() {
-    6
+class Person {
+    def _(firstName of String, lastName of String) {
+        @firstName := firstName;
+        @lastName := lastName;
+    }
+    
+    def firstName {
+        @firstName
+    }
+    
+    def lastName {
+        @lastName
+    }
+    
+    def + (other of Person) {
+        @"#{@firstName} #{@lastName} and #{other.@firstName} #{other.@lastName}"
+    }
 }
 
-print five + six;
+bob := Person.new "Bob", "Johnson";
+
+print @"Hello #{bob.firstName} #{bob.lastName}";
+
+sue := Person.new "Sue", "Timmy";
+
+print bob + sue;        # Prints `Bob Johnson and Sue Timmy`

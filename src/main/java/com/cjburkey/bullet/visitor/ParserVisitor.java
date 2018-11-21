@@ -29,8 +29,8 @@ import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.namespace.ANamespaceIn;
 import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.parser.program.AProgramIn;
-import com.cjburkey.bullet.parser.requirement.ARequirement;
-import com.cjburkey.bullet.parser.requirement.ARequirements;
+import com.cjburkey.bullet.parser.program.requirement.ARequirement;
+import com.cjburkey.bullet.parser.program.requirement.ARequirements;
 import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.parser.statement.AStatementExpression;
 import com.cjburkey.bullet.parser.statement.AStatementIf;
@@ -104,7 +104,7 @@ public class ParserVisitor {
             // No null check needed for requirements because our custom base class will return Optional.empty() if the
             // input is null
             final ARequirements requirements = visit(ctx.requirements()).orElseGet(() -> new ARequirements(ctx));
-            _requirementVisitor.visit(ctx.requirement()).ifPresent(requirements.requirements::add);
+            _requirementVisitor.visit(ctx.requirement()).ifPresent(requirement -> requirements.requirements.add(0, requirement));
             return Optional.of(requirements);
         }
     }
@@ -122,9 +122,9 @@ public class ParserVisitor {
     private static class ProgramInVisitor extends B<AProgramIn> {
         public Optional<AProgramIn> visitProgramIn(BulletParser.ProgramInContext ctx) {
             final AProgramIn programIn = visit(ctx.programIn()).orElseGet(() -> new AProgramIn(ctx));
-            _namespaceVisitor.visit(ctx.namespace()).ifPresent(programIn.namespaces::add);
-            _contentVisitor.visit(ctx.content()).ifPresent(programIn.contents::add);
-            _statementVisitor.visit(ctx.statement()).ifPresent(programIn.statements::add);
+            _namespaceVisitor.visit(ctx.namespace()).ifPresent(namespace -> programIn.namespaces.add(0, namespace));
+            _contentVisitor.visit(ctx.content()).ifPresent(content -> programIn.contents.add(0, content));
+            _statementVisitor.visit(ctx.statement()).ifPresent(statement -> programIn.statements.add(0, statement));
             return Optional.of(programIn);
         }
     }
@@ -150,7 +150,7 @@ public class ParserVisitor {
     private static class NamespaceInVisitor extends B<ANamespaceIn> {
         public Optional<ANamespaceIn> visitNamespaceIn(BulletParser.NamespaceInContext ctx) {
             final ANamespaceIn namespaceIn = _namespaceInVisitor.visit(ctx.namespaceIn()).orElseGet(() -> new ANamespaceIn(ctx));
-            _contentVisitor.visit(ctx.content()).ifPresent(namespaceIn.contents::add);
+            _contentVisitor.visit(ctx.content()).ifPresent(content -> namespaceIn.contents.add(0, content));
             return Optional.of(namespaceIn);
         }
     }
@@ -222,6 +222,9 @@ public class ParserVisitor {
         public Optional<AExpression> visitReference(BulletParser.ReferenceContext ctx) {
             return _referenceVisitor.visit(ctx).map(val -> val);
         }
+        public Optional<AExpression> visitFunctionReference(BulletParser.FunctionReferenceContext ctx) {
+            return _referenceVisitor.visit(ctx).map(val -> val);
+        }
     }
     
     private static class BooleanVisitor extends B<ABoolean> {
@@ -264,6 +267,9 @@ public class ParserVisitor {
     
     private static class BinaryOpVisitor extends B<ABinaryOperator> {
         public Optional<ABinaryOperator> visitBinaryOp(BulletParser.BinaryOpContext ctx) {
+            if (ctx.expression().size() != 2) {
+                return Optional.empty();
+            }
             final Optional<AExpression> expressionA = _expressionVisitor.visit(ctx.expression(0));
             final Optional<AExpression> expressionB = _expressionVisitor.visit(ctx.expression(1));
             final Optional<AOperator> operator = AOperator.from(ctx);
@@ -291,7 +297,7 @@ public class ParserVisitor {
     private static class FuncParamsVisitor extends B<AFuncParams> {
         public Optional<AFuncParams> visitFuncParams(BulletParser.FuncParamsContext ctx) {
             final AFuncParams funcParams = visit(ctx.funcParams()).orElseGet(() -> new AFuncParams(ctx));
-            _expressionVisitor.visit(ctx.expression()).ifPresent(funcParams.expressions::add);
+            _expressionVisitor.visit(ctx.expression()).ifPresent(expression -> funcParams.expressions.add(0, expression));
             return Optional.of(funcParams);
         }
     }
@@ -311,8 +317,8 @@ public class ParserVisitor {
     
     private static class ArgumentsVisitor extends B<AArguments> {
         public Optional<AArguments> visitArguments(BulletParser.ArgumentsContext ctx) {
-            final AArguments arguments = visit(ctx.argument()).orElseGet(() -> new AArguments(ctx));
-            _argumentVisitor.visit(ctx.argument()).ifPresent(arguments.arguments::add);
+            final AArguments arguments = visit(ctx.arguments()).orElseGet(() -> new AArguments(ctx));
+            _argumentVisitor.visit(ctx.argument()).ifPresent(argument -> arguments.arguments.add(0, argument));
             return Optional.of(arguments);
         }
     }
@@ -328,7 +334,7 @@ public class ParserVisitor {
     private static class StatementsVisitor extends B<AStatements> {
         public Optional<AStatements> visitStatements(BulletParser.StatementsContext ctx) {
             final AStatements statements = visit(ctx.statements()).orElseGet(() -> new AStatements(ctx));
-            _statementVisitor.visit(ctx.statement()).ifPresent(statements.statements::add);
+            _statementVisitor.visit(ctx.statement()).ifPresent(statement -> statements.statements.add(0, statement));
             return Optional.of(statements);
         }
     }
@@ -420,8 +426,8 @@ public class ParserVisitor {
     private static class ClassMembersVisitor extends B<AClassMembers> {
         public Optional<AClassMembers> visitClassMembers(BulletParser.ClassMembersContext ctx) {
             final AClassMembers types = visit(ctx.classMembers()).orElseGet(() -> new AClassMembers(ctx));
-            _variableDecVisitor.visit(ctx.variableDec()).ifPresent(types.variableDecs::add);
-            _functionDecVisitor.visit(ctx.functionDec()).ifPresent(types.functionDecs::add);
+            _variableDecVisitor.visit(ctx.variableDec()).ifPresent(variableDec -> types.variableDecs.add(0, variableDec));
+            _functionDecVisitor.visit(ctx.functionDec()).ifPresent(functionDec -> types.functionDecs.add(0, functionDec));
             return Optional.of(types);
         }
     }

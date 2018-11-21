@@ -15,4 +15,20 @@ public class ATypes extends ABase {
         super(ctx);
     }
     
+    public String getFormattedDebug(int indent) {
+        StringBuilder output = new StringBuilder();
+        
+        output.append(getIndent(indent));
+        output.append("Types:\n");
+        
+        for (String type : types) {
+            output.append(getIndent(indent + indent()));
+            output.append("Type:\n");
+            output.append(getIndent(indent + indent() * 2));
+            output.append(type);
+            output.append('\n');
+        }
+        return output.toString();
+    }
+    
 }

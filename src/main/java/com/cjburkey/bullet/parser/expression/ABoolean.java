@@ -16,4 +16,8 @@ public class ABoolean extends AExpression {
         this.bool = bool;
     }
     
+    public String getFormattedDebug(int indent) {
+        return getIndent(indent) + "Boolean:\n" + getIndent(indent + indent()) + bool + '\n';
+    }
+    
 }
