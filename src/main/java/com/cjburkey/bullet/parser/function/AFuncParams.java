@@ -2,8 +2,7 @@ package com.cjburkey.bullet.parser.function;
 
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import java.util.ArrayList;
-import java.util.List;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
@@ -11,7 +10,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class AFuncParams extends ABase {
     
-    public final List<AExpression> expressions = new ArrayList<>();
+    public final ObjectArrayList<AExpression> expressions = new ObjectArrayList<>();
     
     public AFuncParams(ParserRuleContext ctx) {
         super(ctx);

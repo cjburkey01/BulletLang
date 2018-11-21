@@ -2,15 +2,14 @@ package com.cjburkey.bullet.parser.program.requirement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import java.util.ArrayList;
-import java.util.List;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Created by CJ Burkey on 2018/11/19
  */
 public class ARequirements extends ABase {
     
-    public final List<ARequirement> requirements = new ArrayList<>();
+    public final ObjectArrayList<ARequirement> requirements = new ObjectArrayList<>();
     
     public ARequirements(BulletParser.RequirementsContext ctx) {
         super(ctx);

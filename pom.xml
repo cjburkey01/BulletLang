@@ -29,6 +29,9 @@
         <!-- Command Line Interpretation -->
         <picocli.version>3.7.0</picocli.version>
         
+        <!-- Data Storage -->
+        <fastutil.version>8.2.2</fastutil.version>
+        
         <!-- Console Output -->
         <log4j.version>2.11.1</log4j.version>
         <jansi.version>1.17.1</jansi.version>
@@ -114,13 +117,14 @@
         </profile>
     </profiles>
     
-    <!-- ANTLR4 Runtime -->
     <dependencies>
+        <!-- ANTLR4 Runtime -->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>${antlr.version}</version>
         </dependency>
+        
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
@@ -135,6 +139,11 @@
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
             <version>${jansi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastutil.version}</version>
         </dependency>
     </dependencies>
     

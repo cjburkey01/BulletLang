@@ -5,17 +5,16 @@ import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AContent;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import java.util.ArrayList;
-import java.util.List;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * Created by CJ Burkey on 2018/11/19
  */
 public class AProgramIn extends ABase {
     
-    public final List<ANamespace> namespaces = new ArrayList<>();
-    public final List<AContent> contents = new ArrayList<>();
-    public final List<AStatement> statements = new ArrayList<>();
+    public final ObjectArrayList<ANamespace> namespaces = new ObjectArrayList<>();
+    public final ObjectArrayList<AContent> contents = new ObjectArrayList<>();
+    public final ObjectArrayList<AStatement> statements = new ObjectArrayList<>();
     
     public AProgramIn(BulletParser.ProgramInContext ctx) {
         super(ctx);

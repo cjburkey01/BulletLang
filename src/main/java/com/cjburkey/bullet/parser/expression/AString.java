@@ -3,9 +3,7 @@ package com.cjburkey.bullet.parser.expression;
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.visitor.ParserVisitor;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +18,7 @@ public class AString extends AExpression {
     
     public final boolean isSmart;
     public final String string;
-    public final Map<Integer, AExpression> smartInsertionPoints = new LinkedHashMap<>();
+    public final Int2ObjectLinkedOpenHashMap<AExpression> smartInsertionPoints = new Int2ObjectLinkedOpenHashMap<>();
     
     public AString(boolean isSmart, String string, BulletParser.StringContext ctx) {
         super(ctx);
@@ -69,12 +67,12 @@ public class AString extends AExpression {
     }
     
     public String getFormattedDebug(int indent) {
-        // Show insertion points as the '^' character in the string for debugging
+        // Show insertion points as '<>' character in the string for debugging
         StringBuilder str = new StringBuilder(string);
         if (isSmart) {
-            Integer[] points = smartInsertionPoints.keySet().toArray(new Integer[0]);
+            int[] points = smartInsertionPoints.keySet().toIntArray();
             for (int i = 0; i < points.length; i ++) {
-                str.insert(i + points[i], '^');
+                str.insert((i * 2) + points[i], "<>");
             }
         }
         
