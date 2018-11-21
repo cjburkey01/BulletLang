@@ -1,28 +1,61 @@
-namespace Test {
-    class Person {
-        def _(firstName of String, lastName of String) {
-            @firstName := firstName;
-            @lastName := lastName;
-        }
+class Person {
+    def _(firstName of String, lastName of String) {
+        @@people = @@people + 1;
         
-        def firstName {
-            @firstName
-        }
-        
-        def lastName {
-            @lastName
-        }
-        
-        def + (other of Person) {
-            @"#{@firstName} #{@lastName} and #{other.@firstName} #{other.@lastName}"
-        }
+        @firstName := firstName;
+        @lastName := lastName;
+    }
+    
+    def firstName {
+        @firstName
+    }
+    
+    def lastName {
+        @lastName
+    }
+    
+    def fullName {
+        @"#{firstName} #{lastName}";
+    }
+    
+    def greeting {
+        @"Hello #{fullName}"
+    }
+    
+    def +(other of Person) {
+        @"#{fullName} and #{other.fullName}"
+    }
+    
+    def -(other of Person) {
+        @"#{fullName} without #{other.fullName}"
+    }
+    
+    def *(other of Person) {
+        @"#{fullName} married to #{other.fullName}"
+    }
+    
+    def /(other of Person) {
+        @"#{fullName} divorced with #{other.fullName}"
+    }
+    
+    def **(other of Person) {
+        @"#{fullName}'s child with #{other.fullName}"
+    }
+    
+    def - {
+        @"Deceased #{fullName}"
     }
 }
 
 bob := Person.new "Bob", "Johnson";
 
-print @"Hello #{bob.firstName} #{bob.lastName}";
+print bob.greeting;         # Prints `Hello Bob Johnson`
 
 sue := Person.new "Sue", "Timmy";
 
 print bob + sue;        # Prints `Bob Johnson and Sue Timmy`
+print bob - sue;        # Prints `Bob Johnson without Sue Timmy`
+print bob * sue;        # Prints `Bob Johnson married to Sue Timmy`
+print bob / sue;        # Prints `Bob Johnson divorced Sue Timmy`
+print bob ** sue;       # Prints `Bob Johnson's child with Sue Timmy`
+print sue - -bob;       # Prints `Sue Timmy without Deceased Bob Johnson`

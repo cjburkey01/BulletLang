@@ -6,7 +6,7 @@ grammar Bullet;
 
 // Comments
 SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
-ML_COMMENT  : '/#' .*? '#/' -> skip ;
+ML_COMMENT  : ('/#' | '/*') .*? ('#/' | '*/') -> skip ;
 
 // Ignore whitespace but allow through if necessary
 WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
@@ -40,6 +40,19 @@ TIMES       : '*' ;
 DIV         : '/' ;
 PLUS        : '+' ;
 MINUS       : '-' ;
+BIT_AND     : '&' ;
+BIT_OR      : '|' ;
+BIT_XOR     : '^' ;
+BIT_NOT     : '~' ;
+BIT_RIGHT   : '>>' ;
+BIT_LEFT    : '<<' ;
+NOT         : '!' ;
+NOT_EQ      : '!=' ;
+EQUAL       : '==' ;
+GREAT       : '>' ;
+LESS        : '<' ;
+LESS_EQ     : '<=' ;
+GREAT_EQ    : '>=' ;
 
 // Late
 BOOL        : ('true' | 'false') ;
@@ -88,7 +101,27 @@ content         : variableDec
                 | classDec
                 ;
 
-functionDec     : DEF (name | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDec? LB statements RB ;
+functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB statements RB ;
+
+op              : POW
+                | ROOT
+                | TIMES
+                | DIV
+                | PLUS
+                | MINUS
+                | BIT_AND
+                | BIT_OR
+                | BIT_XOR
+                | BIT_NOT
+                | BIT_RIGHT
+                | BIT_LEFT
+                | NOT
+                | NOT_EQ
+                | GREAT
+                | GREAT_EQ
+                | LESS
+                | LESS_EQ
+                | EQUAL ;
 
 arguments       : argument COM arguments
                 | argument
@@ -121,30 +154,44 @@ variableDec     : variableRef typeDec? DEC expression SEMI          // Declarati
 
 variableAssign  : variableRef EQ expression ;
 
-expression      : BOOL                                          # Boolean
+funcParams      : expression COM funcParams
+                | expression
+                ;
+
+expression      // Literals
+                : BOOL                                          # Boolean
                 | INTEGER                                       # Integer
                 | FLOAT                                         # Float
                 | STRING                                        # String
                 | LIT_STRING                                    # LiteralString
                 
+                // Bitwise operators
+                | BIT_NOT expression                                    # UnaryOp
+                | expression (BIT_AND | BIT_OR | BIT_XOR) expression    # BinaryOp
+                | expression (BIT_RIGHT | BIT_LEFT) expression          # BinaryOp
+                
+                // Value operators
+                | NOT expression                                                                # UnaryOp
+                | expression (LESS | GREAT | LESS_EQ | GREAT_EQ | EQUAL | NOT_EQ) expression    # BinaryOp
+                
+                // Mathematical operators
                 | expression (POW | ROOT)                       # UnaryOp
                 | expression (POW | ROOT) expression            # BinaryOp
-                | MINUS expression                              # UnaryOp       // This must be out of order for op-precedence
+                | MINUS expression                              # UnaryOp               // This must be out of order for op-precedence
                 | expression (TIMES | DIV) expression           # BinaryOp
                 | expression (PLUS | MINUS) expression          # BinaryOp
+                | expression (GREAT | LESS) expression          # BinaryOp
+                | expression (GREAT | LESS) expression          # BinaryOp
                 
                 | LP expression RP                              # ParenthesisWrap
                 
+                // References
                 | expression PER name LP funcParams? RP         # FunctionReference
                 | expression PER variableRef                    # Reference             // Variable or function
                 | expression PER name funcParams                # FunctionReference
                 | name LP funcParams? RP                        # FunctionReference
                 | variableRef                                   # Reference             // Variable or function
                 | name funcParams                               # FunctionReference
-                ;
-
-funcParams      : expression COM funcParams
-                | expression
                 ;
 
 ifStatement     : IF expression LB statements RB

@@ -117,7 +117,7 @@ public class BulletLang {
         // Begin parsing
         info("Parsing input");
         Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
-        if (!program.isPresent()) {
+        if (!program.isPresent() || ErrorHandler.hasErrored()) {
             error("Failed to parse input");
         } else {
             debugPrint(program.get());

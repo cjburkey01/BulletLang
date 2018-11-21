@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("WeakerAccess")
 public class AString extends AExpression {
     
-    private static final Pattern internalExpressionPattern = Pattern.compile("\\#\\{.*?\\}");
+    private static final Pattern internalExpressionPattern = Pattern.compile("#\\{.*?}");
     
     public final boolean isSmart;
     public final String string;

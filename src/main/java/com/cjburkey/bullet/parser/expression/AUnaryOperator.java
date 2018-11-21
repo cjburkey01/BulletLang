@@ -6,21 +6,14 @@ import com.cjburkey.bullet.parser.AOperator;
 /**
  * Created by CJ Burkey on 2018/11/20
  */
-@SuppressWarnings("WeakerAccess")
-public class AUnaryOperator extends AExpression {
-    
-    public final AExpression expression;
-    public final AOperator operator;
+public class AUnaryOperator extends AOperatorExpression {
     
     public AUnaryOperator(AExpression expression, AOperator operator, BulletParser.UnaryOpContext ctx) {
-        super(ctx);
-        
-        this.expression = expression;
-        this.operator = operator;
+        super(expression, operator, ctx);
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "UnaryOperator:\n" + expression.debug(indent + indent()) + operator.debug(indent + indent());
+        return getIndent(indent) + "UnaryOperator:\n" + expressionA.debug(indent + indent()) + operator.debug(indent + indent());
     }
     
 }

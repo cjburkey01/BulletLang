@@ -20,7 +20,8 @@ public class AVariableAssign extends ABase {
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "Program:\n" + variableRef.debug(indent + indent()) + expression.debug(indent + indent());
+        return getIndent(indent) + "VariableAssign:\n" + variableRef.debug(indent + indent()) +
+                expression.debug(indent + indent());
     }
     
 }

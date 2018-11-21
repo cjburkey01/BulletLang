@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AName;
+import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.AVariableRef;
 import com.cjburkey.bullet.parser.function.AFuncParams;
 import java.util.Optional;
@@ -17,6 +18,30 @@ public class AReference extends AExpression {
     public final Optional<AName> name;
     public final Optional<AVariableRef> variableRef;
     public final Optional<AFuncParams> funcParams;
+    
+    // Create a function reference to <expression>.<operator>()
+    AReference(AExpression expression, AOperator operator, BulletParser.UnaryOpContext ctx) {
+        super(ctx);
+        
+        this.isFunctionRef = true;
+        this.expression = Optional.ofNullable(expression);
+        this.name = Optional.of(new AName(operator, ctx));
+        this.variableRef = Optional.empty();
+        this.funcParams = Optional.empty();
+    }
+    
+    // Create a function reference to <expressionA>.<operator>(<expressionB>)
+    AReference(AExpression expressionA, AExpression expressionB, AOperator operator, BulletParser.BinaryOpContext ctx) {
+        super(ctx);
+        
+        this.isFunctionRef = true;
+        this.expression = Optional.ofNullable(expressionA);
+        this.name = Optional.of(new AName(operator, ctx));
+        this.variableRef = Optional.empty();
+        this.funcParams = Optional.of(new AFuncParams(ctx));
+        
+        this.funcParams.get().expressions.add(expressionB);
+    }
     
     public AReference(Optional<AExpression> expression, AName name, Optional<AFuncParams> funcParams,
                          BulletParser.FunctionReferenceContext ctx) {

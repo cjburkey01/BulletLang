@@ -9,6 +9,18 @@ public class AName extends ABase {
     
     public final String identifier;
     
+    public AName(AOperator operator, BulletParser.UnaryOpContext ctx) {
+        super(ctx);
+        
+        this.identifier = operator.token;
+    }
+    
+    public AName(AOperator operator, BulletParser.BinaryOpContext ctx) {
+        super(ctx);
+        
+        this.identifier = operator.token;
+    }
+    
     public AName(String identifier, BulletParser.NameContext ctx) {
         super(ctx);
         

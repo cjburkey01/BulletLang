@@ -2,16 +2,16 @@ package com.cjburkey.bullet.visitor;
 
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.ATypes;
-import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.AContent;
 import com.cjburkey.bullet.parser.AIfStatement;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableAssign;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.AVariableRef;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.classDec.AClassMembers;
 import com.cjburkey.bullet.parser.expression.ABinaryOperator;
 import com.cjburkey.bullet.parser.expression.ABoolean;
@@ -29,8 +29,8 @@ import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.namespace.ANamespaceIn;
 import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.parser.program.AProgramIn;
-import com.cjburkey.bullet.parser.program.requirement.ARequirement;
-import com.cjburkey.bullet.parser.program.requirement.ARequirements;
+import com.cjburkey.bullet.parser.program.ARequirement;
+import com.cjburkey.bullet.parser.program.ARequirements;
 import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.parser.statement.AStatementExpression;
 import com.cjburkey.bullet.parser.statement.AStatementIf;
@@ -309,7 +309,7 @@ public class ParserVisitor {
     public static final class FunctionDecVisitor extends B<AFunctionDec> {
         public Optional<AFunctionDec> visitFunctionDec(BulletParser.FunctionDecContext ctx) {
             final Optional<AName> name = _nameVisitor.visit(ctx.name());
-            final Optional<AOperator> operator = AOperator.from(ctx);
+            final Optional<AOperator> operator = AOperator.from(ctx.op());
             final Optional<AArguments> arguments = _argumentsVisitor.visit(ctx.arguments());
             final Optional<AStatements> statements = _statementsVisitor.visit(ctx.statements());
             if (name.isPresent() || operator.isPresent()) {

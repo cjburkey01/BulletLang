@@ -1,4 +1,4 @@
-package com.cjburkey.bullet.parser.program.requirement;
+package com.cjburkey.bullet.parser.program;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;

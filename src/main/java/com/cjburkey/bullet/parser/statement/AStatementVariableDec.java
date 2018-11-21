@@ -18,7 +18,7 @@ public class AStatementVariableDec extends AStatement {
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "StatementVariableDec:\n" + variableDec.debug(indent + indent());
+        return variableDec.debug(indent);
     }
     
 }
