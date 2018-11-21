@@ -63,6 +63,8 @@ name            : IDENTIFIER ;
 
 program         : requirements programIn EOF ;
 
+partialExp      : expression EOF ;      // Used with smart strings in the Java source
+
 requirements    : requirement requirements
                 |
                 ;

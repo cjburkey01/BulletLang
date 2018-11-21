@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
@@ -107,12 +108,8 @@ public class BulletLang {
     
     @SuppressWarnings("unused")
     public void compile(InputStream input, OutputStream output) throws IOException {
-        // Initialize the lexer to be fed into the parser
-        BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        
         // Initialize parser
-        BulletParser parser = new BulletParser(tokenStream);
+        BulletParser parser = buildParser(buildLexer(input));
         parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
         parser.removeErrorListeners();                  // Clear the default error listener
         parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
@@ -137,6 +134,22 @@ public class BulletLang {
         System.out.println(out);
         System.out.println();
         info("Finished print");
+    }
+    
+    public static BulletLexer buildLexer(InputStream input) throws IOException {
+        return new BulletLexer(CharStreams.fromStream(input, StandardCharsets.UTF_8));
+    }
+    
+    public static BulletLexer buildLexer(String input) {
+        return new BulletLexer(CharStreams.fromString(input));
+    }
+    
+    public static BulletParser buildParser(BulletLexer lexer) {
+        return new BulletParser(new CommonTokenStream(lexer));
+    }
+    
+    public static BulletParser buildQuickParser(String input) {
+        return buildParser(buildLexer(input));
     }
     
 }

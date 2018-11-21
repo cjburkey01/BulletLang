@@ -1,19 +1,21 @@
-class Person {
-    def _(firstName of String, lastName of String) {
-        @firstName := firstName;
-        @lastName := lastName;
-    }
-    
-    def firstName {
-        @firstName
-    }
-    
-    def lastName {
-        @lastName
-    }
-    
-    def + (other of Person) {
-        @"#{@firstName} #{@lastName} and #{other.@firstName} #{other.@lastName}"
+namespace Test {
+    class Person {
+        def _(firstName of String, lastName of String) {
+            @firstName := firstName;
+            @lastName := lastName;
+        }
+        
+        def firstName {
+            @firstName
+        }
+        
+        def lastName {
+            @lastName
+        }
+        
+        def + (other of Person) {
+            @"#{@firstName} #{@lastName} and #{other.@firstName} #{other.@lastName}"
+        }
     }
 }
 
