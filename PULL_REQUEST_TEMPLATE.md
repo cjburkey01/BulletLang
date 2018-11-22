@@ -1,0 +1,1 @@
+Just explain what you did, why it had to change/be added, etc. Thank you for supporting BulletLang! It takes a lot of work to develop a programming language, and I can't thank you enough for helping out!
