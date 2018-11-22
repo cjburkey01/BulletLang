@@ -3,6 +3,8 @@ package com.cjburkey.bullet.parser.program;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AContent;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.verify.BulletVerifyError;
@@ -11,10 +13,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
+@SuppressWarnings("WeakerAccess")
 public class AProgramIn extends ABase {
     
     public final ObjectArrayList<ANamespace> namespaces = new ObjectArrayList<>();
-    public final ObjectArrayList<AContent> contents = new ObjectArrayList<>();
+    public final ObjectArrayList<AFunctionDec> functions = new ObjectArrayList<>();
+    public final ObjectArrayList<AClassDec> classes = new ObjectArrayList<>();
     public final ObjectArrayList<AStatement> statements = new ObjectArrayList<>();
     
     public AProgramIn(BulletParser.ProgramInContext ctx) {
@@ -35,9 +39,14 @@ public class AProgramIn extends ABase {
             output.append(namespace.debug(indent + indent()));
         }
         output.append(getIndent(indent));
-        output.append("Contents:\n");
-        for (AContent content : contents) {
-            output.append(content.debug(indent + indent()));
+        output.append("Functions:\n");
+        for (AFunctionDec function : functions) {
+            output.append(function.debug(indent + indent()));
+        }
+        output.append(getIndent(indent));
+        output.append("Classes:\n");
+        for (AClassDec classDec : classes) {
+            output.append(classDec.debug(indent + indent()));
         }
         output.append(getIndent(indent));
         output.append("Statements:\n");
@@ -49,7 +58,7 @@ public class AProgramIn extends ABase {
     
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
-        return verifyLists(namespaces, contents, statements);
+        return verifyLists(namespaces, functions, classes, statements);
     }
     
 }

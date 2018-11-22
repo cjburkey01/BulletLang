@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import com.cjburkey.bullet.parser.statement.AStatements;
+import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -15,9 +15,9 @@ public class AIfStatement extends ABase {
     
     public final boolean isElse;
     public final Optional<AExpression> expression;
-    public final AStatements statements;
+    public final AScope statements;
     
-    public AIfStatement(boolean isElse, Optional<AExpression> expression, AStatements statements, BulletParser.IfStatementContext ctx) {
+    public AIfStatement(boolean isElse, Optional<AExpression> expression, AScope statements, BulletParser.IfStatementContext ctx) {
         super(ctx);
         
         this.isElse = isElse;

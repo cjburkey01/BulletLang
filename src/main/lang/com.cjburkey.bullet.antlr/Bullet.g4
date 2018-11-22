@@ -76,7 +76,7 @@ name            : IDENTIFIER ;
 
 program         : requirements programIn EOF ;
 
-partialExp      : expression EOF ;      // Used with smart strings in the Java source
+partialExp      : expression EOF ;      // Used with smart strings in the parser
 
 requirements    : requirement requirements
                 |
@@ -85,7 +85,8 @@ requirements    : requirement requirements
 requirement     : REQUIRE STRING SEMI ;
 
 programIn       : namespace programIn
-                | content programIn
+                | functionDec programIn
+                | classDec programIn
                 | statement programIn
                 |
                 ;
@@ -101,7 +102,7 @@ content         : variableDec
                 | classDec
                 ;
 
-functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB statements RB ;
+functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB scope RB ;
 
 op              : POW
                 | ROOT
@@ -129,9 +130,11 @@ arguments       : argument COM arguments
 
 argument        : name typeDec? ;
 
-typeDec         : OF IDENTIFIER ;
+arrayType       : LBR expression? RBR ;
 
-statements      : statement statements
+typeDec         : OF IDENTIFIER arrayType? ;
+
+scope           : statement scope
                 |
                 ;
 
@@ -149,12 +152,12 @@ variableRef     : VAR_TYPE? name ;
 //      [@[@]]<name> [of <type>] := <value>
 //      :[@[@]]variable of Type
 variableDec     : variableRef typeDec? DEC expression SEMI          // Declaration using ':='
-                | COLON VAR_TYPE? name typeDec SEMI                 // No-value declaration
+                | COLON variableRef typeDec SEMI                    // No-value declaration
                 ;
 
 variableAssign  : variableRef EQ expression ;
 
-funcParams      : expression COM funcParams
+exprList        : expression COM exprList
                 | expression
                 ;
 
@@ -186,17 +189,19 @@ expression      // Literals
                 | LP expression RP                              # ParenthesisWrap
                 
                 // References
-                | expression PER name LP funcParams? RP         # FunctionReference
+                | expression PER name LP exprList? RP           # FunctionReference
                 | expression PER variableRef                    # Reference             // Variable or function
-                | expression PER name funcParams                # FunctionReference
-                | expression PER op funcParams?                 # FunctionReference
-                | name LP funcParams? RP                        # FunctionReference
+                | expression PER name exprList                  # FunctionReference
+                | expression PER op exprList?                   # FunctionReference
+                | name LP exprList? RP                          # FunctionReference
                 | variableRef                                   # Reference             // Variable or function
-                | name funcParams                               # FunctionReference
+                | name exprList                                 # FunctionReference
+                
+                | LB exprList RB                                # ArrayValue
                 ;
 
-ifStatement     : IF expression LB statements RB
-                | ELSE expression? LB statements RB
+ifStatement     : IF expression LB scope RB
+                | ELSE expression? LB scope RB
                 ;
 
 classDec        : CLASS name (OF types)? LB classMembers RB ;

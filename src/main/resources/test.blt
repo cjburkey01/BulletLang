@@ -68,3 +68,6 @@ print bob.+(sue);
 
 # One possible reason to use the method call would be to avoid parenthesis:
 print bob.-;    # Instead of `print (-bob);`
+
+:arrayTest of Int32[];
+arrayValueTest := { 5, 4, 3, 2, 1 };

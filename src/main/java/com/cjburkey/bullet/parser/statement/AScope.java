@@ -8,11 +8,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 /**
  * Created by CJ Burkey on 2018/11/20
  */
-public class AStatements extends ABase {
+public class AScope extends ABase {
     
     public final ObjectArrayList<AStatement> statements = new ObjectArrayList<>();
     
-    public AStatements(BulletParser.StatementsContext ctx) {
+    public AScope(BulletParser.ScopeContext ctx) {
         super(ctx);
     }
     

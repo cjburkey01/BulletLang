@@ -4,7 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.parser.statement.AStatements;
+import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -18,9 +18,9 @@ public class AFunctionDec extends ABase {
     public Optional<AName> name;
     public Optional<AOperator> operator;
     public Optional<AArguments> arguments;
-    public Optional<AStatements> statements;
+    public Optional<AScope> statements;
     
-    public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<AStatements> statements,
+    public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<AScope> statements,
                         BulletParser.FunctionDecContext ctx) {
         super(ctx);
         
@@ -39,14 +39,14 @@ public class AFunctionDec extends ABase {
         name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
         operator.ifPresent(aOperator -> output.append(aOperator.debug(indent + indent())));
         arguments.ifPresent(aArguments -> output.append(aArguments.debug(indent + indent())));
-        statements.ifPresent(aStatements -> output.append(aStatements.debug(indent + indent())));
+        statements.ifPresent(aScope -> output.append(aScope.debug(indent + indent())));
         return output.toString();
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = name.map(AName::verify).orElseGet(ObjectArrayList::new);
         arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
-        statements.ifPresent(aStatements -> output.addAll(aStatements.verify()));
+        statements.ifPresent(aScope -> output.addAll(aScope.verify()));
         if (!name.isPresent() && !operator.isPresent()) {
             output.add(new BulletVerifyError("Invalid function lacking name", ctx));
         }

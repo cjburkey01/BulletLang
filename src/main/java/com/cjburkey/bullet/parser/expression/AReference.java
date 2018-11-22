@@ -4,7 +4,6 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.AVariableRef;
-import com.cjburkey.bullet.parser.function.AFuncParams;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -19,7 +18,7 @@ public class AReference extends AExpression {
     public final Optional<AExpression> expression;
     public final Optional<AName> name;
     public final Optional<AVariableRef> variableRef;
-    public final Optional<AFuncParams> funcParams;
+    public final Optional<AExprList> funcParams;
     
     // Create a function reference to <expression>.<operator>()
     AReference(AExpression expression, AOperator operator, BulletParser.UnaryOpContext ctx) {
@@ -40,12 +39,12 @@ public class AReference extends AExpression {
         this.expression = Optional.ofNullable(expressionA);
         this.name = Optional.of(new AName(operator, ctx));
         this.variableRef = Optional.empty();
-        this.funcParams = Optional.of(new AFuncParams(ctx));
+        this.funcParams = Optional.of(new AExprList(ctx));
         
         this.funcParams.get().expressions.add(expressionB);
     }
     
-    public AReference(Optional<AExpression> expression, AOperator operator, Optional<AFuncParams> funcParams,
+    public AReference(Optional<AExpression> expression, AOperator operator, Optional<AExprList> funcParams,
                          BulletParser.FunctionReferenceContext ctx) {
         super(ctx);
         
@@ -56,7 +55,7 @@ public class AReference extends AExpression {
         this.funcParams = funcParams;
     }
     
-    public AReference(Optional<AExpression> expression, AName name, Optional<AFuncParams> funcParams,
+    public AReference(Optional<AExpression> expression, AName name, Optional<AExprList> funcParams,
                          BulletParser.FunctionReferenceContext ctx) {
         super(ctx);
         
@@ -91,7 +90,7 @@ public class AReference extends AExpression {
         expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
         name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
         variableRef.ifPresent(aVariableRef -> output.append(aVariableRef.debug(indent + indent())));
-        funcParams.ifPresent(aFuncParams -> output.append(aFuncParams.debug(indent + indent())));
+        funcParams.ifPresent(aExprList -> output.append(aExprList.debug(indent + indent())));
         return output.toString();
     }
     
@@ -99,7 +98,7 @@ public class AReference extends AExpression {
         ObjectArrayList<BulletVerifyError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
         name.ifPresent(aName -> output.addAll(aName.verify()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.verify()));
-        funcParams.ifPresent(aFuncParams -> output.addAll(aFuncParams.verify()));
+        funcParams.ifPresent(aExprList -> output.addAll(aExprList.verify()));
         return output;
     }
     

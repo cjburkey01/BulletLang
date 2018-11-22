@@ -5,6 +5,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileInputStream;
@@ -132,7 +133,7 @@ public class BulletLang {
         ObjectArrayList<BulletVerifyError> errors = program.get().verify();
         if (!errors.isEmpty()) {
             for (BulletVerifyError error : errors) {
-                error(error.printText);
+                error.print(Log::error);
             }
             error("Failed to verify");
             return;
