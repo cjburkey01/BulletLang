@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -25,6 +26,10 @@ public class AExprList extends ABase {
             output.append(expression.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, expressions);
     }
     
     @SuppressWarnings("unchecked")

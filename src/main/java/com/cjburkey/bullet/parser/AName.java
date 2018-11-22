@@ -28,6 +28,9 @@ public class AName extends ABase {
         return getIndent(indent) + "Name:\n" + getIndent(indent + indent()) + identifier + '\n';
     }
     
+    public void settleChildren() {
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

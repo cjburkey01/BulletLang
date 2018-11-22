@@ -26,10 +26,15 @@ public class AVariableRef extends ABase {
                 getIndent(indent + indent() * 2) +  variableType + '\n' + name.debug(indent + indent());
     }
     
+    public void settleChildren() {
+        name.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }
     
+    @SuppressWarnings("unused")
     public enum AVariableType {
         GLOBAL,
         LOCAL,

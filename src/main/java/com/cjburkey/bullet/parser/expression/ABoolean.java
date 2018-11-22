@@ -22,6 +22,9 @@ public class ABoolean extends AExpression {
         return getIndent(indent) + "Boolean:\n" + getIndent(indent + indent()) + bool + '\n';
     }
     
+    public void settleChildren() {
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

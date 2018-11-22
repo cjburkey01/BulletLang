@@ -22,6 +22,10 @@ public class AArrayValue extends AExpression {
         return getIndent(indent) + "ArrayValue:\n" + exprList.debug(indent + indent());
     }
     
+    public void settleChildren() {
+        exprList.setScopeParent(getScope(), this);
+    }
+    
     // TODO: CHECK VARIABLE TYPES
     public ObjectArrayList<BulletVerifyError> verify() {
         return exprList.verify();

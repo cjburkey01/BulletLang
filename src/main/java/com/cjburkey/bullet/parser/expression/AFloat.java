@@ -31,6 +31,9 @@ public class AFloat extends AExpression {
         return getIndent(indent) + "Float:\n" + getIndent(indent + indent()) + floating + '\n';
     }
     
+    public void settleChildren() {
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
         if (!valid) output.add(new BulletVerifyError("Invalid floating point number", ctx));

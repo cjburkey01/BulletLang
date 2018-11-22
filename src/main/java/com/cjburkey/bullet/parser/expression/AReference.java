@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.AVariableRef;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -92,6 +93,13 @@ public class AReference extends AExpression {
         variableRef.ifPresent(aVariableRef -> output.append(aVariableRef.debug(indent + indent())));
         funcParams.ifPresent(aExprList -> output.append(aExprList.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChild(getScope(), this, expression);
+        IScopeContainer.makeChild(getScope(), this, name);
+        IScopeContainer.makeChild(getScope(), this, variableRef);
+        IScopeContainer.makeChild(getScope(), this, funcParams);
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

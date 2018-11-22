@@ -22,6 +22,10 @@ public class AStatementReturn extends AStatement {
         return getIndent(indent) + "StatementReturn:\n" + expression.debug(indent + indent());
     }
     
+    public void settleChildren() {
+        expression.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return expression.verify();
     }

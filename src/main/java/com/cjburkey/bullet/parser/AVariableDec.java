@@ -37,6 +37,12 @@ public class AVariableDec extends ABase {
         return output.toString();
     }
     
+    public void settleChildren() {
+        variableRef.setScopeParent(getScope(), this);
+        IScopeContainer.makeChild(getScope(), this, typeDec);
+        IScopeContainer.makeChild(getScope(), this, expression);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = variableRef.verify();
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.verify()));

@@ -11,7 +11,7 @@ import java.util.Optional;
  * Created by CJ Burkey on 2018/11/20
  */
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
-public class AIfStatement extends ABase {
+public class AIfStatement extends ABase implements IScopeContainer {
     
     public final boolean isElse;
     public final Optional<AExpression> expression;
@@ -39,6 +39,11 @@ public class AIfStatement extends ABase {
         expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
         output.append(statements.debug(indent + indent()));
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChild(getScope(), this, expression);
+        statements.setScopeParent(this, this);
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

@@ -38,6 +38,12 @@ public class AContent extends ABase {
         return output.toString();
     }
     
+    public void settleChildren() {
+        IScopeContainer.makeChild(getScope(), getParent(), variableDec);
+        IScopeContainer.makeChild(getScope(), getParent(), functionDec);
+        IScopeContainer.makeChild(getScope(), getParent(), classDec);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = variableDec.map(ABase::verify).orElseGet(ObjectArrayList::new);
         functionDec.ifPresent(aFunctionDec -> output.addAll(aFunctionDec.verify()));

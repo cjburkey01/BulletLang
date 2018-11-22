@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -33,6 +34,11 @@ public class AArgument extends ABase {
         output.append(name.getFormattedDebug(indent + indent()));
         typeDec.ifPresent(aTypeDec -> output.append(aTypeDec.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        name.setScopeParent(getScope(), this);
+        IScopeContainer.makeChild(getScope(), this, typeDec);
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

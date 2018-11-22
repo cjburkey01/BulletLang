@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.classDec;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AVariableDec;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -32,6 +33,11 @@ public class AClassMembers extends ABase {
             output.append(functionDec.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, variableDecs);
+        IScopeContainer.makeChildren(getScope(), this, functionDecs);
     }
     
     @SuppressWarnings("unchecked")

@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
@@ -26,6 +27,10 @@ public class AScope extends ABase {
             output.append(statement.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
     @SuppressWarnings("unchecked")

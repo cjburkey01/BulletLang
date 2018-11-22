@@ -24,6 +24,10 @@ public class ABinaryOperator extends AOperatorExpression {
                 expressionB.getFormattedDebug(indent + 2) + operator.debug(indent + indent());
     }
     
+    public void settleChildren() {
+        expressionB.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = super.verify();
         output.addAll(expressionB.verify());

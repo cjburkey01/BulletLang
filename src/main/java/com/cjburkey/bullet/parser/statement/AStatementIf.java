@@ -23,6 +23,10 @@ public class AStatementIf extends AStatement {
         return ifStatement.debug(indent);
     }
     
+    public void settleChildren() {
+        ifStatement.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return ifStatement.verify();
     }

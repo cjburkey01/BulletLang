@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.Optional;
  * Created by CJ Burkey on 2018/11/19
  */
 @SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType"})
-public class AClassDec extends ABase {
+public class AClassDec extends ABase implements IScopeContainer {
     
     public final AName name;
     public final Optional<ATypes> types;
@@ -36,6 +37,12 @@ public class AClassDec extends ABase {
         types.ifPresent(aTypes -> output.append(aTypes.debug(indent + indent())));
         classMembers.ifPresent(aClassMembers -> output.append(aClassMembers.debug(indent + indent())));
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        name.setScopeParent(getScope(), this);
+        types.ifPresent(aTypes -> aTypes.setScopeParent(getScope(), this));
+        classMembers.ifPresent(aClassMembers -> aClassMembers.setScopeParent(this, this));
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

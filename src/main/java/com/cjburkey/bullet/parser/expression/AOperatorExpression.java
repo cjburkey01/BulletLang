@@ -37,6 +37,10 @@ public abstract class AOperatorExpression extends AExpression {
         return functionReference;
     }
     
+    public void settleChildren() {
+        expressionA.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return expressionA.verify();
     }

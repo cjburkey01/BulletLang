@@ -23,7 +23,7 @@ exampleBoolean := false;
 differentBooleanVariable := true;
 differentBooleanVariable = false;
 
-# If-statements don't require parenthesis
+# If-scope don't require parenthesis
 if exampleBoolean {
     testFunction;
 } else differentBooleanVariable {   # Else-if blocks don't require an "else if", "elif", or similar special keyword

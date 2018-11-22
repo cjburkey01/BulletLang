@@ -26,6 +26,11 @@ public class AVariableAssign extends ABase {
                 expression.debug(indent + indent());
     }
     
+    public void settleChildren() {
+        variableRef.setScopeParent(getScope(), this);
+        expression.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = variableRef.verify();
         output.addAll(expression.verify());

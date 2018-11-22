@@ -31,6 +31,9 @@ public class ATypes extends ABase {
         return output.toString();
     }
     
+    public void settleChildren() {
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

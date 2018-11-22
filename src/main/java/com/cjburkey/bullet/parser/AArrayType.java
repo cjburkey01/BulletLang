@@ -33,6 +33,10 @@ public class AArrayType extends ABase {
         return output.toString();
     }
     
+    public void settleChildren() {
+        IScopeContainer.makeChild(getScope(), this, expression);
+    }
+    
     // TODO: ENSURE EXPRESSION RESOLVES TO INTEGER
     public ObjectArrayList<BulletVerifyError> verify() {
         return expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);

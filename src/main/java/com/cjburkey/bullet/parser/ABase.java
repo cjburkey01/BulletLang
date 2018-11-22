@@ -8,12 +8,29 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public abstract class ABase {
     
     public final ParserRuleContext ctx;
+    private IScopeContainer scope;
+    private ABase parent;
     
     public ABase(ParserRuleContext ctx) {
         this.ctx = ctx;
+    }
+    
+    public void setScopeParent(IScopeContainer scope, ABase parent) {
+        this.scope = scope;
+        this.parent = parent;
+        settleChildren();
+    }
+    
+    public IScopeContainer getScope() {
+        return scope;
+    }
+    
+    public ABase getParent() {
+        return parent;
     }
     
     public final String debug(int indent) {
@@ -25,6 +42,11 @@ public abstract class ABase {
     }
     
     public abstract String getFormattedDebug(int indent);
+    
+    // Sets all children's parents to self, where applicable
+    public abstract void settleChildren();
+    
+    // Verifies elements before compilation to detect errors
     public abstract ObjectArrayList<BulletVerifyError> verify();
     
     @SuppressWarnings("unchecked")

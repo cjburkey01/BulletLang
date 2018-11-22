@@ -31,6 +31,9 @@ public class AInteger extends AExpression {
         return getIndent(indent) + "Integer:\n" + getIndent(indent + indent()) + integer + '\n';
     }
     
+    public void settleChildren() {
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
         if (!valid) output.add(new BulletVerifyError("Invalid integer", ctx));

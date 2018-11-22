@@ -23,6 +23,10 @@ public class AStatementVariableAssign extends AStatement {
         return variableAssign.debug(indent);
     }
     
+    public void settleChildren() {
+        variableAssign.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return variableAssign.verify();
     }

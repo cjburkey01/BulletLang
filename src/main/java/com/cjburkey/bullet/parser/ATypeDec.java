@@ -26,6 +26,10 @@ public class ATypeDec extends ABase {
                 arrayType.map(aArrayType -> aArrayType.debug(indent + indent())).orElse("");
     }
     
+    public void settleChildren() {
+        IScopeContainer.makeChild(getScope(), this, arrayType);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

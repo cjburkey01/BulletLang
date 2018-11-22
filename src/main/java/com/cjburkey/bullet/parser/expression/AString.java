@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -100,6 +101,10 @@ public class AString extends AExpression {
         }
         
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, smartInsertionPoints.values());
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

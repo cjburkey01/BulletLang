@@ -127,7 +127,9 @@ public class BulletLang {
         if (debug) {
             debugPrint(program.get());
         }
-        info("Parsed input");
+        
+        info("Settling");
+        program.get().settleChildren();
         
         info("Verifying");
         ObjectArrayList<BulletVerifyError> errors = program.get().verify();
@@ -138,7 +140,8 @@ public class BulletLang {
             error("Failed to verify");
             return;
         }
-        info("Verification successful");
+        
+        info("Compiling");
     }
     
     private void debugPrint(AProgram program) {

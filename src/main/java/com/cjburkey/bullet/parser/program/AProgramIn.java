@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.program;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AContent;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
@@ -13,7 +13,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings("WeakerAccess")
 public class AProgramIn extends ABase {
     
     public final ObjectArrayList<ANamespace> namespaces = new ObjectArrayList<>();
@@ -54,6 +53,13 @@ public class AProgramIn extends ABase {
             output.append(statement.debug(indent + indent()));
         }
         return output.toString();
+    }
+    
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, namespaces);
+        IScopeContainer.makeChildren(getScope(), this, functions);
+        IScopeContainer.makeChildren(getScope(), this, classes);
+        IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
     @SuppressWarnings("unchecked")

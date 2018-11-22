@@ -22,6 +22,9 @@ public class ARequirement extends ABase {
         return getIndent(indent) + string + '\n';
     }
     
+    public void settleChildren() {
+    }
+    
     // TODO: CHECK IF FILE EXISTS IN SOURCE OR AS ABSOLUTE
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();

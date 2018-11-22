@@ -23,6 +23,10 @@ public class AStatementVariableDec extends AStatement {
         return variableDec.debug(indent);
     }
     
+    public void settleChildren() {
+        variableDec.setScopeParent(getScope(), this);
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return variableDec.verify();
     }
