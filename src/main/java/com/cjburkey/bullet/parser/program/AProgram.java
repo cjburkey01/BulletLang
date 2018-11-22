@@ -3,8 +3,13 @@ package com.cjburkey.bullet.parser.program;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
+import com.cjburkey.bullet.parser.namespace.ANamespace;
+import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -42,6 +47,22 @@ public class AProgram extends ABase implements IScopeContainer {
         ObjectArrayList<BulletVerifyError> output = requirements.map(ARequirements::verify).orElseGet(ObjectArrayList::new);
         output.addAll(programIn.map(AProgramIn::verify).orElseGet(ObjectArrayList::new));
         return output;
+    }
+    
+    public Optional<Collection<ANamespace>> getNamespaces() {
+        return programIn.map(aProgramIn -> aProgramIn.namespaces);
+    }
+    
+    public Optional<Collection<AFunctionDec>> getFunctionDecs() {
+        return programIn.map(aProgramIn -> aProgramIn.functions);
+    }
+    
+    public Optional<Collection<AClassDec>> getClassDecs() {
+        return programIn.map(aProgramIn -> aProgramIn.classes);
+    }
+    
+    public Optional<Collection<AStatement>> getStatements() {
+        return programIn.map(aProgramIn -> aProgramIn.statements);
     }
     
 }

@@ -4,9 +4,12 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -50,6 +53,14 @@ public class AClassDec extends ABase implements IScopeContainer {
         types.ifPresent(aTypes -> output.addAll(aTypes.verify()));
         classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.verify()));
         return output;
+    }
+    
+    public Optional<Collection<AVariableDec>> getVariableDecs() {
+        return classMembers.map(aClassMembers -> aClassMembers.variableDecs);
+    }
+    
+    public Optional<Collection<AFunctionDec>> getFunctionDecs() {
+        return classMembers.map(aClassMembers -> aClassMembers.functionDecs);
     }
     
 }

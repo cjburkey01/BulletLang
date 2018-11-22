@@ -3,8 +3,10 @@ package com.cjburkey.bullet.parser;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.statement.AScope;
+import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -53,6 +55,10 @@ public class AIfStatement extends ABase implements IScopeContainer {
             output.add(new BulletVerifyError("Invalid if-statement lacking conditional expression", ctx));
         }
         return output;
+    }
+    
+    public Optional<Collection<AStatement>> getStatements() {
+        return Optional.of(statements.statements);
     }
     
 }

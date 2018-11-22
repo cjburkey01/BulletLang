@@ -5,7 +5,6 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
-import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileInputStream;

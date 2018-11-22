@@ -3,7 +3,6 @@ package com.cjburkey.bullet.visitor;
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AArrayType;
-import com.cjburkey.bullet.parser.AContent;
 import com.cjburkey.bullet.parser.AIfStatement;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
@@ -17,6 +16,7 @@ import com.cjburkey.bullet.parser.classDec.AClassMembers;
 import com.cjburkey.bullet.parser.expression.AArrayValue;
 import com.cjburkey.bullet.parser.expression.ABinaryOperator;
 import com.cjburkey.bullet.parser.expression.ABoolean;
+import com.cjburkey.bullet.parser.expression.AExprList;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.expression.AFloat;
 import com.cjburkey.bullet.parser.expression.AInteger;
@@ -25,7 +25,6 @@ import com.cjburkey.bullet.parser.expression.AString;
 import com.cjburkey.bullet.parser.expression.AUnaryOperator;
 import com.cjburkey.bullet.parser.function.AArgument;
 import com.cjburkey.bullet.parser.function.AArguments;
-import com.cjburkey.bullet.parser.expression.AExprList;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.namespace.ANamespaceIn;
@@ -33,13 +32,13 @@ import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.parser.program.AProgramIn;
 import com.cjburkey.bullet.parser.program.ARequirement;
 import com.cjburkey.bullet.parser.program.ARequirements;
+import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.parser.statement.AStatementExpression;
 import com.cjburkey.bullet.parser.statement.AStatementIf;
 import com.cjburkey.bullet.parser.statement.AStatementReturn;
 import com.cjburkey.bullet.parser.statement.AStatementVariableAssign;
 import com.cjburkey.bullet.parser.statement.AStatementVariableDec;
-import com.cjburkey.bullet.parser.statement.AScope;
 import java.util.Optional;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -57,7 +56,6 @@ public class ParserVisitor {
     public static final NamespaceVisitor _namespaceVisitor = new NamespaceVisitor();
     public static final NameVisitor _nameVisitor = new NameVisitor();
     public static final NamespaceInVisitor _namespaceInVisitor = new NamespaceInVisitor();
-    public static final ContentVisitor _contentVisitor = new ContentVisitor();
     public static final VariableDecVisitor _variableDecVisitor = new VariableDecVisitor();
     public static final VariableRefVisitor _variableRefVisitor = new VariableRefVisitor();
     public static final TypeDecVisitor _typeDecVisitor = new TypeDecVisitor();
@@ -159,20 +157,10 @@ public class ParserVisitor {
     public static final class NamespaceInVisitor extends B<ANamespaceIn> {
         public Optional<ANamespaceIn> visitNamespaceIn(BulletParser.NamespaceInContext ctx) {
             final ANamespaceIn namespaceIn = _namespaceInVisitor.visit(ctx.namespaceIn()).orElseGet(() -> new ANamespaceIn(ctx));
-            _contentVisitor.visit(ctx.content()).ifPresent(content -> namespaceIn.contents.add(0, content));
+            _variableDecVisitor.visit(ctx.variableDec()).ifPresent(namespaceIn.variableDecs::add);
+            _functionDecVisitor.visit(ctx.functionDec()).ifPresent(namespaceIn.functionDecs::add);
+            _classDecVisitor.visit(ctx.classDec()).ifPresent(namespaceIn.classDecs::add);
             return Optional.of(namespaceIn);
-        }
-    }
-    
-    public static final class ContentVisitor extends B<AContent> {
-        public Optional<AContent> visitContent(BulletParser.ContentContext ctx) {
-            final Optional<AVariableDec> variableDec = _variableDecVisitor.visit(ctx.variableDec());
-            final Optional<AFunctionDec> functionDec = _functionDecVisitor.visit(ctx.functionDec());
-            final Optional<AClassDec> classDec = _classDecVisitor.visit(ctx.classDec());
-            if (variableDec.isPresent() || functionDec.isPresent() || classDec.isPresent()) {
-                return Optional.of(new AContent(variableDec, functionDec, classDec, ctx));
-            }
-            return Optional.empty();
         }
     }
     
@@ -434,7 +422,7 @@ public class ParserVisitor {
     public static final class StatementReturnVisitor extends B<AStatementReturn> {
         public Optional<AStatementReturn> visitStatementReturn(BulletParser.StatementReturnContext ctx) {
             if (ctx.expression() == null) return Optional.empty();
-            Optional<AExpression> exp = _expressionVisitor.visit(ctx.expression());
+            final Optional<AExpression> exp = _expressionVisitor.visit(ctx.expression());
             //noinspection OptionalAssignedToNull
             if (exp == null) return Optional.empty();   // Weird possibility somehow
             return exp.map(expression -> new AStatementReturn(expression, ctx));

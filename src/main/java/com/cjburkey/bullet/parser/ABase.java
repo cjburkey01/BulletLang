@@ -8,14 +8,18 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings({"FieldCanBeLocal"})
+@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
 public abstract class ABase {
     
+    private static int nextId;
+    
+    public final int id;
     public final ParserRuleContext ctx;
     private IScopeContainer scope;
     private ABase parent;
     
     public ABase(ParserRuleContext ctx) {
+        this.id = nextId ++;
         this.ctx = ctx;
     }
     

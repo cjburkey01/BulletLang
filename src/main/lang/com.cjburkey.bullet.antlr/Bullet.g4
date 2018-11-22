@@ -93,13 +93,10 @@ programIn       : namespace programIn
 
 namespace       : NAMESPACE name LB namespaceIn RB ;
 
-namespaceIn     : content namespaceIn
-                | 
-                ;
-
-content         : variableDec
-                | functionDec
-                | classDec
+namespaceIn     : variableDec namespaceIn
+                | functionDec namespaceIn
+                | classDec namespaceIn
+                |
                 ;
 
 functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB scope RB ;

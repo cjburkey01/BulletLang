@@ -6,8 +6,10 @@ import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.statement.AScope;
+import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -58,6 +60,10 @@ public class AFunctionDec extends ABase implements IScopeContainer {
             output.add(new BulletVerifyError("Invalid function lacking name", ctx));
         }
         return output;
+    }
+    
+    public Optional<Collection<AStatement>> getStatements() {
+        return scope.map(aScope -> aScope.statements);
     }
     
 }
