@@ -43,6 +43,15 @@ public class AVariableDec extends ABase {
         IScopeContainer.makeChild(getScope(), this, expression);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        output.addAll(variableRef.searchAndMerge());
+        typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.searchAndMerge()));
+        expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
+        // TODO: CHECK IF IS DUPLICATE VARIABLE
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = variableRef.verify();
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.verify()));

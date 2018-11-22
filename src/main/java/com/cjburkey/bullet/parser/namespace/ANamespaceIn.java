@@ -12,7 +12,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings("WeakerAccess")
 public class ANamespaceIn extends ABase {
     
     public final ObjectArrayList<AVariableDec> variableDecs = new ObjectArrayList<>();
@@ -52,6 +51,14 @@ public class ANamespaceIn extends ABase {
         IScopeContainer.makeChildren(getScope(), this, variableDecs);
         IScopeContainer.makeChildren(getScope(), this, functionDecs);
         IScopeContainer.makeChildren(getScope(), this, classDecs);
+    }
+    
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        variableDecs.forEach(variableDec -> output.addAll(variableDec.searchAndMerge()));
+        functionDecs.forEach(functionDec -> output.addAll(functionDec.searchAndMerge()));
+        classDecs.forEach(classDec -> output.addAll(classDec.searchAndMerge()));
+        return output;
     }
     
     @SuppressWarnings("unchecked")

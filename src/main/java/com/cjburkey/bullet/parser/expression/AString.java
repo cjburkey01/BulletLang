@@ -103,6 +103,10 @@ public class AString extends AExpression {
         return output.toString();
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     public void settleChildren() {
         IScopeContainer.makeChildren(getScope(), this, smartInsertionPoints.values());
     }

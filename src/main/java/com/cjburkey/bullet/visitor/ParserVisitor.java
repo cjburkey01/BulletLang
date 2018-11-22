@@ -353,7 +353,7 @@ public class ParserVisitor {
     public static final class ScopeVisitor extends B<AScope> {
         public Optional<AScope> visitScope(BulletParser.ScopeContext ctx) {
             final AScope statements = visit(ctx.scope()).orElseGet(() -> new AScope(ctx));
-            _statementVisitor.visit(ctx.scope()).ifPresent(statement -> statements.statements.add(0, statement));
+            _statementVisitor.visit(ctx.statement()).ifPresent(statement -> statements.statements.add(0, statement));
             return Optional.of(statements);
         }
     }

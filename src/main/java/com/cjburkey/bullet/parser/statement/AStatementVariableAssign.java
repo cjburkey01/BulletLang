@@ -27,6 +27,10 @@ public class AStatementVariableAssign extends AStatement {
         variableAssign.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return variableAssign.searchAndMerge();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return variableAssign.verify();
     }

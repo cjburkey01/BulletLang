@@ -130,6 +130,9 @@ public class BulletLang {
         info("Settling");
         program.get().settleChildren();
         
+        info("Merging");
+        program.get().searchAndMerge();
+        
         info("Verifying");
         ObjectArrayList<BulletVerifyError> errors = program.get().verify();
         if (!errors.isEmpty()) {
@@ -144,7 +147,7 @@ public class BulletLang {
     }
     
     private void debugPrint(AProgram program) {
-        info("Debug print...");
+        debug("Debug print...");
         System.out.println();
         String out = program.debug(0);
         while (out.endsWith("\n")) {
@@ -152,7 +155,7 @@ public class BulletLang {
         }
         System.out.println(out);
         System.out.println();
-        info("Finished print");
+        debug("Finished print");
     }
     
     public static BulletLexer buildLexer(InputStream input) throws IOException {

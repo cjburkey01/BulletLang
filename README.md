@@ -32,12 +32,7 @@ To build/run the source code, [Maven](https://maven.apache.org/) is required on 
 
 ## Packaging to Jar from Source
 
-In the cloned repository directory, run `mvn clean compile inject:inject package` to include all the necessary libraries in the executable output Jar file.
-
-* `clean` - cleans up any previous builds (it can be ommitted if this is the first execution of the `mvn` command in this diretory).
-* `compile` - compiles the Antlr source files into Java and the java source files into their `.class` equivalents.
-* `inject:inject` - injects the project information into the already-compiled Java files.
-* `package` - Builds the class files and dependencies into a single executable Jar file.
+In the cloned repository directory, run `mvn clean package` to include all the necessary libraries in the executable output Jar file.
 
 ## Packaging to EXE from Source
 

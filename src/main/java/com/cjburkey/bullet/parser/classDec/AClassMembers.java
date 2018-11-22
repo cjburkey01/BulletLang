@@ -1,5 +1,6 @@
 package com.cjburkey.bullet.parser.classDec;
 
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AVariableDec;
@@ -38,6 +39,13 @@ public class AClassMembers extends ABase {
     public void settleChildren() {
         IScopeContainer.makeChildren(getScope(), this, variableDecs);
         IScopeContainer.makeChildren(getScope(), this, functionDecs);
+    }
+    
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        variableDecs.forEach(variableDec -> output.addAll(variableDec.searchAndMerge()));
+        functionDecs.forEach(functionDec -> output.addAll(functionDec.searchAndMerge()));
+        return output;
     }
     
     @SuppressWarnings("unchecked")

@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Created by CJ Burkey on 2018/11/19
  */
 @SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
-public abstract class ABase {
+public abstract class ABase implements IABase {
     
     private static int nextId;
     
@@ -44,14 +44,6 @@ public abstract class ABase {
         }
         return output;
     }
-    
-    public abstract String getFormattedDebug(int indent);
-    
-    // Sets all children's parents to self, where applicable
-    public abstract void settleChildren();
-    
-    // Verifies elements before compilation to detect errors
-    public abstract ObjectArrayList<BulletVerifyError> verify();
     
     @SuppressWarnings("unchecked")
     protected static ObjectArrayList<BulletVerifyError> verifyLists(Collection<? extends ABase>... lists) {

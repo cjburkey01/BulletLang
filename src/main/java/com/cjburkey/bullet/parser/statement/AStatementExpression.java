@@ -26,6 +26,10 @@ public class AStatementExpression extends AStatement {
         expression.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return expression.searchAndMerge();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return expression.verify();
     }

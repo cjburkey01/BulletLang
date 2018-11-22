@@ -62,6 +62,15 @@ public class AProgramIn extends ABase {
         IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        namespaces.forEach(namespace -> output.addAll(namespace.searchAndMerge()));
+        functions.forEach(function -> output.addAll(function.searchAndMerge()));
+        classes.forEach(classDec -> output.addAll(classDec.searchAndMerge()));
+        statements.forEach(statement -> output.addAll(statement.searchAndMerge()));
+        return output;
+    }
+    
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
         return verifyLists(namespaces, functions, classes, statements);

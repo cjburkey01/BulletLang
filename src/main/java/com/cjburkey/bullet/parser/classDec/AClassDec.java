@@ -1,5 +1,6 @@
 package com.cjburkey.bullet.parser.classDec;
 
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
@@ -61,6 +62,38 @@ public class AClassDec extends ABase implements IScopeContainer {
     
     public Optional<Collection<AFunctionDec>> getFunctionDecs() {
         return classMembers.map(aClassMembers -> aClassMembers.functionDecs);
+    }
+    
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        final IScopeContainer parentScope = getScope();
+        if (parentScope != null && parentScope.getClassDecs().isPresent()) {
+            for (AClassDec classDec : parentScope.getClassDecs().get()) {
+                // Merge classes of the same superclasses and with the same name
+                if (classDec != this && classDec.name.equals(name) && classDec.types.equals(types)) {
+                    classDec.classMembers.ifPresent(aClassMembers -> {
+                        classMembers.ifPresent(aClassMembers1 -> aClassMembers.functionDecs.addAll(aClassMembers1.functionDecs));
+                        classMembers.ifPresent(aClassMembers1 -> aClassMembers.variableDecs.addAll(aClassMembers1.variableDecs));
+                    });
+                    
+                    // Destroy self and remove from parent
+                    getScope().remove(this);
+                    classMembers.ifPresent(aClassMembers -> {
+                        aClassMembers.functionDecs.clear();
+                        aClassMembers.variableDecs.clear();
+                    });
+                    setScopeParent(null, null);
+                    
+                    // Propogate changes through children
+                    classDec.settleChildren();
+                    return classDec.searchAndMerge();   // TODO: TRY TO PREVENT EXTRA INVOCATIONS OF searchAndMerge?
+                }
+            }
+        }
+        
+        ObjectArrayList<BulletVerifyError> output = name.searchAndMerge();
+        types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
+        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
+        return output;
     }
     
 }

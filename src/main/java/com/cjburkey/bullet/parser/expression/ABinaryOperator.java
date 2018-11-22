@@ -28,6 +28,12 @@ public class ABinaryOperator extends AOperatorExpression {
         expressionB.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = super.searchAndMerge();
+        output.addAll(expressionB.searchAndMerge());
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = super.verify();
         output.addAll(expressionB.verify());

@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -34,8 +35,23 @@ public class ATypes extends ABase {
     public void settleChildren() {
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ATypes aTypes = (ATypes) o;
+        return types.equals(aTypes.types);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(types);
     }
     
 }

@@ -27,6 +27,10 @@ public class AStatementVariableDec extends AStatement {
         variableDec.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return variableDec.searchAndMerge();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return variableDec.verify();
     }

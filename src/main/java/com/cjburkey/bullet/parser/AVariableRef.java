@@ -30,6 +30,10 @@ public class AVariableRef extends ABase {
         name.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return name.searchAndMerge();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

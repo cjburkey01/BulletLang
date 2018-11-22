@@ -5,6 +5,7 @@ import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -33,9 +34,26 @@ public class AArguments extends ABase {
         IScopeContainer.makeChildren(getScope(), this, arguments);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        arguments.forEach(argument -> output.addAll(argument.searchAndMerge()));
+        return output;
+    }
+    
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
         return verifyLists(arguments);
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AArguments that = (AArguments) o;
+        return arguments.equals(that.arguments);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(arguments);
     }
     
 }

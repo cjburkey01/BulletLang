@@ -32,6 +32,12 @@ public class AExprList extends ABase {
         IScopeContainer.makeChildren(getScope(), this, expressions);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        expressions.forEach(expression -> output.addAll(expression.searchAndMerge()));
+        return output;
+    }
+    
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
         return verifyLists(expressions);

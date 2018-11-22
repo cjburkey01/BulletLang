@@ -25,6 +25,10 @@ public class ARequirement extends ABase {
     public void settleChildren() {
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     // TODO: CHECK IF FILE EXISTS IN SOURCE OR AS ABSOLUTE
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();

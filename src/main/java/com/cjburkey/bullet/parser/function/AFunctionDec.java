@@ -66,4 +66,25 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         return scope.map(aScope -> aScope.statements);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        
+        final IScopeContainer parentScope = getScope();
+        if (parentScope != null && parentScope.getFunctionDecs().isPresent()) {
+            for (AFunctionDec functionDec : parentScope.getFunctionDecs().get()) {
+                if (functionDec != this && functionDec.name.equals(name) && functionDec.operator.equals(operator)
+                        && functionDec.arguments.equals(arguments)) {
+                    //noinspection OptionalGetWithoutIsPresent
+                    output.add(new BulletVerifyError("Duplicate function: " +
+                            (name.isPresent() ? name.get() : operator.get()), ctx));    // TODO: SHOW ARGS (I'M IN A RUSH)
+                }
+            }
+        }
+        
+        name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
+        arguments.ifPresent(aArguments -> output.addAll(aArguments.searchAndMerge()));
+        scope.ifPresent(aScope -> output.addAll(aScope.searchAndMerge()));
+        return output;
+    }
+    
 }

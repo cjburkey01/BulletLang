@@ -27,6 +27,10 @@ public class AStatementIf extends AStatement {
         ifStatement.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return ifStatement.searchAndMerge();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return ifStatement.verify();
     }

@@ -32,6 +32,12 @@ public class ARequirements extends ABase {
         IScopeContainer.makeChildren(getScope(), this, requirements);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        requirements.forEach(requirement -> output.addAll(requirement.searchAndMerge()));
+        return output;
+    }
+    
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
         return verifyLists(requirements);

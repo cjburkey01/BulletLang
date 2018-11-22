@@ -31,6 +31,10 @@ public class AInteger extends AExpression {
         return getIndent(indent) + "Integer:\n" + getIndent(indent + indent()) + integer + '\n';
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     public void settleChildren() {
     }
     

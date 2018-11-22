@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -37,9 +38,24 @@ public class AArrayType extends ABase {
         IScopeContainer.makeChild(getScope(), this, expression);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return expression.map(AExpression::searchAndMerge).orElseGet(ObjectArrayList::new);
+    }
+    
     // TODO: ENSURE EXPRESSION RESOLVES TO INTEGER
     public ObjectArrayList<BulletVerifyError> verify() {
         return expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AArrayType that = (AArrayType) o;
+        return expression.equals(that.expression);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(expression);
     }
     
 }

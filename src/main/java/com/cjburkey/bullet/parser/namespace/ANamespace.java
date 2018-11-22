@@ -37,6 +37,13 @@ public class ANamespace extends ABase implements IScopeContainer {
         namespaceIn.setScopeParent(this, this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        output.addAll(name.searchAndMerge());
+        output.addAll(namespaceIn.searchAndMerge());
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = name.verify();
         output.addAll(namespaceIn.verify());

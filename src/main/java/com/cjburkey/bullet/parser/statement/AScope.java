@@ -33,6 +33,12 @@ public class AScope extends ABase {
         IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        statements.forEach(statement -> output.addAll(statement.searchAndMerge()));
+        return output;
+    }
+    
     @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletVerifyError> verify() {
         return verifyLists(statements);

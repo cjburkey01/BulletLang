@@ -65,4 +65,11 @@ public class AProgram extends ABase implements IScopeContainer {
         return programIn.map(aProgramIn -> aProgramIn.statements);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        requirements.ifPresent(aRequirements -> output.addAll(aRequirements.searchAndMerge()));
+        programIn.ifPresent(aProgramIn -> output.addAll(aProgramIn.searchAndMerge()));
+        return output;
+    }
+    
 }

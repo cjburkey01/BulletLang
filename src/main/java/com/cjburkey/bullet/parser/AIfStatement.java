@@ -48,6 +48,13 @@ public class AIfStatement extends ABase implements IScopeContainer {
         statements.setScopeParent(this, this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
+        output.addAll(statements.searchAndMerge());
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
         output.addAll(statements.verify());

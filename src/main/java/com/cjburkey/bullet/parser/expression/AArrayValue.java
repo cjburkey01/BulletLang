@@ -26,6 +26,10 @@ public class AArrayValue extends AExpression {
         exprList.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return exprList.searchAndMerge();
+    }
+    
     // TODO: CHECK VARIABLE TYPES
     public ObjectArrayList<BulletVerifyError> verify() {
         return exprList.verify();

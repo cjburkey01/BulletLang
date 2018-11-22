@@ -31,6 +31,10 @@ public class AFloat extends AExpression {
         return getIndent(indent) + "Float:\n" + getIndent(indent + indent()) + floating + '\n';
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     public void settleChildren() {
     }
     

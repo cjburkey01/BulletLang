@@ -25,6 +25,10 @@ public class ABoolean extends AExpression {
     public void settleChildren() {
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        return new ObjectArrayList<>();
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         return new ObjectArrayList<>();
     }

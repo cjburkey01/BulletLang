@@ -15,7 +15,9 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class AReference extends AExpression {
     
-    public boolean isFunctionRef;
+    // When this is false, it could be a function, but it could also not be
+    public boolean isUnambiguousFunctionRef;
+    
     public final Optional<AExpression> expression;
     public final Optional<AName> name;
     public final Optional<AVariableRef> variableRef;
@@ -25,7 +27,7 @@ public class AReference extends AExpression {
     AReference(AExpression expression, AOperator operator, BulletParser.UnaryOpContext ctx) {
         super(ctx);
         
-        this.isFunctionRef = true;
+        this.isUnambiguousFunctionRef = true;
         this.expression = Optional.ofNullable(expression);
         this.name = Optional.of(new AName(operator, ctx));
         this.variableRef = Optional.empty();
@@ -36,7 +38,7 @@ public class AReference extends AExpression {
     AReference(AExpression expressionA, AExpression expressionB, AOperator operator, BulletParser.BinaryOpContext ctx) {
         super(ctx);
         
-        this.isFunctionRef = true;
+        this.isUnambiguousFunctionRef = true;
         this.expression = Optional.ofNullable(expressionA);
         this.name = Optional.of(new AName(operator, ctx));
         this.variableRef = Optional.empty();
@@ -49,7 +51,7 @@ public class AReference extends AExpression {
                          BulletParser.FunctionReferenceContext ctx) {
         super(ctx);
         
-        this.isFunctionRef = true;
+        this.isUnambiguousFunctionRef = true;
         this.expression = expression;
         this.name = Optional.of(new AName(operator, ctx));
         this.variableRef = Optional.empty();
@@ -60,7 +62,7 @@ public class AReference extends AExpression {
                          BulletParser.FunctionReferenceContext ctx) {
         super(ctx);
         
-        this.isFunctionRef = true;
+        this.isUnambiguousFunctionRef = true;
         this.expression = expression;
         this.name = Optional.of(name);
         this.variableRef = Optional.empty();
@@ -70,7 +72,7 @@ public class AReference extends AExpression {
     public AReference(Optional<AExpression> expression, AVariableRef variableRef, BulletParser.ReferenceContext ctx) {
         super(ctx);
         
-        this.isFunctionRef = false;
+        this.isUnambiguousFunctionRef = false;
         this.expression = expression;
         this.name = Optional.empty();
         this.variableRef = Optional.of(variableRef);
@@ -85,7 +87,7 @@ public class AReference extends AExpression {
         output.append(getIndent(indent + indent()));
         output.append("IsFunctionRef:\n");
         output.append(getIndent(indent + indent() * 2));
-        output.append(isFunctionRef);
+        output.append(isUnambiguousFunctionRef);
         output.append('\n');
         
         expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
@@ -100,6 +102,16 @@ public class AReference extends AExpression {
         IScopeContainer.makeChild(getScope(), this, name);
         IScopeContainer.makeChild(getScope(), this, variableRef);
         IScopeContainer.makeChild(getScope(), this, funcParams);
+    }
+    
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
+        name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
+        variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.searchAndMerge()));
+        funcParams.ifPresent(aFuncParams -> output.addAll(aFuncParams.searchAndMerge()));
+        // TODO: CHECK IF REFERENCE IS VALID
+        return output;
     }
     
     public ObjectArrayList<BulletVerifyError> verify() {

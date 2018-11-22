@@ -7,6 +7,7 @@ import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.verify.BulletVerifyError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -41,10 +42,29 @@ public class AArgument extends ABase {
         IScopeContainer.makeChild(getScope(), this, typeDec);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        output.addAll(name.searchAndMerge());
+        typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.searchAndMerge()));
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = name.verify();
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.verify()));
         return output;
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AArgument argument = (AArgument) o;
+        return name.equals(argument.name) &&
+                typeDec.equals(argument.typeDec);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(name, typeDec);
     }
     
 }

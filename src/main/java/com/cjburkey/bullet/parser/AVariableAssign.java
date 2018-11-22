@@ -31,6 +31,13 @@ public class AVariableAssign extends ABase {
         expression.setScopeParent(getScope(), this);
     }
     
+    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+        output.addAll(variableRef.searchAndMerge());
+        output.addAll(expression.searchAndMerge());
+        return output;
+    }
+    
     public ObjectArrayList<BulletVerifyError> verify() {
         ObjectArrayList<BulletVerifyError> output = variableRef.verify();
         output.addAll(expression.verify());

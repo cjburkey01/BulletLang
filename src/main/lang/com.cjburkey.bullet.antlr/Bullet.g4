@@ -194,7 +194,7 @@ expression      // Literals
                 | variableRef                                   # Reference             // Variable or function
                 | name exprList                                 # FunctionReference
                 
-                | LB exprList RB                                # ArrayValue
+                | LB exprList COM? RB                           # ArrayValue
                 ;
 
 ifStatement     : IF expression LB scope RB
