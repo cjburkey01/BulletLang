@@ -1,7 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 
@@ -35,11 +35,11 @@ public class ATypes extends ABase {
     public void settleChildren() {
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return new ObjectArrayList<>();
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
     }
     

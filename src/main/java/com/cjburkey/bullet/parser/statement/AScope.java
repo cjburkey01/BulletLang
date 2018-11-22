@@ -3,7 +3,7 @@ package com.cjburkey.bullet.parser.statement;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -33,14 +33,14 @@ public class AScope extends ABase {
         IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         statements.forEach(statement -> output.addAll(statement.searchAndMerge()));
         return output;
     }
     
     @SuppressWarnings("unchecked")
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return verifyLists(statements);
     }
     

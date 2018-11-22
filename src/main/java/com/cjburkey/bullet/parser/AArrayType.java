@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,12 +38,12 @@ public class AArrayType extends ABase {
         IScopeContainer.makeChild(getScope(), this, expression);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return expression.map(AExpression::searchAndMerge).orElseGet(ObjectArrayList::new);
     }
     
     // TODO: ENSURE EXPRESSION RESOLVES TO INTEGER
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
     }
     

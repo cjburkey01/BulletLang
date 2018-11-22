@@ -1,6 +1,5 @@
 package com.cjburkey.bullet.parser.classDec;
 
-import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
@@ -8,7 +7,7 @@ import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -49,8 +48,8 @@ public class AClassDec extends ABase implements IScopeContainer {
         classMembers.ifPresent(aClassMembers -> aClassMembers.setScopeParent(this, this));
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = name.verify();
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = name.verify();
         types.ifPresent(aTypes -> output.addAll(aTypes.verify()));
         classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.verify()));
         return output;
@@ -64,7 +63,7 @@ public class AClassDec extends ABase implements IScopeContainer {
         return classMembers.map(aClassMembers -> aClassMembers.functionDecs);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         final IScopeContainer parentScope = getScope();
         if (parentScope != null && parentScope.getClassDecs().isPresent()) {
             for (AClassDec classDec : parentScope.getClassDecs().get()) {
@@ -90,7 +89,7 @@ public class AClassDec extends ABase implements IScopeContainer {
             }
         }
         
-        ObjectArrayList<BulletVerifyError> output = name.searchAndMerge();
+        ObjectArrayList<BulletError> output = name.searchAndMerge();
         types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
         classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
         return output;

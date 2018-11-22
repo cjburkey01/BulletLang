@@ -3,7 +3,7 @@ package com.cjburkey.bullet.parser.expression;
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -103,7 +103,7 @@ public class AString extends AExpression {
         return output.toString();
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return new ObjectArrayList<>();
     }
     
@@ -111,7 +111,7 @@ public class AString extends AExpression {
         IScopeContainer.makeChildren(getScope(), this, smartInsertionPoints.values());
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
     }
     

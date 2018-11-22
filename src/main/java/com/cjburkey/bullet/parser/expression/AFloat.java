@@ -1,7 +1,7 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -31,16 +31,16 @@ public class AFloat extends AExpression {
         return getIndent(indent) + "Float:\n" + getIndent(indent + indent()) + floating + '\n';
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return new ObjectArrayList<>();
     }
     
     public void settleChildren() {
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
-        if (!valid) output.add(new BulletVerifyError("Invalid floating point number", ctx));
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        if (!valid) output.add(new BulletError("Invalid floating point number", ctx));
         return output;
     }
     

@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AVariableAssign;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -27,11 +27,11 @@ public class AStatementVariableAssign extends AStatement {
         variableAssign.setScopeParent(getScope(), this);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return variableAssign.searchAndMerge();
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return variableAssign.verify();
     }
     

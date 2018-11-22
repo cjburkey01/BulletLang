@@ -1,12 +1,11 @@
 package com.cjburkey.bullet.parser.classDec;
 
-import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -41,15 +40,15 @@ public class AClassMembers extends ABase {
         IScopeContainer.makeChildren(getScope(), this, functionDecs);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         variableDecs.forEach(variableDec -> output.addAll(variableDec.searchAndMerge()));
         functionDecs.forEach(functionDec -> output.addAll(functionDec.searchAndMerge()));
         return output;
     }
     
     @SuppressWarnings("unchecked")
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return verifyLists(variableDecs, functionDecs);
     }
     

@@ -4,7 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -48,18 +48,18 @@ public class AIfStatement extends ABase implements IScopeContainer {
         statements.setScopeParent(this, this);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
         output.addAll(statements.searchAndMerge());
         return output;
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
         output.addAll(statements.verify());
         if (!isElse && !expression.isPresent()) {
-            output.add(new BulletVerifyError("Invalid if-statement lacking conditional expression", ctx));
+            output.add(new BulletError("Invalid if-statement lacking conditional expression", ctx));
         }
         return output;
     }

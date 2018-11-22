@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -31,15 +31,15 @@ public class AVariableAssign extends ABase {
         expression.setScopeParent(getScope(), this);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         output.addAll(variableRef.searchAndMerge());
         output.addAll(expression.searchAndMerge());
         return output;
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = variableRef.verify();
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = variableRef.verify();
         output.addAll(expression.verify());
         return output;
     }

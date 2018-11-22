@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -43,8 +43,8 @@ public class AVariableDec extends ABase {
         IScopeContainer.makeChild(getScope(), this, expression);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         output.addAll(variableRef.searchAndMerge());
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.searchAndMerge()));
         expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
@@ -52,12 +52,12 @@ public class AVariableDec extends ABase {
         return output;
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = variableRef.verify();
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = variableRef.verify();
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.verify()));
         expression.ifPresent(aExpression -> output.addAll(aExpression.verify()));
         if (!typeDec.isPresent() && !expression.isPresent()) {
-            output.add(new BulletVerifyError("Invalid variable declaration", ctx));
+            output.add(new BulletError("Invalid variable declaration", ctx));
         }
         return output;
     }

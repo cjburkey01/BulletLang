@@ -1,6 +1,6 @@
 package com.cjburkey.bullet.parser;
 
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -30,11 +30,11 @@ public class AVariableRef extends ABase {
         name.setScopeParent(getScope(), this);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return name.searchAndMerge();
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
     }
     

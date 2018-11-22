@@ -1,6 +1,6 @@
 package com.cjburkey.bullet.parser;
 
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -46,8 +46,8 @@ public abstract class ABase implements IABase {
     }
     
     @SuppressWarnings("unchecked")
-    protected static ObjectArrayList<BulletVerifyError> verifyLists(Collection<? extends ABase>... lists) {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    protected static ObjectArrayList<BulletError> verifyLists(Collection<? extends ABase>... lists) {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         for (Collection<? extends ABase> list : lists) list.forEach(element -> output.addAll(element.verify()));
         return output;
     }

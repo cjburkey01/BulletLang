@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -18,7 +18,7 @@ public class AUnaryOperator extends AOperatorExpression {
         return getIndent(indent) + "UnaryOperator:\n" + expressionA.debug(indent + indent()) + operator.debug(indent + indent());
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return super.verify();
     }
     

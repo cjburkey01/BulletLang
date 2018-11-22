@@ -7,7 +7,7 @@ import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -52,12 +52,12 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         IScopeContainer.makeChild(this, this, scope);
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = name.map(AName::verify).orElseGet(ObjectArrayList::new);
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = name.map(AName::verify).orElseGet(ObjectArrayList::new);
         arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
         scope.ifPresent(aScope -> output.addAll(aScope.verify()));
         if (!name.isPresent() && !operator.isPresent()) {
-            output.add(new BulletVerifyError("Invalid function lacking name", ctx));
+            output.add(new BulletError("Invalid function lacking name", ctx));
         }
         return output;
     }
@@ -66,8 +66,8 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         return scope.map(aScope -> aScope.statements);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         
         final IScopeContainer parentScope = getScope();
         if (parentScope != null && parentScope.getFunctionDecs().isPresent()) {
@@ -75,7 +75,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
                 if (functionDec != this && functionDec.name.equals(name) && functionDec.operator.equals(operator)
                         && functionDec.arguments.equals(arguments)) {
                     //noinspection OptionalGetWithoutIsPresent
-                    output.add(new BulletVerifyError("Duplicate function: " +
+                    output.add(new BulletError("Duplicate function: " +
                             (name.isPresent() ? name.get() : operator.get()), ctx));    // TODO: SHOW ARGS (I'M IN A RUSH)
                 }
             }

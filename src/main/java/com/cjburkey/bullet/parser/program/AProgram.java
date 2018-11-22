@@ -7,7 +7,7 @@ import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -43,8 +43,8 @@ public class AProgram extends ABase implements IScopeContainer {
         IScopeContainer.makeChild(this, this, programIn);
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = requirements.map(ARequirements::verify).orElseGet(ObjectArrayList::new);
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = requirements.map(ARequirements::verify).orElseGet(ObjectArrayList::new);
         output.addAll(programIn.map(AProgramIn::verify).orElseGet(ObjectArrayList::new));
         return output;
     }
@@ -65,8 +65,8 @@ public class AProgram extends ABase implements IScopeContainer {
         return programIn.map(aProgramIn -> aProgramIn.statements);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         requirements.ifPresent(aRequirements -> output.addAll(aRequirements.searchAndMerge()));
         programIn.ifPresent(aProgramIn -> output.addAll(aProgramIn.searchAndMerge()));
         return output;

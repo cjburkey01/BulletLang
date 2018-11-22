@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -28,14 +28,14 @@ public class ABinaryOperator extends AOperatorExpression {
         expressionB.setScopeParent(getScope(), this);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = super.searchAndMerge();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = super.searchAndMerge();
         output.addAll(expressionB.searchAndMerge());
         return output;
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = super.verify();
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = super.verify();
         output.addAll(expressionB.verify());
         return output;
     }

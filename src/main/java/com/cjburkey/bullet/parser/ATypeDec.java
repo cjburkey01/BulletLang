@@ -1,7 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,11 +31,11 @@ public class ATypeDec extends ABase {
         IScopeContainer.makeChild(getScope(), this, arrayType);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return arrayType.map(AArrayType::searchAndMerge).orElseGet(ObjectArrayList::new);
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
     }
     

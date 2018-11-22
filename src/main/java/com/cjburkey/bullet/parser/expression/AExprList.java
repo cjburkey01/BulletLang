@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -32,14 +32,14 @@ public class AExprList extends ABase {
         IScopeContainer.makeChildren(getScope(), this, expressions);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         expressions.forEach(expression -> output.addAll(expression.searchAndMerge()));
         return output;
     }
     
     @SuppressWarnings("unchecked")
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return verifyLists(expressions);
     }
     

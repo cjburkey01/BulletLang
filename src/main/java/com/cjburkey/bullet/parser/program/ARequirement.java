@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.program;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -25,12 +25,12 @@ public class ARequirement extends ABase {
     public void settleChildren() {
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
+    public ObjectArrayList<BulletError> searchAndMerge() {
         return new ObjectArrayList<>();
     }
     
     // TODO: CHECK IF FILE EXISTS IN SOURCE OR AS ABSOLUTE
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
     }
     

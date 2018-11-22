@@ -3,7 +3,6 @@ package com.cjburkey.bullet;
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.program.AProgram;
-import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
@@ -131,19 +130,30 @@ public class BulletLang {
         program.get().settleChildren();
         
         info("Merging");
-        program.get().searchAndMerge();
+        final ObjectArrayList<BulletError> errorsa = program.get().searchAndMerge();
+        if (validFromErr(errorsa)) {
+            error("Failed to merge");
+            return;
+        }
         
         info("Verifying");
-        ObjectArrayList<BulletVerifyError> errors = program.get().verify();
-        if (!errors.isEmpty()) {
-            for (BulletVerifyError error : errors) {
-                error.print(Log::error);
-            }
+        final ObjectArrayList<BulletError> errorsb = program.get().verify();
+        if (validFromErr(errorsb)) {
             error("Failed to verify");
             return;
         }
         
         info("Compiling");
+    }
+    
+    private boolean validFromErr(ObjectArrayList<BulletError> errors) {
+        if (!errors.isEmpty()) {
+            for (BulletError error : errors) {
+                error.print(Log::error);
+            }
+            return true;
+        }
+        return false;
     }
     
     private void debugPrint(AProgram program) {

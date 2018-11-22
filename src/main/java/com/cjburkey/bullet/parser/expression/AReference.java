@@ -5,7 +5,7 @@ import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.AVariableRef;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -104,8 +104,8 @@ public class AReference extends AExpression {
         IScopeContainer.makeChild(getScope(), this, funcParams);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
         name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.searchAndMerge()));
@@ -114,8 +114,8 @@ public class AReference extends AExpression {
         return output;
     }
     
-    public ObjectArrayList<BulletVerifyError> verify() {
-        ObjectArrayList<BulletVerifyError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
+    public ObjectArrayList<BulletError> verify() {
+        ObjectArrayList<BulletError> output = expression.map(AExpression::verify).orElseGet(ObjectArrayList::new);
         name.ifPresent(aName -> output.addAll(aName.verify()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.verify()));
         funcParams.ifPresent(aExprList -> output.addAll(aExprList.verify()));

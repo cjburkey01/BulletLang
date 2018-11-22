@@ -7,7 +7,7 @@ import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -62,8 +62,8 @@ public class AProgramIn extends ABase {
         IScopeContainer.makeChildren(getScope(), this, statements);
     }
     
-    public ObjectArrayList<BulletVerifyError> searchAndMerge() {
-        ObjectArrayList<BulletVerifyError> output = new ObjectArrayList<>();
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         namespaces.forEach(namespace -> output.addAll(namespace.searchAndMerge()));
         functions.forEach(function -> output.addAll(function.searchAndMerge()));
         classes.forEach(classDec -> output.addAll(classDec.searchAndMerge()));
@@ -72,7 +72,7 @@ public class AProgramIn extends ABase {
     }
     
     @SuppressWarnings("unchecked")
-    public ObjectArrayList<BulletVerifyError> verify() {
+    public ObjectArrayList<BulletError> verify() {
         return verifyLists(namespaces, functions, classes, statements);
     }
     

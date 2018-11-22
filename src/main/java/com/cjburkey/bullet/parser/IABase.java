@@ -1,6 +1,6 @@
 package com.cjburkey.bullet.parser;
 
-import com.cjburkey.bullet.verify.BulletVerifyError;
+import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -19,9 +19,9 @@ public interface IABase {
     void settleChildren();
     
     // Merge and error scopes
-    ObjectArrayList<BulletVerifyError> searchAndMerge();
+    ObjectArrayList<BulletError> searchAndMerge();
     
     // Checks for errors before compilation
-    ObjectArrayList<BulletVerifyError> verify();
+    ObjectArrayList<BulletError> verify();
     
 }
