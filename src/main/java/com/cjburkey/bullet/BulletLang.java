@@ -2,21 +2,19 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.compiler.Compiler;
-import com.cjburkey.bullet.obj.BFunction;
-import com.cjburkey.bullet.obj.BNamespace;
-import com.cjburkey.bullet.obj.BProgram;
-import com.cjburkey.bullet.obj.classdef.BClass;
-import com.cjburkey.bullet.obj.statement.BStatement;
+import com.cjburkey.bullet.parser.program.AProgram;
+import com.cjburkey.bullet.verify.BulletVerifyError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +29,7 @@ public class BulletLang {
     
     // INJECTED BY MAVEN-INJECTION-PLGUIN!
     // Make sure to run "mvn inject:inject" after
-    // "mvn compile" when building from source
+    // "mvn compile" when building from source!
     public static String VERSION() {
         return null;
     }
@@ -82,7 +80,7 @@ public class BulletLang {
             error("Invalid input file");
             if (input.debug) {
                 // TODO: REMOVE THIS TEST CODE
-                debug("Performing test compile on resource \"/test.blt\" because no valid input file was found and debug is enabled");
+                debug("Performing test compile on resource \"/test2.blt\" because no valid input file was found and debug is enabled");
                 compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
             }
             return;
@@ -113,104 +111,65 @@ public class BulletLang {
     
     @SuppressWarnings("unused")
     public void compile(InputStream input, OutputStream output) throws IOException {
-        BProgram program = compileRaw(input, false, true);
-        if (program != null && output == null) {
-            error("Stopping compilation because there is no valid output file");
-        }
-    }
-    
-    public BProgram compileRaw(InputStream input, boolean skipVerify, boolean resolveRequirements) throws IOException {
-        // Generate token stream
-        BulletLexer lexer = new BulletLexer(CharStreams.fromStream(input));
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        
         // Initialize parser
-        BulletParser parser = new BulletParser(tokenStream);
-        parser.setBuildParseTree(true);
-        parser.removeErrorListeners();
-        parser.addErrorListener(new ErrorHandler());
+        BulletParser parser = buildParser(buildLexer(input));
+        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
+        parser.removeErrorListeners();                  // Clear the default error listener
+        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
         
         // Begin parsing
         info("Parsing input");
-        BProgram program = ParserVisitor.parse(parser);
-        if (ParserVisitor.stop) {
-            return null;
+        Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
+        if (!program.isPresent() || ErrorHandler.hasErrored()) {
+            error("Failed to parse input");
+            return;
         }
-        if (resolveRequirements) {
-            boolean missing = false;
-            List<File> reqd = new ArrayList<>();
-            for (String requirement : program.requirements) {
-                File requiredFile = new File(sourceDirectory, requirement);
-                if (!requiredFile.exists()) {
-                    requiredFile = new File(requirement);       // Try an absolute directory if it's not in the source directory
-                    if (!requiredFile.exists()) {
-                        error("Missing required file: \"{}\" in source directory or as an absolute path", requirement);
-                        missing = true;
-                        continue;
-                    }
-                }
-                reqd.add(requiredFile);
-            }
-            if (missing) {
-                error("Unable to proceed with compilation because required source file(s) could not be located");
-                return null;
-            }
-            for (File req : reqd) {
-                info("Merging \"{}\" into compilation", req.getAbsolutePath());
-                BProgram reqdp = compileRaw(new FileInputStream(req), true, true);
-                if (reqdp == null) {
-                    return null;
-                }
-                // Merge required functions, classes, and namespaces
-                program.functions.addAll(reqdp.functions);
-                program.classes.addAll(reqdp.classes);
-                info("Merged module into compilation");
-            }
+        if (debug) {
+            debugPrint(program.get());
         }
-        info("Finished parsing");
         
-        // TODO: TEST CODE
-        debugSpam(program);
+        info("Settling");
+        program.get().settleChildren();
         
-        if (skipVerify) {
-            return program;
-        }
-        info("Compiling parsed program");
-        Compiler compiler = new Compiler(program);
-        if (compiler.compile()) {
-            info("Finished compiling");
-            debugSpam(program);
-            return program;
-        }
-        return null;
-    }
-    
-    public static void debugSpam(BProgram mainProgram) {
-        if (!input.debug || ParserVisitor.stop) {
+        info("Verifying");
+        ObjectArrayList<BulletVerifyError> errors = program.get().verify();
+        if (!errors.isEmpty()) {
+            for (BulletVerifyError error : errors) {
+                error.print(Log::error);
+            }
+            error("Failed to verify");
             return;
         }
         
-        debug("Parsed program module {}", mainProgram);
-        
-        debug("  Namespaces ({}): ", mainProgram.namespaces.size());
-        for (BNamespace namespace : mainProgram.namespaces) {
-            debug("    {}", namespace);
+        info("Compiling");
+    }
+    
+    private void debugPrint(AProgram program) {
+        info("Debug print...");
+        System.out.println();
+        String out = program.debug(0);
+        while (out.endsWith("\n")) {
+            out = out.substring(0, out.length() - 1);
         }
-        
-        debug("  Classes ({}): ", mainProgram.classes.size());
-        for (BClass classDef : mainProgram.classes) {
-            debug("    {}", classDef);
-        }
-        
-        debug("  Functions ({}): ", mainProgram.functions.size());
-        for (BFunction function : mainProgram.functions) {
-            debug("    {}", function);
-        }
-        
-        debug("  Statements ({}): ", mainProgram.scope.statements.size());
-        for (BStatement statement : mainProgram.scope.statements) {
-            debug("    {}", statement);
-        }
+        System.out.println(out);
+        System.out.println();
+        info("Finished print");
+    }
+    
+    public static BulletLexer buildLexer(InputStream input) throws IOException {
+        return new BulletLexer(CharStreams.fromStream(input, StandardCharsets.UTF_8));
+    }
+    
+    public static BulletLexer buildLexer(String input) {
+        return new BulletLexer(CharStreams.fromString(input));
+    }
+    
+    public static BulletParser buildParser(BulletLexer lexer) {
+        return new BulletParser(new CommonTokenStream(lexer));
+    }
+    
+    public static BulletParser buildQuickParser(String input) {
+        return buildParser(buildLexer(input));
     }
     
 }

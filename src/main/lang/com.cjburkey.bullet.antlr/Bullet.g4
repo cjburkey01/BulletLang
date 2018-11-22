@@ -6,7 +6,7 @@ grammar Bullet;
 
 // Comments
 SL_COMMENT  : '#' ~('\n')* '\n' -> skip ;
-ML_COMMENT  : '/#' .*? '#/' -> skip ;
+ML_COMMENT  : ('/#' | '/*') .*? ('#/' | '*/') -> skip ;
 
 // Ignore whitespace but allow through if necessary
 WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
@@ -40,6 +40,19 @@ TIMES       : '*' ;
 DIV         : '/' ;
 PLUS        : '+' ;
 MINUS       : '-' ;
+BIT_AND     : '&' ;
+BIT_OR      : '|' ;
+BIT_XOR     : '^' ;
+BIT_NOT     : '~' ;
+BIT_RIGHT   : '>>' ;
+BIT_LEFT    : '<<' ;
+NOT         : '!' ;
+NOT_EQ      : '!=' ;
+EQUAL       : '==' ;
+GREAT       : '>' ;
+LESS        : '<' ;
+LESS_EQ     : '<=' ;
+GREAT_EQ    : '>=' ;
 
 // Late
 BOOL        : ('true' | 'false') ;
@@ -59,7 +72,11 @@ STRING      : ('"' | STR_INTER) { iws = false; } STRING_IN? '"' { iws = true; } 
 LIT_STRING  : '"""' { iws = false; } .*? '"""' { iws = true; } ;
 
 // Rules
+name            : IDENTIFIER ;
+
 program         : requirements programIn EOF ;
+
+partialExp      : expression EOF ;      // Used with smart strings in the parser
 
 requirements    : requirement requirements
                 |
@@ -68,97 +85,132 @@ requirements    : requirement requirements
 requirement     : REQUIRE STRING SEMI ;
 
 programIn       : namespace programIn
+                | functionDec programIn
+                | classDec programIn
                 | statement programIn
-                | content programIn
                 |
                 ;
 
-namespace       : NAMESPACE IDENTIFIER LB namespaceIn RB ;
+namespace       : NAMESPACE name LB namespaceIn RB ;
 
 namespaceIn     : content namespaceIn
                 | 
                 ;
 
-content         : function
-                | classDef
+content         : variableDec
+                | functionDec
+                | classDec
                 ;
 
-function        : attrib? DEF (IDENTIFIER | PLUS | MINUS | TIMES | DIV | POW | ROOT) (LP arguments? RP)? typeDef? LB statements RB ;
+functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB scope RB ;
+
+op              : POW
+                | ROOT
+                | TIMES
+                | DIV
+                | PLUS
+                | MINUS
+                | BIT_AND
+                | BIT_OR
+                | BIT_XOR
+                | BIT_NOT
+                | BIT_RIGHT
+                | BIT_LEFT
+                | NOT
+                | NOT_EQ
+                | GREAT
+                | GREAT_EQ
+                | LESS
+                | LESS_EQ
+                | EQUAL ;
 
 arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : IDENTIFIER typeDef?
-                ;
+argument        : name typeDec? ;
 
-typeName        : IDENTIFIER ;
+arrayType       : LBR expression? RBR ;
 
-typeDef         : OF typeName ;
+typeDec         : OF IDENTIFIER arrayType? ;
 
-statements      : statement statements
+scope           : statement scope
                 |
                 ;
 
-statement       : variableDef SEMI          # StatementVariableDef
+statement       : variableDec               # StatementVariableDec
+                | variableAssign SEMI       # StatementVariableAssign
                 | ifStatement               # StatementIf
                 | expression SEMI           # StatementExpression
                 | RETURN expression SEMI    # StatementReturn
-                | expression                # StatementReturn   // Allow raw expression returns (shorthand)
+                | expression                # StatementReturn       // Allow raw expression returns (shorthand)
                 ;
 
-//  Variable format:
-//      [':']['@']['@']<NAME> ['of' <TYPE>] [<':=' / '='> <EXPRESSION>]
-variableDef     : VAR_TYPE? IDENTIFIER typeDef DEC expression   // Declaration using ':='
-                | VAR_TYPE? IDENTIFIER DEC expression           // Value declaration
-                | COLON? VAR_TYPE? IDENTIFIER EQ expression     // Value assignment or declaration
-                | COLON VAR_TYPE? IDENTIFIER typeDef            // Value declaration
-                | VAR_TYPE? IDENTIFIER EQ expression            // Value assignment
+variableRef     : VAR_TYPE? name ;
+
+// Possible variable types:
+//      [@[@]]<name> [of <type>] := <value>
+//      :[@[@]]variable of Type
+variableDec     : variableRef typeDec? DEC expression SEMI          // Declaration using ':='
+                | COLON variableRef typeDec SEMI                    // No-value declaration
                 ;
 
-expression      : BOOL                                              # Boolean
-                | INTEGER                                           # Integer
-                | FLOAT                                             # Float
-                | STRING                                            # String
-                | LIT_STRING                                        # LiteralString
-                
-                | expression (POW | ROOT)                           # UnaryOp
-                | expression (POW | ROOT) expression                # BinaryOp
-                | MINUS expression                                  # UnaryOp
-                | expression (TIMES | DIV) expression               # BinaryOp
-                | expression (PLUS | MINUS) expression              # BinaryOp
-                
-                | LP expression RP                                  # ParenthesisWrap
-                
-                | expression PER IDENTIFIER LP funcParams? RP       # Reference
-                | expression PER IDENTIFIER funcParams?             # Reference
-                | expression PER VAR_TYPE? IDENTIFIER               # Reference
-                | IDENTIFIER LP funcParams? RP                      # Reference
-                | IDENTIFIER funcParams?                            # Reference
-                | VAR_TYPE? IDENTIFIER                              # Reference
-                ;
+variableAssign  : variableRef EQ expression ;
 
-funcParams      : expression COM funcParams
+exprList        : expression COM exprList
                 | expression
                 ;
 
-ifStatement     : IF expression LB statements RB
-                | ELSE expression? LB statements RB
+expression      // Literals
+                : BOOL                                          # Boolean
+                | INTEGER                                       # Integer
+                | FLOAT                                         # Float
+                | STRING                                        # String
+                | LIT_STRING                                    # LiteralString
+                
+                // Bitwise operators
+                | BIT_NOT expression                                    # UnaryOp
+                | expression (BIT_AND | BIT_OR | BIT_XOR) expression    # BinaryOp
+                | expression (BIT_RIGHT | BIT_LEFT) expression          # BinaryOp
+                
+                // Value operators
+                | NOT expression                                                                # UnaryOp
+                | expression (LESS | GREAT | LESS_EQ | GREAT_EQ | EQUAL | NOT_EQ) expression    # BinaryOp
+                
+                // Mathematical operators
+                | expression (POW | ROOT)                       # UnaryOp
+                | expression (POW | ROOT) expression            # BinaryOp
+                | MINUS expression                              # UnaryOp               // This must be out of order for op-precedence
+                | expression (TIMES | DIV) expression           # BinaryOp
+                | expression (PLUS | MINUS) expression          # BinaryOp
+                | expression (GREAT | LESS) expression          # BinaryOp
+                | expression (GREAT | LESS) expression          # BinaryOp
+                
+                | LP expression RP                              # ParenthesisWrap
+                
+                // References
+                | expression PER name LP exprList? RP           # FunctionReference
+                | expression PER variableRef                    # Reference             // Variable or function
+                | expression PER name exprList                  # FunctionReference
+                | expression PER op exprList?                   # FunctionReference
+                | name LP exprList? RP                          # FunctionReference
+                | variableRef                                   # Reference             // Variable or function
+                | name exprList                                 # FunctionReference
+                
+                | LB exprList RB                                # ArrayValue
                 ;
 
-classDef        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
+ifStatement     : IF expression LB scope RB
+                | ELSE expression? LB scope RB
+                ;
 
-classMembers    : variableDef SEMI classMembers
-                | function classMembers
+classDec        : CLASS name (OF types)? LB classMembers RB ;
+
+classMembers    : variableDec classMembers
+                | functionDec classMembers
                 |
                 ;
 
 types           : IDENTIFIER COM types
-                | IDENTIFIER
-                ;
-
-attrib          : LBR attribIn RBR ;
-
-attribIn        : IDENTIFIER COM attribIn
                 | IDENTIFIER
                 ;

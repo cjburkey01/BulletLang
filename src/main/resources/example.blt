@@ -1,0 +1,144 @@
+# Single line comments start with a hash(tag) symbol, like this
+/#
+    Multi-line comments are possible, too,
+    like this!
+#/
+
+# Requirements come after module declaration, but are not required
+# These are '.blt' files that will be parsed and loaded before this one
+# If the '.blt' is ommitted, it will be added automatically
+require "file1";
+
+# Variable definitions look like variable assignments but with the ':=' (assignment operator)
+variableExample1 := 2;
+variableExample1 := 2;
+
+# A variable can be declared with no value by preceeding it with a colon
+:variableExample2 of Int32;
+
+# Variables can have an explicit type declaration and a value, though there is generally little reason to do this
+variableExample3 of String := "Hello, I'm Dom";
+
+exampleBoolean := false;
+differentBooleanVariable := true;
+differentBooleanVariable = false;
+
+# If-scope don't require parenthesis
+if exampleBoolean {
+    testFunction;
+} else differentBooleanVariable {   # Else-if blocks don't require an "else if", "elif", or similar special keyword
+    anotherTestFunction;
+} else {
+    finalTestFunction;
+}
+
+# Functions are defined with the "def" keyword and parenthesis
+# Parenthesis are optional if no arguments exist
+def anotherTestFunction {
+    
+}
+
+# The return type can be explicitly declared, though it is generally inferred
+# (Here it would be "Void")
+def testFunction of Timone {
+}
+
+def finalTestFunction {
+}
+
+# Argument types will be inferred if possible
+# Here they are any type, as they are converted to strings by the string interpolation
+def greet(firstName, lastName) {
+    print @"Hello, #{firstName} #{lastName}";
+}
+
+class SimpleClass {
+    def sayHelloWorld {
+        print "Hello world!";
+    }
+}
+
+class Person {
+    def _(firstName, lastName) {
+        @firstName := firstName;
+        @lastName := lastName;
+    }
+    
+    def greet {
+        print @"Hello, #{@firstName} #{@lastName}!";
+    }
+    
+    # Binary operators can be overridden
+    def +(other) {
+        @"#{@firstName} #{@lastName} and #{other.firstName} #{other.lastName}"
+    }
+    
+    # As well as unary operators
+    def - {
+        @"Deceased #{@firstName} #{@lastName}"
+    }
+    
+    # Getters
+    def firstName {
+        @firstName
+    }
+    def lastName {
+        @lastName
+    }
+}
+
+distance := 9.45;
+print 5 + (-(8 * 3) / 5) * ((fib abs(distance)) / 927.67);
+
+print (fib abs(5)) * 5;
+
+# You can square expressions like this:
+print 5**;      # 25
+
+# Or square root them:
+print 25//;     # 5
+
+# Or nth-power them:
+print 2 ** 3;   # 8
+
+# Or nth-root them:
+print 8 // 3;   # 2
+
+print 4** + 7 * 2 + 18; # 48
+
+# Referencing variables and functions of a class:
+personJimmy := Person.new "Jimmy", "Bobby";
+personJimmy.greet;
+
+personJimette := Person.new "Jimette", "Francis";
+personJimette.greet;
+
+print personJimmy + personJimette;      # "Jimmy Bobby and Jimette Francis"
+
+print -personJimmy;                     # "Deceased Jimmy Bobby"
+
+# Values can be returned using "return <EXPRESSION>;"
+# or "<EXPRESSION>" without the semicolon:
+def add(a, b) { # Type declarations are not required for these arguments because the methods are type-inspecific.
+                # As long as 'a' implements the '+' operator and accepts a parameter of type 'b', compilation will succeed.
+                # This function will return a type of whatever the '+' operator on 'a' returns when given a type of 'b'.
+    a + b
+}
+
+# Namespaces can be used to organize classes and functions, but cannot execute code in the outer scope
+namespace Bob {
+    def five {
+        5
+    }
+    
+    class HelloWorldExample {
+        :@number of Int32;
+        
+        def setNum(number) {    # Argument type is inferred because the declaration is a 32 bit integer
+            @number = number;
+        }
+        def getNum {
+            return @number;
+        }
+    }
+}
