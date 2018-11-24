@@ -55,20 +55,20 @@ public abstract class AOperatorExpression extends AExpression {
         return expressionA.verify();
     }
     
-    public ATypeDec resolveType() {
+    public Optional<ATypeDec> resolveType() {
         // Get the type of the first term
-        ATypeDec typeDec = expressionA.resolveType();
-        if (typeDec == null) return null;
+        Optional<ATypeDec> typeDec = expressionA.resolveType();
+        if (!typeDec.isPresent()) return Optional.empty();
         
         // Find the function for the first term
-        AClassDec classDec = typeDec.resolveTypeDeclaration(getScope()).orElse(null);
-        if (classDec == null || !classDec.getFunctionDecs().isPresent()) return null;
+        AClassDec classDec = typeDec.get().type.resolveTypeDeclaration(getScope()).orElse(null);
+        if (classDec == null || !classDec.getFunctionDecs().isPresent()) return Optional.empty();
         for (AFunctionDec functionDec : classDec.getFunctionDecs().get()) {
             if (functionDec.getFullMatches(operator.token, getParameters())) {
-                return functionDec.typeDec;
+                return Optional.of(functionDec.typeDec);
             }
         }
-        return null;
+        return Optional.empty();
     }
     
     protected abstract Optional<AExprList> getParameters();

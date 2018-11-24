@@ -125,8 +125,8 @@ public class AString extends AExpression {
         throw new IllegalStateException(String.format("Invalid expression in smart string: \"%s\"", text));
     }
     
-    public ATypeDec resolveType() {
-        return new ATypeDec(new AType("String", ctx), Optional.empty(), ctx);
+    public Optional<ATypeDec> resolveType() {
+        return Optional.of(new ATypeDec(new AType("String", ctx), Optional.empty(), ctx));
     }
     
 }

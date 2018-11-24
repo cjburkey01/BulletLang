@@ -36,8 +36,8 @@ public class ABoolean extends AExpression {
         return new ObjectArrayList<>();
     }
     
-    public ATypeDec resolveType() {
-        return new ATypeDec(new AType("Boolean", ctx), Optional.empty(), ctx);
+    public Optional<ATypeDec> resolveType() {
+        return Optional.of(new ATypeDec(new AType("Boolean", ctx), Optional.empty(), ctx));
     }
     
 }

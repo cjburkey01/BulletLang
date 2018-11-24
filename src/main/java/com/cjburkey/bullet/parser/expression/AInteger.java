@@ -47,8 +47,8 @@ public class AInteger extends AExpression {
         return output;
     }
     
-    public ATypeDec resolveType() {
-        return new ATypeDec(new AType("Int32", ctx), Optional.empty(), ctx);
+    public Optional<ATypeDec> resolveType() {
+        return Optional.of(new ATypeDec(new AType("Int32", ctx), Optional.empty(), ctx));
     }
     
 }

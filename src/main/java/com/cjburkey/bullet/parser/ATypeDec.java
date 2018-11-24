@@ -1,7 +1,6 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.BulletError;
-import com.cjburkey.bullet.parser.classDec.AClassDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,18 +45,6 @@ public class ATypeDec extends ABase {
         output.addAll(type.verify());
         arrayType.ifPresent(aArrayType -> output.addAll(aArrayType.verify()));
         return output;
-    }
-    
-    public Optional<AClassDec> resolveTypeDeclaration(IScopeContainer startingPoint) {
-        while (startingPoint != null) {
-            if (startingPoint.getClassDecs().isPresent()) {
-                for (AClassDec classDec : startingPoint.getClassDecs().get()) {
-                    if (classDec.name.identifier.equals(type.identifier)) return Optional.of(classDec);
-                }
-            }
-            startingPoint = startingPoint.getScope();
-        }
-        return Optional.empty();
     }
     
     public boolean equals(Object o) {

@@ -67,10 +67,10 @@ public class AArgument extends AVariable {
         return Objects.hash(name, typeDec);
     }
     
-    public ATypeDec resolveType() {
-        if (typeDec.isPresent()) return typeDec.get();
+    public Optional<ATypeDec> resolveType() {
+        if (typeDec.isPresent()) return typeDec;
         // TODO
-        return null;
+        return Optional.empty();
     }
     
 }

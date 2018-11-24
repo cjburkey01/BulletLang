@@ -5,6 +5,7 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/21
@@ -38,8 +39,8 @@ public class AArrayValue extends AExpression {
     }
     
     // TODO
-    public ATypeDec resolveType() {
-        return null;
+    public Optional<ATypeDec> resolveType() {
+        return Optional.empty();
     }
     
 }

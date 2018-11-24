@@ -32,6 +32,10 @@ public class AClassDec extends ABase implements IScopeContainer {
         this.classMembers = classMembers;
     }
     
+    public boolean getMatchesTypeExactly(AType type) {
+        return type.identifier.equals(name.identifier);
+    }
+    
     public String getFormattedDebug(int indent) {
         StringBuilder output = new StringBuilder();
         

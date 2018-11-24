@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.expression.AParentChild;
@@ -74,6 +75,15 @@ public class AReference extends ABase {
         this.name = Optional.empty();
         this.variableRef = Optional.of(variableRef);
         this.exprList = Optional.empty();
+    }
+    
+    public Optional<ATypeDec> resolveType() {
+        Optional<AFunctionDec> functionDec = resolveFunctionReference();
+        if (functionDec.isPresent()) {
+            return Optional.of(functionDec.get().typeDec);
+        }
+        Optional<AVariable> variable = resolveVariableReference();
+        return variable.flatMap(AVariable::resolveType);
     }
     
     public String getFormattedDebug(int indent) {
@@ -178,15 +188,6 @@ public class AReference extends ABase {
             parent = parent.getParent();
         }
         return Optional.empty();
-    }
-    
-    public ATypeDec resolveType() {
-        Optional<AFunctionDec> functionDec = resolveFunctionReference();
-        if (functionDec.isPresent()) {
-            return functionDec.get().typeDec;
-        }
-        Optional<AVariable> variable = resolveVariableReference();
-        return variable.map(AVariable::resolveType).orElse(null);
     }
     
     private BulletError onNoMatch() {

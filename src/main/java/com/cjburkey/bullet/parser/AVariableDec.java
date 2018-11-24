@@ -75,8 +75,9 @@ public class AVariableDec extends AVariable {
         return BulletError.format(ctx, "Variable of name \"%s\" has already been declared", other.variableRef.toString());
     }
     
-    public ATypeDec resolveType() {
-        return typeDec.orElseGet(() -> expression.map(AExpression::resolveType).orElse(null));
+    public Optional<ATypeDec> resolveType() {
+        if (typeDec.isPresent()) return typeDec;
+        return expression.flatMap(AExpression::resolveType);
     }
     
 }

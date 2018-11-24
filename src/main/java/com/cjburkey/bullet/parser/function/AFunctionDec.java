@@ -3,12 +3,12 @@ package com.cjburkey.bullet.parser.function;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
 import com.cjburkey.bullet.parser.statement.AStatementVariableDec;
@@ -118,7 +118,8 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         if (!exprList.isPresent()) return true;
         if (exprList.get().expressions.size() != arguments.get().arguments.size()) return false;
         for (int i = 0; i < exprList.get().expressions.size(); i ++) {
-            if (!arguments.get().arguments.get(i).typeDec.equals(Optional.of(exprList.get().expressions.get(i).resolveType()))) {
+            if (!Optional.ofNullable(arguments.get().arguments.get(i).typeDec)
+                    .equals(Optional.of(exprList.get().expressions.get(i).resolveType()))) {
                 return false;
             }
         }

@@ -1,10 +1,12 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/23
@@ -36,7 +38,7 @@ public class ARef extends AExpression {
         return reference.verify();
     }
     
-    public ATypeDec resolveType() {
+    public Optional<ATypeDec> resolveType() {
         return reference.resolveType();
     }
     

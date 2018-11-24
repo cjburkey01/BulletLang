@@ -46,7 +46,7 @@ public class AParentChild extends AExpression {
         return output;
     }
     
-    public ATypeDec resolveType() {
+    public Optional<ATypeDec> resolveType() {
         return reference.resolveType();
     }
     
