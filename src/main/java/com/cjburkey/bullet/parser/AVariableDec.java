@@ -76,9 +76,7 @@ public class AVariableDec extends AVariable {
     }
     
     public ATypeDec resolveType() {
-        if (typeDec.isPresent()) return typeDec.get();
-        // TODO
-        return null;
+        return typeDec.orElseGet(() -> expression.map(AExpression::resolveType).orElse(null));
     }
     
 }

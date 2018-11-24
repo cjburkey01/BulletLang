@@ -122,9 +122,9 @@ public class BulletLang {
             error("Failed to parse input");
             return;
         }
-        if (debug) {
+        /*if (debug) {
             debugPrint(program.get());
-        }
+        }*/
         
         info("Settling");
         program.get().settleChildren();

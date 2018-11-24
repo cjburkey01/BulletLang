@@ -75,6 +75,9 @@ public class AClassDec extends ABase implements IScopeContainer {
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        output.addAll(name.searchAndMerge());
+        types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
+        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
         
         if (getScope() != null && getScope().getClassDecs().isPresent()) {
             for (AClassDec classDec : getScope().getClassDecs().get()) {
@@ -102,10 +105,6 @@ public class AClassDec extends ABase implements IScopeContainer {
                 }
             }
         }
-        
-        output.addAll(name.searchAndMerge());
-        types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
-        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
         return output;
     }
     

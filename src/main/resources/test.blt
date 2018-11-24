@@ -76,8 +76,9 @@ arrayTest = { 5, 4, 3, 2, 1 };
 #/
 
 class Bob {
+    :@name of String;
     def _(name of String) {
-        @name := name;
+        @name = name;
     }
     def greet() {
         print @"Hello #{@name}!";
@@ -93,5 +94,5 @@ class Bob {
     }
 }
 
-def print(msg of String) {
-}
+# Until the standard library is added, this is required for print calls to be valid
+def print(msg of String) {}

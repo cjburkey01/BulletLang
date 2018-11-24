@@ -92,8 +92,9 @@ public class AFunctionDec extends ABase implements IScopeContainer {
     }
     
     public Optional<Collection<AVariableDec>> getVariableDecs() {
-        return Optional.of(scope.statements.stream().filter(statement -> (statement instanceof AStatementVariableDec))
-                .map(statement -> ((AStatementVariableDec) statement).variableDec).collect(Collectors.toList()));
+        Collection<AVariableDec> out =  scope.statements.stream().filter(statement -> (statement instanceof AStatementVariableDec))
+                .map(statement -> ((AStatementVariableDec) statement).variableDec).collect(Collectors.toList());
+        return Optional.of(out);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {

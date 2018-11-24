@@ -9,6 +9,7 @@ import com.cjburkey.bullet.parser.function.AArguments;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -66,7 +67,7 @@ public class AReference extends ABase {
         this.exprList = exprList;
     }
     
-    public AReference(AVariableRef variableRef, BulletParser.ReferenceContext ctx) {
+    public AReference(AVariableRef variableRef, ParserRuleContext ctx) {
         super(ctx);
         
         this.isUnambiguousFunctionRef = false;

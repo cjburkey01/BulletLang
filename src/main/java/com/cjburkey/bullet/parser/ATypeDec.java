@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class ATypeDec extends ABase {
     
+    // TODO: UNION TYPES
     public final String identifier;
     public final Optional<AArrayType> arrayType;
     
