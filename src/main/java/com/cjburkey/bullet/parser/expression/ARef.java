@@ -1,37 +1,39 @@
 package com.cjburkey.bullet.parser.expression;
 
-import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
- * Created by CJ Burkey on 2018/11/20
+ * Created by CJ Burkey on 2018/11/23
  */
 @SuppressWarnings("WeakerAccess")
-public class ABoolean extends AExpression {
+public class ARef extends AExpression {
     
-    public final boolean bool;
+    public final AReference reference;
     
-    public ABoolean(boolean bool, BulletParser.BooleanContext ctx) {
+    public ARef(AReference reference, BulletParser.RefContext ctx) {
         super(ctx);
         
-        this.bool = bool;
+        this.reference = reference;
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "Boolean:\n" + getIndent(indent + indent()) + bool + '\n';
+        return reference.debug(indent);
     }
     
     public void settleChildren() {
+        reference.setScopeParent(getScope(), this);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        return new ObjectArrayList<>();
+        return reference.searchAndMerge();
     }
     
     public ObjectArrayList<BulletError> verify() {
-        return new ObjectArrayList<>();
+        return reference.verify();
     }
     
     // TODO

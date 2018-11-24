@@ -1,10 +1,10 @@
 package com.cjburkey.bullet.parser;
 
-import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2018/11/19
@@ -15,7 +15,7 @@ public class ATypeDec extends ABase {
     public final String identifier;
     public final Optional<AArrayType> arrayType;
     
-    public ATypeDec(String identifier, Optional<AArrayType> arrayType, BulletParser.TypeDecContext ctx) {
+    public ATypeDec(String identifier, Optional<AArrayType> arrayType, ParserRuleContext ctx) {
         super(ctx);
         
         this.identifier = identifier;
@@ -49,6 +49,10 @@ public class ATypeDec extends ABase {
     
     public int hashCode() {
         return Objects.hash(identifier, arrayType);
+    }
+    
+    public String toString() {
+        return identifier + (arrayType.isPresent() ? "[]" : "");
     }
     
 }

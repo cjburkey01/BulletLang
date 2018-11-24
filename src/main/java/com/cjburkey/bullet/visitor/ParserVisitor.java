@@ -16,11 +16,13 @@ import com.cjburkey.bullet.parser.classDec.AClassMembers;
 import com.cjburkey.bullet.parser.expression.AArrayValue;
 import com.cjburkey.bullet.parser.expression.ABinaryOperator;
 import com.cjburkey.bullet.parser.expression.ABoolean;
-import com.cjburkey.bullet.parser.expression.AExprList;
+import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.expression.AFloat;
 import com.cjburkey.bullet.parser.expression.AInteger;
-import com.cjburkey.bullet.parser.expression.AReference;
+import com.cjburkey.bullet.parser.AReference;
+import com.cjburkey.bullet.parser.expression.AParentChild;
+import com.cjburkey.bullet.parser.expression.ARef;
 import com.cjburkey.bullet.parser.expression.AString;
 import com.cjburkey.bullet.parser.expression.AUnaryOperator;
 import com.cjburkey.bullet.parser.function.AArgument;
@@ -67,7 +69,9 @@ public class ParserVisitor {
     public static final StringVisitor _stringVisitor = new StringVisitor();
     public static final UnaryOpVisitor _unaryOpVisitor = new UnaryOpVisitor();
     public static final BinaryOpVisitor _binaryOpVisitor = new BinaryOpVisitor();
+    public static final RefVisitor _refVisitor = new RefVisitor();
     public static final ReferenceVisitor _referenceVisitor = new ReferenceVisitor();
+    public static final AParentChildVisitor _parentChildVisitor = new AParentChildVisitor();
     public static final ArrayValueVisitor _arrayValueVisitor = new ArrayValueVisitor();
     public static final ExprListVisitor _exprListVisitor = new ExprListVisitor();
     public static final FunctionDecVisitor _functionDecVisitor = new FunctionDecVisitor();
@@ -223,11 +227,11 @@ public class ParserVisitor {
         public Optional<AExpression> visitParenthesisWrap(BulletParser.ParenthesisWrapContext ctx) {
             return visit(ctx.expression());
         }
-        public Optional<AExpression> visitReference(BulletParser.ReferenceContext ctx) {
-            return _referenceVisitor.visit(ctx).map(val -> val);
+        public Optional<AExpression> visitRef(BulletParser.RefContext ctx) {
+            return _refVisitor.visit(ctx).map(val -> val);
         }
-        public Optional<AExpression> visitFunctionReference(BulletParser.FunctionReferenceContext ctx) {
-            return _referenceVisitor.visit(ctx).map(val -> val);
+        public Optional<AExpression> visitParentChild(BulletParser.ParentChildContext ctx) {
+            return _parentChildVisitor.visit(ctx).map(val -> val);
         }
         public Optional<AExpression> visitPartialExp(BulletParser.PartialExpContext ctx) {
             return visit(ctx.expression());
@@ -291,19 +295,34 @@ public class ParserVisitor {
         }
     }
     
+    public static final class RefVisitor extends B<ARef> {
+        public Optional<ARef> visitRef(BulletParser.RefContext ctx) {
+            return _referenceVisitor.visit(ctx.reference()).map(reference -> new ARef(reference, ctx));
+        }
+    }
+    
     public static final class ReferenceVisitor extends B<AReference> {
-        public Optional<AReference> visitReference(BulletParser.ReferenceContext ctx) {
-            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+        public Optional<AReference> visitAmbigReference(BulletParser.AmbigReferenceContext ctx) {
             final Optional<AVariableRef> variableRef = _variableRefVisitor.visit(ctx.variableRef());
-            return variableRef.map(variable -> new AReference(expression, variable, ctx));
+            return variableRef.map(variable -> new AReference(variable, ctx));
         }
         public Optional<AReference> visitFunctionReference(BulletParser.FunctionReferenceContext ctx) {
-            final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
             final Optional<AName> name = _nameVisitor.visit(ctx.name());
             final Optional<AExprList> funcParams = _exprListVisitor.visit(ctx.exprList());
             final Optional<AOperator> operator = AOperator.from(ctx.op());
-            return operator.map(aOperator -> Optional.of(new AReference(expression, aOperator, funcParams, ctx)))
-                    .orElseGet(() -> name.map(aName -> new AReference(expression, aName, funcParams, ctx)));
+            return operator.map(aOperator -> Optional.of(new AReference(aOperator, funcParams, ctx)))
+                    .orElseGet(() -> name.map(aName -> new AReference(aName, funcParams, ctx)));
+        }
+    }
+    
+    public static final class AParentChildVisitor extends B<AParentChild> {
+        public Optional<AParentChild> visitParentChild(BulletParser.ParentChildContext ctx) {
+            Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
+            Optional<AReference> reference = _referenceVisitor.visit(ctx.reference());
+            if (expression.isPresent() && reference.isPresent()) {
+                return Optional.of(new AParentChild(expression.get(), reference.get(), ctx));
+            }
+            return Optional.empty();
         }
     }
     
@@ -408,7 +427,15 @@ public class ParserVisitor {
     public static final class IfStatementVisitor extends B<AIfStatement> {
         public Optional<AIfStatement> visitIfStatement(BulletParser.IfStatementContext ctx) {
             final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
-            final Optional<AScope> statements = _scopeVisitor.visit(ctx.scope());
+            final Optional<AScope> statements;
+            if (ctx.scope() != null) {
+                statements = _scopeVisitor.visit(ctx.scope());
+            } else if (ctx.statement() != null) {
+                statements = Optional.of(new AScope(ctx));
+                _statementVisitor.visit(ctx.statement()).ifPresent(statements.get().statements::add);
+            } else {
+                statements = Optional.empty();
+            }
             return statements.map(aScope -> new AIfStatement(ctx.ELSE() != null, expression, aScope, ctx));
         }
     }

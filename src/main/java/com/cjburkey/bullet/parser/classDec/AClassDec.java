@@ -3,12 +3,15 @@ package com.cjburkey.bullet.parser.classDec;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
+import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.function.AArgument;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -56,7 +59,16 @@ public class AClassDec extends ABase implements IScopeContainer {
     }
     
     public Optional<Collection<AVariableDec>> getVariableDecs() {
-        return classMembers.map(aClassMembers -> aClassMembers.variableDecs);
+        ObjectArrayList<AVariableDec> variables = new ObjectArrayList<>();
+        if (classMembers.isPresent()) {
+            variables.addAll(classMembers.get().variableDecs);
+            for (AFunctionDec functionDec : classMembers.get().functionDecs) {
+                if (functionDec.isConstructor) {
+                    functionDec.getVariableDecs().ifPresent(variables::addAll);
+                }
+            }
+        }
+        return Optional.of(variables);
     }
     
     public Optional<Collection<AFunctionDec>> getFunctionDecs() {
@@ -64,9 +76,10 @@ public class AClassDec extends ABase implements IScopeContainer {
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        final IScopeContainer parentScope = getScope();
-        if (parentScope != null && parentScope.getClassDecs().isPresent()) {
-            for (AClassDec classDec : parentScope.getClassDecs().get()) {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        
+        if (getScope() != null && getScope().getClassDecs().isPresent()) {
+            for (AClassDec classDec : getScope().getClassDecs().get()) {
                 // Merge classes of the same superclasses and with the same name
                 if (classDec != this && classDec.name.equals(name) && classDec.types.equals(types)) {
                     classDec.classMembers.ifPresent(aClassMembers -> {
@@ -84,15 +97,27 @@ public class AClassDec extends ABase implements IScopeContainer {
                     
                     // Propogate changes through children
                     classDec.settleChildren();
-                    return classDec.searchAndMerge();   // TODO: TRY TO PREVENT EXTRA INVOCATIONS OF searchAndMerge?
+                    return classDec.searchAndMerge();
+                } else if (classDec != this && classDec.name.equals(name)) {
+                    output.add(onDuplicate(classDec));
+                    break;
                 }
             }
         }
         
-        ObjectArrayList<BulletError> output = name.searchAndMerge();
+        output.addAll(name.searchAndMerge());
         types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
         classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
         return output;
+    }
+    
+    private BulletError onDuplicate(AClassDec other) {
+        ObjectArrayList<String> argTypes1 = new ObjectArrayList<>();
+        other.types.ifPresent(aTypes -> argTypes1.addAll(aTypes.types));
+        ObjectArrayList<String> argTypes2 = new ObjectArrayList<>();
+        types.ifPresent(aTypes -> argTypes2.addAll(aTypes.types));
+        return BulletError.format(ctx, "Classes with name \"%s\" have differing super classes of types: %s and %s", name,
+                Arrays.toString(argTypes1.toArray(new String[0])), Arrays.toString(argTypes2.toArray(new String[0])));
     }
     
 }

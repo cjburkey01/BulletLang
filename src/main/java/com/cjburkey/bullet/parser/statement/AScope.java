@@ -17,6 +17,10 @@ public class AScope extends ABase {
         super(ctx);
     }
     
+    public AScope(BulletParser.IfStatementContext ctx) {
+        super(ctx);
+    }
+    
     public String getFormattedDebug(int indent) {
         StringBuilder output = new StringBuilder();
         

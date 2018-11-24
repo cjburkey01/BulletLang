@@ -3,6 +3,8 @@ package com.cjburkey.bullet.parser.expression;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.AReference;
+import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -32,7 +34,7 @@ public abstract class AOperatorExpression extends AExpression {
     
     public AReference getFunctionReference() {
         if (functionReference == null) {
-            functionReference = new AReference(expressionA, operator, (BulletParser.UnaryOpContext) ctx);
+            functionReference = new AReference(operator, (BulletParser.UnaryOpContext) ctx);
         }
         return functionReference;
     }
@@ -47,6 +49,11 @@ public abstract class AOperatorExpression extends AExpression {
     
     public ObjectArrayList<BulletError> verify() {
         return expressionA.verify();
+    }
+    
+    // TODO
+    public ATypeDec resolveType() {
+        return null;
     }
     
 }

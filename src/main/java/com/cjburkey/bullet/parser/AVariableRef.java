@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -36,6 +37,28 @@ public class AVariableRef extends ABase {
     
     public ObjectArrayList<BulletError> verify() {
         return new ObjectArrayList<>();
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AVariableRef that = (AVariableRef) o;
+        return variableType == that.variableType &&
+                name.equals(that.name);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(variableType, name);
+    }
+    
+    public String toString() {
+        String type = "";
+        if (variableType.equals(AVariableType.LOCAL)) {
+            type = "@";
+        } else if (variableType.equals(AVariableType.STATIC)) {
+            type = "@@";
+        }
+        return type + name;
     }
     
     @SuppressWarnings("unused")

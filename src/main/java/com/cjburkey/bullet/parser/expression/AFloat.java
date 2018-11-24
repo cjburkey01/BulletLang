@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -42,6 +43,11 @@ public class AFloat extends AExpression {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         if (!valid) output.add(new BulletError("Invalid floating point number", ctx));
         return output;
+    }
+    
+    // TODO
+    public ATypeDec resolveType() {
+        return null;
     }
     
 }

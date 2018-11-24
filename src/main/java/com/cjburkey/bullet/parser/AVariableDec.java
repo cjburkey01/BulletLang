@@ -1,8 +1,8 @@
 package com.cjburkey.bullet.parser;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
-import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -48,7 +48,16 @@ public class AVariableDec extends ABase {
         output.addAll(variableRef.searchAndMerge());
         typeDec.ifPresent(aTypeDec -> output.addAll(aTypeDec.searchAndMerge()));
         expression.ifPresent(aExpression -> output.addAll(aExpression.searchAndMerge()));
-        // TODO: CHECK IF IS DUPLICATE VARIABLE
+        
+        // Ignore statement variable declarations; they will shadow each other
+        if (getScope().getVariableDecs().isPresent()) {
+            for (AVariableDec variableDec : getScope().getVariableDecs().get()) {
+                if (variableDec != this && variableDec.variableRef.equals(variableRef)) {
+                    output.add(onDuplicate(variableDec));
+                }
+            }
+        }
+        
         return output;
     }
     
@@ -60,6 +69,10 @@ public class AVariableDec extends ABase {
             output.add(new BulletError("Invalid variable declaration", ctx));
         }
         return output;
+    }
+    
+    private BulletError onDuplicate(AVariableDec other) {
+        return BulletError.format(ctx, "Variable of name \"%s\" has already been declared", other.variableRef.toString());
     }
     
 }

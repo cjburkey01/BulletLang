@@ -10,6 +10,7 @@ import java.util.Optional;
 /**
  * Created by CJ Burkey on 2018/11/21
  */
+@SuppressWarnings("unused")
 public interface IScopeContainer extends IABase {
     
     default Optional<Collection<ANamespace>> getNamespaces() { return Optional.empty(); }

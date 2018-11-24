@@ -21,4 +21,8 @@ public class BulletError {
         log.accept(String.format("%s on line %s at character %s", printText, ctx.start.getLine(), ctx.start.getCharPositionInLine()));
     }
     
+    public static BulletError format(ParserRuleContext ctx, String format, Object... data) {
+        return new BulletError(String.format(format, data), ctx);
+    }
+    
 }

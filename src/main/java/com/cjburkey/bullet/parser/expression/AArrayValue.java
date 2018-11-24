@@ -2,6 +2,8 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.AExprList;
+import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -33,6 +35,11 @@ public class AArrayValue extends AExpression {
     // TODO: CHECK VARIABLE TYPES
     public ObjectArrayList<BulletError> verify() {
         return exprList.verify();
+    }
+    
+    // TODO
+    public ATypeDec resolveType() {
+        return null;
     }
     
 }

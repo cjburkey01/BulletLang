@@ -1,3 +1,5 @@
+/#
+
 class Person {
     def _(firstName of String, lastName of String) {
         @@people = @@people + 1;
@@ -69,4 +71,27 @@ print bob.+(sue);
 print bob.-;    # Instead of `print (-bob);`
 
 :arrayTest of Int32[];
-arrayValueTest := { 5, 4, 3, 2, 1 };
+arrayTest = { 5, 4, 3, 2, 1 };
+
+#/
+
+class Bob {
+    def _(name of String) {
+        @name := name;
+    }
+    def greet() {
+        print @"Hello #{@name}!";
+    }
+}
+
+class Bob {
+    def _(age of Int32) {
+        @age := age;
+    }
+    def greet(name of String) {
+        print @"Welcome #{name}, #{@age}!";
+    }
+}
+
+def print(msg of String) {
+}

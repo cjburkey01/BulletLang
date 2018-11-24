@@ -51,4 +51,8 @@ public class AName extends ABase {
         return Objects.hash(identifier);
     }
     
+    public String toString() {
+        return identifier;
+    }
+    
 }

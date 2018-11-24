@@ -1,8 +1,7 @@
-package com.cjburkey.bullet.parser.expression;
+package com.cjburkey.bullet.parser;
 
-import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.expression.AExpression;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 

@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.expression;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
@@ -20,6 +21,11 @@ public class AUnaryOperator extends AOperatorExpression {
     
     public ObjectArrayList<BulletError> verify() {
         return super.verify();
+    }
+    
+    // TODO
+    public ATypeDec resolveType() {
+        return null;
     }
     
 }

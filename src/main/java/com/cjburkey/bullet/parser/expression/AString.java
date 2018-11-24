@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
@@ -104,7 +105,9 @@ public class AString extends AExpression {
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        return new ObjectArrayList<>();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        smartInsertionPoints.values().forEach(expression -> output.addAll(expression.searchAndMerge()));
+        return output;
     }
     
     public void settleChildren() {
@@ -112,11 +115,18 @@ public class AString extends AExpression {
     }
     
     public ObjectArrayList<BulletError> verify() {
-        return new ObjectArrayList<>();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        smartInsertionPoints.values().forEach(expression -> output.addAll(expression.verify()));
+        return output;
     }
     
     private static void onInvalidSmartString(String text) {
         throw new IllegalStateException(String.format("Invalid expression in smart string: \"%s\"", text));
+    }
+    
+    // TODO
+    public ATypeDec resolveType() {
+        return null;
     }
     
 }

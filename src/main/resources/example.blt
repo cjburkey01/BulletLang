@@ -3,6 +3,9 @@
     Multi-line comments are possible, too,
     like this!
 #/
+/*
+    Or like this!
+*/
 
 # Requirements come after module declaration, but are not required
 # These are '.blt' files that will be parsed and loaded before this one

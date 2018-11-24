@@ -1,16 +1,22 @@
 package com.cjburkey.bullet.parser.function;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
+import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
-import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.statement.AStatementVariableDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by CJ Burkey on 2018/11/19
@@ -18,15 +24,17 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class AFunctionDec extends ABase implements IScopeContainer {
     
-    public Optional<AName> name;
-    public Optional<AOperator> operator;
-    public Optional<AArguments> arguments;
-    public Optional<AScope> scope;
+    public final boolean isConstructor;
+    public final Optional<AName> name;
+    public final Optional<AOperator> operator;
+    public final Optional<AArguments> arguments;
+    public final Optional<AScope> scope;
     
     public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<AScope> scope,
                         BulletParser.FunctionDecContext ctx) {
         super(ctx);
         
+        this.isConstructor = name.map(aName -> aName.identifier.equals("_")).orElse(false);
         this.name = name;
         this.operator = operator;
         this.arguments = arguments;
@@ -66,6 +74,11 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         return scope.map(aScope -> aScope.statements);
     }
     
+    public Optional<Collection<AVariableDec>> getVariableDecs() {
+        return scope.map(aScope -> aScope.statements.stream().filter(statement -> (statement instanceof AStatementVariableDec))
+                .map(statement -> ((AStatementVariableDec) statement).variableDec).collect(Collectors.toList()));
+    }
+    
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         
@@ -74,9 +87,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
             for (AFunctionDec functionDec : parentScope.getFunctionDecs().get()) {
                 if (functionDec != this && functionDec.name.equals(name) && functionDec.operator.equals(operator)
                         && functionDec.arguments.equals(arguments)) {
-                    //noinspection OptionalGetWithoutIsPresent
-                    output.add(new BulletError("Duplicate function: " +
-                            (name.isPresent() ? name.get() : operator.get()), ctx));    // TODO: SHOW ARGS (I'M IN A RUSH)
+                    output.add(onDuplicate(functionDec));
                 }
             }
         }
@@ -85,6 +96,41 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         arguments.ifPresent(aArguments -> output.addAll(aArguments.searchAndMerge()));
         scope.ifPresent(aScope -> output.addAll(aScope.searchAndMerge()));
         return output;
+    }
+    
+    public boolean getMatches(String name) {
+        if (operator.isPresent() && operator.get().token.equals(name)) {
+            return true;
+        }
+        return (this.name.isPresent() && this.name.get().identifier.equals(name));
+    }
+    
+    public boolean getArgumentsMatch(Optional<AExprList> exprList) {
+        if (exprList.isPresent() != arguments.isPresent()) return false;
+        if (!exprList.isPresent()) return true;
+        if (exprList.get().expressions.size() != arguments.get().arguments.size()) return false;
+        for (int i = 0; i < exprList.get().expressions.size(); i ++) {
+            if (!arguments.get().arguments.get(i).typeDec.equals(Optional.of(exprList.get().expressions.get(i).resolveType()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean getFullMatches(String name, Optional<AExprList> exprList) {
+        return getMatches(name) && getArgumentsMatch(exprList);
+    }
+    
+    private BulletError onDuplicate(AFunctionDec other) {
+        ObjectArrayList<String> argTypes = new ObjectArrayList<>();
+        if (other.arguments.isPresent()) {
+            for (AArgument argument : other.arguments.get().arguments) {
+                argTypes.add(argument.typeDec.map(ATypeDec::toString).orElse("?"));
+            }
+        }
+        return BulletError.format(ctx, "Duplicate function: \"%s\" with args of types: %s",
+                (this.name.isPresent() ? this.name.get().toString() : (this.operator.isPresent() ? this.operator.get().toString() : "")),
+                Arrays.toString(argTypes.toArray(new String[0])));
     }
     
 }

@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser;
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
@@ -43,6 +44,18 @@ public abstract class ABase implements IABase {
             output += '\n';
         }
         return output;
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ABase aBase = (ABase) o;
+        return id == aBase.id &&
+                ctx.equals(aBase.ctx);
+    }
+    
+    public int hashCode() {
+        return Objects.hash(id, ctx);
     }
     
     @SuppressWarnings("unchecked")

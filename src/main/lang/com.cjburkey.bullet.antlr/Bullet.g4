@@ -158,6 +158,12 @@ exprList        : expression COM exprList
                 | expression
                 ;
 
+reference       : name LP exprList? RP                          # FunctionReference
+                | variableRef                                   # AmbigReference        // Variable or function
+                | name exprList                                 # FunctionReference
+                | op exprList?                                  # FunctionReference
+                ;
+
 expression      // Literals
                 : BOOL                                          # Boolean
                 | INTEGER                                       # Integer
@@ -186,19 +192,16 @@ expression      // Literals
                 | LP expression RP                              # ParenthesisWrap
                 
                 // References
-                | expression PER name LP exprList? RP           # FunctionReference
-                | expression PER variableRef                    # Reference             // Variable or function
-                | expression PER name exprList                  # FunctionReference
-                | expression PER op exprList?                   # FunctionReference
-                | name LP exprList? RP                          # FunctionReference
-                | variableRef                                   # Reference             // Variable or function
-                | name exprList                                 # FunctionReference
+                | reference                                     # Ref
+                | expression PER reference                      # ParentChild
                 
                 | LB exprList COM? RB                           # ArrayValue
                 ;
 
 ifStatement     : IF expression LB scope RB
+                | IF expression statement 
                 | ELSE expression? LB scope RB
+                | ELSE expression? statement
                 ;
 
 classDec        : CLASS name (OF types)? LB classMembers RB ;
