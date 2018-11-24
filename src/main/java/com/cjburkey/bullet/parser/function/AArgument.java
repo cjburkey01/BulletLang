@@ -1,11 +1,11 @@
 package com.cjburkey.bullet.parser.function;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.AVariable;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,14 +13,14 @@ import java.util.Optional;
 /**
  * Created by CJ Burkey on 2018/11/20
  */
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
-public class AArgument extends ABase {
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType"})
+public class AArgument extends AVariable {
     
     public final AName name;
     public final Optional<ATypeDec> typeDec;
     
     public AArgument(AName name, Optional<ATypeDec> typeDec, BulletParser.ArgumentContext ctx) {
-        super(ctx);
+        super(name, ctx);
         
         this.name = name;
         this.typeDec = typeDec;
@@ -65,6 +65,12 @@ public class AArgument extends ABase {
     
     public int hashCode() {
         return Objects.hash(name, typeDec);
+    }
+    
+    public ATypeDec resolveType() {
+        if (typeDec.isPresent()) return typeDec.get();
+        // TODO
+        return null;
     }
     
 }

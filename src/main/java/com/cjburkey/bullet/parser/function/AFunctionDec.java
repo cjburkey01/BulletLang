@@ -28,16 +28,18 @@ public class AFunctionDec extends ABase implements IScopeContainer {
     public final Optional<AName> name;
     public final Optional<AOperator> operator;
     public final Optional<AArguments> arguments;
-    public final Optional<AScope> scope;
+    public final ATypeDec typeDec;
+    public final AScope scope;
     
-    public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<AScope> scope,
-                        BulletParser.FunctionDecContext ctx) {
+    public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<ATypeDec> typeDec,
+                        AScope scope, BulletParser.FunctionDecContext ctx) {
         super(ctx);
         
         this.isConstructor = name.map(aName -> aName.identifier.equals("_")).orElse(false);
         this.name = name;
         this.operator = operator;
         this.arguments = arguments;
+        this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(ctx));
         this.scope = scope;
     }
     
@@ -50,36 +52,19 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
         operator.ifPresent(aOperator -> output.append(aOperator.debug(indent + indent())));
         arguments.ifPresent(aArguments -> output.append(aArguments.debug(indent + indent())));
-        scope.ifPresent(aScope -> output.append(aScope.debug(indent + indent())));
+        typeDec.debug(indent + indent());
+        output.append(scope.debug(indent + indent()));
         return output.toString();
     }
     
     public void settleChildren() {
         IScopeContainer.makeChild(getScope(), this, name);
         IScopeContainer.makeChild(getScope(), this, arguments);
-        IScopeContainer.makeChild(this, this, scope);
+        typeDec.setScopeParent(getScope(), this);
+        scope.setScopeParent(this, this);
     }
     
     public ObjectArrayList<BulletError> verify() {
-        ObjectArrayList<BulletError> output = name.map(AName::verify).orElseGet(ObjectArrayList::new);
-        arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
-        scope.ifPresent(aScope -> output.addAll(aScope.verify()));
-        if (!name.isPresent() && !operator.isPresent()) {
-            output.add(new BulletError("Invalid function lacking name", ctx));
-        }
-        return output;
-    }
-    
-    public Optional<Collection<AStatement>> getStatements() {
-        return scope.map(aScope -> aScope.statements);
-    }
-    
-    public Optional<Collection<AVariableDec>> getVariableDecs() {
-        return scope.map(aScope -> aScope.statements.stream().filter(statement -> (statement instanceof AStatementVariableDec))
-                .map(statement -> ((AStatementVariableDec) statement).variableDec).collect(Collectors.toList()));
-    }
-    
-    public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         
         final IScopeContainer parentScope = getScope();
@@ -92,9 +77,31 @@ public class AFunctionDec extends ABase implements IScopeContainer {
             }
         }
         
+        name.ifPresent(aName -> output.addAll(aName.verify()));
+        arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
+        output.addAll(typeDec.verify());
+        output.addAll(scope.verify());
+        if (!name.isPresent() && !operator.isPresent()) {
+            output.add(new BulletError("Invalid function: lacking name", ctx));
+        }
+        return output;
+    }
+    
+    public Optional<Collection<AStatement>> getStatements() {
+        return Optional.of(scope.statements);
+    }
+    
+    public Optional<Collection<AVariableDec>> getVariableDecs() {
+        return Optional.of(scope.statements.stream().filter(statement -> (statement instanceof AStatementVariableDec))
+                .map(statement -> ((AStatementVariableDec) statement).variableDec).collect(Collectors.toList()));
+    }
+    
+    public ObjectArrayList<BulletError> searchAndMerge() {
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
         arguments.ifPresent(aArguments -> output.addAll(aArguments.searchAndMerge()));
-        scope.ifPresent(aScope -> output.addAll(aScope.searchAndMerge()));
+        output.addAll(typeDec.searchAndMerge());
+        output.addAll(scope.searchAndMerge());
         return output;
     }
     

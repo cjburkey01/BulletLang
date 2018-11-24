@@ -36,9 +36,8 @@ public class ARef extends AExpression {
         return reference.verify();
     }
     
-    // TODO
     public ATypeDec resolveType() {
-        return null;
+        return reference.resolveType();
     }
     
 }

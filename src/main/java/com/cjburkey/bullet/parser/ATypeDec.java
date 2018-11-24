@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +40,18 @@ public class ATypeDec extends ABase {
         return new ObjectArrayList<>();
     }
     
+    public Optional<AClassDec> resolveTypeDeclaration(IScopeContainer startingPoint) {
+        while (startingPoint != null) {
+            if (startingPoint.getClassDecs().isPresent()) {
+                for (AClassDec classDec : startingPoint.getClassDecs().get()) {
+                    if (classDec.name.identifier.equals(identifier)) return Optional.of(classDec);
+                }
+            }
+            startingPoint = startingPoint.getScope();
+        }
+        return Optional.empty();
+    }
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -53,6 +66,10 @@ public class ATypeDec extends ABase {
     
     public String toString() {
         return identifier + (arrayType.isPresent() ? "[]" : "");
+    }
+    
+    public static ATypeDec getVoid(ParserRuleContext ctx) {
+        return new ATypeDec("Void", Optional.empty(), ctx);
     }
     
 }

@@ -1,10 +1,11 @@
 package com.cjburkey.bullet.parser.expression;
 
-import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.BulletError;
-import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.AExprList;
+import com.cjburkey.bullet.parser.AOperator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -23,9 +24,8 @@ public class AUnaryOperator extends AOperatorExpression {
         return super.verify();
     }
     
-    // TODO
-    public ATypeDec resolveType() {
-        return null;
+    protected Optional<AExprList> getParameters() {
+        return Optional.of(new AExprList(ctx));
     }
     
 }

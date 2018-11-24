@@ -345,9 +345,10 @@ public class ParserVisitor {
             final Optional<AName> name = _nameVisitor.visit(ctx.name());
             final Optional<AOperator> operator = AOperator.from(ctx.op());
             final Optional<AArguments> arguments = _argumentsVisitor.visit(ctx.arguments());
+            final Optional<ATypeDec> typeDec = _typeDecVisitor.visit(ctx.typeDec());
             final Optional<AScope> statements = _scopeVisitor.visit(ctx.scope());
-            if (name.isPresent() || operator.isPresent()) {
-                return Optional.of(new AFunctionDec(name, operator, arguments, statements, ctx));
+            if ((name.isPresent() || operator.isPresent()) && statements.isPresent()) {
+                return Optional.of(new AFunctionDec(name, operator, arguments, typeDec, statements.get(), ctx));
             }
             return Optional.empty();
         }

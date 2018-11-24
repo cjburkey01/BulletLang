@@ -4,6 +4,8 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.expression.AParentChild;
+import com.cjburkey.bullet.parser.function.AArgument;
+import com.cjburkey.bullet.parser.function.AArguments;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -123,13 +125,19 @@ public class AReference extends ABase {
     }
     
     public Optional<AFunctionDec> resolveFunctionReference() {
-        if (!name.isPresent()) return Optional.empty();
+        // Get name and ensure this could be a function reference
+        String n = name.map(aName -> aName.identifier).orElse(null);
+        if (n == null) {
+            n = variableRef.map(aVariableRef -> aVariableRef.name.identifier).orElse(null);
+            // VariableRef must not be a member variable reference for it possibly to be a function
+            if (n == null || !variableRef.get().variableType.equals(AVariableRef.AVariableType.GLOBAL)) return Optional.empty();
+        }
         
         IScopeContainer scope = getScope();
         while (scope != null) {
             if (scope.getFunctionDecs().isPresent()) {
                 for (AFunctionDec functionDec : scope.getFunctionDecs().get()) {
-                    if (functionDec.getFullMatches(name.get().identifier, exprList)) {
+                    if (functionDec.getFullMatches(n, exprList)) {
                         return Optional.of(functionDec);
                     }
                 }
@@ -139,23 +147,53 @@ public class AReference extends ABase {
         return Optional.empty();
     }
     
-    public Optional<AVariableDec> resolveVariableReference() {
+    public Optional<AVariable> resolveVariableReference() {
         if (isUnambiguousFunctionRef || !variableRef.isPresent()) return Optional.empty();
         
         IScopeContainer scope = getScope();
         while (scope != null) {
-            
+            if (scope.getVariableDecs().isPresent()) {
+                for (AVariableDec variableDec : scope.getVariableDecs().get()) {
+                    if (variableDec.variableRef.equals(variableRef.get())) {
+                        return Optional.of(variableDec);
+                    }
+                }
+            }
             scope = scope.getScope();
+        }
+        
+        ABase parent = getParent();
+        while (parent != null) {
+            if (parent instanceof AFunctionDec) {
+                AArguments arguments = ((AFunctionDec) parent).arguments.orElse(null);
+                if (arguments != null) {
+                    for (AArgument argument : arguments.arguments) {
+                        if (argument.name.equals(variableRef.get().name)) {
+                            return Optional.of(argument);
+                        }
+                    }
+                }
+            }
+            parent = parent.getParent();
         }
         return Optional.empty();
     }
     
-    private BulletError onNoMatch() {
-        String n = (name.isPresent() ? name.get().toString() : (variableRef.isPresent() ? variableRef.get().name.toString() : "?"));
-        if (isUnambiguousFunctionRef) {
-            return BulletError.format(ctx, "Invalid function reference: \"%s\"", n);
+    public ATypeDec resolveType() {
+        Optional<AFunctionDec> functionDec = resolveFunctionReference();
+        if (functionDec.isPresent()) {
+            return functionDec.get().typeDec;
         }
-        return BulletError.format(ctx, "Invalid variable/function reference: \"%s\"", n);
+        Optional<AVariable> variable = resolveVariableReference();
+        return variable.map(AVariable::resolveType).orElse(null);
+    }
+    
+    private BulletError onNoMatch() {
+        String n = (name.isPresent() ? name.get().toString() : (variableRef.isPresent() ? variableRef.get().toString() : "?"));
+        String msgPt = (isUnambiguousFunctionRef ? "function"
+                : ((variableRef.isPresent() && !variableRef.get().variableType.equals(AVariableRef.AVariableType.GLOBAL)
+                ? "member variable" : "variable/function")));
+        return BulletError.format(ctx, "Invalid %s reference: \"%s\"", msgPt, n);
     }
     
 }

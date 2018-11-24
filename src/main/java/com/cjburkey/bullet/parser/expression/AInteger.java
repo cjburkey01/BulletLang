@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -45,9 +46,8 @@ public class AInteger extends AExpression {
         return output;
     }
     
-    // TODO
     public ATypeDec resolveType() {
-        return null;
+        return new ATypeDec("Int32", Optional.empty(), ctx);
     }
     
 }

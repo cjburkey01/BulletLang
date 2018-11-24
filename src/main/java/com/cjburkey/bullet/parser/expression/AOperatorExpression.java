@@ -1,11 +1,15 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.classDec.AClassDec;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/21
@@ -51,9 +55,22 @@ public abstract class AOperatorExpression extends AExpression {
         return expressionA.verify();
     }
     
-    // TODO
     public ATypeDec resolveType() {
+        // Get the type of the first term
+        ATypeDec typeDec = expressionA.resolveType();
+        if (typeDec == null) return null;
+        
+        // Find the function for the first term
+        AClassDec classDec = typeDec.resolveTypeDeclaration(getScope()).orElse(null);
+        if (classDec == null || !classDec.getFunctionDecs().isPresent()) return null;
+        for (AFunctionDec functionDec : classDec.getFunctionDecs().get()) {
+            if (functionDec.getFullMatches(operator.token, getParameters())) {
+                return functionDec.typeDec;
+            }
+        }
         return null;
     }
+    
+    protected abstract Optional<AExprList> getParameters();
     
 }

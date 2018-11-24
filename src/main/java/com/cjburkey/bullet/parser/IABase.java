@@ -18,10 +18,10 @@ public interface IABase {
     // Sets all children's parents to self and scope to current scope where applicable
     void settleChildren();
     
-    // Merge and error scopes
+    // Merge scopes such as classes and namespaces
     ObjectArrayList<BulletError> searchAndMerge();
     
-    // Checks for errors before compilation
+    // Checks for errors before compilation including duplicate errors, unknown types, etc
     ObjectArrayList<BulletError> verify();
     
 }

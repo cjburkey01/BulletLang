@@ -78,7 +78,7 @@ public class BulletLang {
             error("Invalid input file");
             if (input.debug) {
                 // TODO: REMOVE THIS TEST CODE
-                debug("Performing test compile on resource \"/test2.blt\" because no valid input file was found and debug is enabled");
+                debug("Performing test compile on resource \"/test.blt\" because no valid input file was found and debug is enabled");
                 compiler.compile(BulletLang.class.getResourceAsStream("/test.blt"), null);
             }
             return;

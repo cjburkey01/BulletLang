@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Optional;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -34,9 +35,8 @@ public class ABoolean extends AExpression {
         return new ObjectArrayList<>();
     }
     
-    // TODO
     public ATypeDec resolveType() {
-        return null;
+        return new ATypeDec("Boolean", Optional.empty(), ctx);
     }
     
 }

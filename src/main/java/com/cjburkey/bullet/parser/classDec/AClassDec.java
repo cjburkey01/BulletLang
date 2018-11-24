@@ -1,15 +1,13 @@
 package com.cjburkey.bullet.parser.classDec;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
-import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.parser.function.AArgument;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
-import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Arrays;
 import java.util.Collection;
