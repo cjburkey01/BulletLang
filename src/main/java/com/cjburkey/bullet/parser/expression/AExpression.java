@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import java.util.Optional;
 
 /**

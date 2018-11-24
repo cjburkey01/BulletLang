@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 

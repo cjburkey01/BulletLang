@@ -129,9 +129,19 @@ argument        : name typeDec? ;
 
 arrayType       : LBR expression? RBR ;
 
-type            : IDENTIFIER ;
+typeFrag        : IDENTIFIER ;
 
-typeDec         : OF type arrayType? ;
+typeHalf        : typeFrag arrayType? ;
+
+typeUnion       : typeHalf BIT_OR typeUnion
+                | typeHalf
+                ;
+
+typeWhole       : typeHalf
+                | LP typeUnion RP
+                ;
+
+typeDec         : OF typeWhole ;
 
 scope           : statement scope
                 |
@@ -213,6 +223,6 @@ classMembers    : variableDec classMembers
                 |
                 ;
 
-types           : type COM types
-                | type
+types           : typeFrag COM types
+                | typeFrag
                 ;

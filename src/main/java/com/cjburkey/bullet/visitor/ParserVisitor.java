@@ -6,9 +6,12 @@ import com.cjburkey.bullet.parser.AArrayType;
 import com.cjburkey.bullet.parser.AIfStatement;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.parser.AType;
-import com.cjburkey.bullet.parser.ATypeDec;
-import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.parser.type.ATypeFrag;
+import com.cjburkey.bullet.parser.type.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeHalf;
+import com.cjburkey.bullet.parser.type.ATypeUnion;
+import com.cjburkey.bullet.parser.type.ATypeWhole;
+import com.cjburkey.bullet.parser.type.ATypes;
 import com.cjburkey.bullet.parser.AVariableAssign;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.AVariableRef;
@@ -62,7 +65,10 @@ public class ParserVisitor {
     public static final VariableDecVisitor _variableDecVisitor = new VariableDecVisitor();
     public static final VariableRefVisitor _variableRefVisitor = new VariableRefVisitor();
     public static final TypeDecVisitor _typeDecVisitor = new TypeDecVisitor();
-    public static final TypeVisitor _typeVisitor = new TypeVisitor();
+    public static final TypeWholeVisitor _typeWholeVisitor = new TypeWholeVisitor();
+    public static final TypeHalfVisitor _typeHalfVisitor = new TypeHalfVisitor();
+    public static final TypeUnionVisitor _typeUnionVisitor = new TypeUnionVisitor();
+    public static final TypeFragVisitor _typeFragVisitor = new TypeFragVisitor();
     public static final AArrayTypeVisitor _arrayTypeVisitor = new AArrayTypeVisitor();
     public static final ExpressionVisitor _expressionVisitor = new ExpressionVisitor();
     public static final BooleanVisitor _booleanVisitor = new BooleanVisitor();
@@ -190,13 +196,34 @@ public class ParserVisitor {
     
     public static final class TypeDecVisitor extends B<ATypeDec> {
         public Optional<ATypeDec> visitTypeDec(BulletParser.TypeDecContext ctx) {
-            return _typeVisitor.visit(ctx.type()).map(aType -> new ATypeDec(aType, _arrayTypeVisitor.visit(ctx.arrayType()), ctx));
+            return _typeWholeVisitor.visit(ctx.typeWhole()).map(aTypeWhole -> new ATypeDec(aTypeWhole, ctx));
         }
     }
     
-    public static final class TypeVisitor extends B<AType> {
-        public Optional<AType> visitType(BulletParser.TypeContext ctx) {
-            return Optional.of(new AType(ctx.IDENTIFIER().getText(), ctx));
+    public static final class TypeWholeVisitor extends B<ATypeWhole> {
+        public Optional<ATypeWhole> visitTypeWhole(BulletParser.TypeWholeContext ctx) {
+            return Optional.of(new ATypeWhole(_typeHalfVisitor.visit(ctx.typeHalf()), _typeUnionVisitor.visit(ctx.typeUnion()), ctx));
+        }
+    }
+    
+    public static final class TypeHalfVisitor extends B<ATypeHalf> {
+        public Optional<ATypeHalf> visitTypeHalf(BulletParser.TypeHalfContext ctx) {
+            return _typeFragVisitor.visit(ctx.typeFrag()).map(aTypeFrag ->
+                    new ATypeHalf(aTypeFrag, _arrayTypeVisitor.visit(ctx.arrayType()), ctx));
+        }
+    }
+    
+    public static final class TypeUnionVisitor extends B<ATypeUnion> {
+        public Optional<ATypeUnion> visitTypeUnion(BulletParser.TypeUnionContext ctx) {
+            ATypeUnion typeUnion = _typeUnionVisitor.visit(ctx.typeUnion()).orElseGet(() -> new ATypeUnion(ctx));
+            _typeHalfVisitor.visit(ctx.typeHalf()).ifPresent(typeUnion.typeHalfs::add);
+            return Optional.of(typeUnion);
+        }
+    }
+    
+    public static final class TypeFragVisitor extends B<ATypeFrag> {
+        public Optional<ATypeFrag> visitTypeFrag(BulletParser.TypeFragContext ctx) {
+            return Optional.of(new ATypeFrag(ctx.IDENTIFIER().getText(), ctx));
         }
     }
     
@@ -208,7 +235,7 @@ public class ParserVisitor {
     
     public static final class ExpressionVisitor extends B<AExpression> {
         // We have to map the visits to get the inheriting classes of AExpression
-        // to become Optional<AExpression> as Optional<ABoolean>, etc, do not
+        // to become Optional<AExpression> as Optional<ABoolean> etc, do not
         // inherit from Optional<AExpression>
         public Optional<AExpression> visitBoolean(BulletParser.BooleanContext ctx) {
             return _booleanVisitor.visit(ctx).map(val -> val);
@@ -476,7 +503,7 @@ public class ParserVisitor {
     public static final class TypesVisitor extends B<ATypes> {
         public Optional<ATypes> visitTypes(BulletParser.TypesContext ctx) {
             final ATypes types = visit(ctx.types()).orElseGet(() -> new ATypes(ctx));
-            _typeVisitor.visit(ctx.type()).ifPresent(types.types::add);
+            _typeFragVisitor.visit(ctx.typeFrag()).ifPresent(types.types::add);
             return Optional.of(types);
         }
     }

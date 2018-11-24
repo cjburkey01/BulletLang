@@ -1,13 +1,16 @@
 package com.cjburkey.bullet.parser.expression;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.AReference;
-import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
+import com.cjburkey.bullet.parser.type.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeHalf;
+import com.cjburkey.bullet.parser.type.ATypeUnion;
+import com.cjburkey.bullet.parser.type.ATypeWhole;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -36,6 +39,7 @@ public abstract class AOperatorExpression extends AExpression {
         this.operator = operator;
     }
     
+    @SuppressWarnings("unused")
     public AReference getFunctionReference() {
         if (functionReference == null) {
             functionReference = new AReference(operator, (BulletParser.UnaryOpContext) ctx);
@@ -60,15 +64,28 @@ public abstract class AOperatorExpression extends AExpression {
         Optional<ATypeDec> typeDec = expressionA.resolveType();
         if (!typeDec.isPresent()) return Optional.empty();
         
-        // Find the function for the first term
-        AClassDec classDec = typeDec.get().type.resolveTypeDeclaration(getScope()).orElse(null);
-        if (classDec == null || !classDec.getFunctionDecs().isPresent()) return Optional.empty();
-        for (AFunctionDec functionDec : classDec.getFunctionDecs().get()) {
-            if (functionDec.getFullMatches(operator.token, getParameters())) {
-                return Optional.of(functionDec.typeDec);
+        // Get classes for the type (possibly union types)
+        Optional<ObjectArrayList<AClassDec>> classesDec = typeDec.get().typeWhole.resolveTypeDeclaration(getScope());
+        if (!classesDec.isPresent()) return Optional.empty();
+        
+        ObjectArrayList<ATypeHalf> typeHalfs = new ObjectArrayList<>();
+        for (AClassDec classDec : classesDec.get()) {
+            if (!classDec.getFunctionDecs().isPresent()) continue;
+            for (AFunctionDec functionDec : classDec.getFunctionDecs().get()) {
+                if (functionDec.getFullMatches(operator.token, getParameters())) {
+                    ATypeWhole typeWhole = functionDec.typeDec.typeWhole;
+                    typeWhole.typeUnion.ifPresent(aTypeUnion -> typeHalfs.addAll(aTypeUnion.typeHalfs));
+                    typeWhole.typeHalf.ifPresent(typeHalfs::add);
+                }
             }
         }
-        return Optional.empty();
+        if (typeHalfs.size() == 0) return Optional.empty();
+        if (typeHalfs.size() == 1) {
+            return Optional.of(new ATypeDec(new ATypeWhole(Optional.of(typeHalfs.get(0)), Optional.empty(), ctx), ctx));
+        }
+        ATypeUnion typeUnion = new ATypeUnion(ctx);
+        typeUnion.typeHalfs.addAll(typeHalfs);
+        return Optional.of(new ATypeDec(new ATypeWhole(Optional.empty(), Optional.of(typeUnion), ctx), ctx));
     }
     
     protected abstract Optional<AExprList> getParameters();

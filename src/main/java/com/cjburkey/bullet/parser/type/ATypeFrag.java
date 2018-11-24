@@ -1,6 +1,8 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.type;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
@@ -10,11 +12,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2018/11/24
  */
-public class AType extends ABase {
+@SuppressWarnings("WeakerAccess")
+public class ATypeFrag extends ABase {
     
     public final String identifier;
     
-    public AType(String identifier, ParserRuleContext ctx) {
+    public ATypeFrag(String identifier, ParserRuleContext ctx) {
         super(ctx);
         
         this.identifier = identifier;
@@ -50,8 +53,8 @@ public class AType extends ABase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AType aType = (AType) o;
-        return identifier.equals(aType.identifier);
+        ATypeFrag aTypeFrag = (ATypeFrag) o;
+        return identifier.equals(aTypeFrag.identifier);
     }
     
     public int hashCode() {

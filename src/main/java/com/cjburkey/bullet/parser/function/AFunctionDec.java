@@ -6,7 +6,7 @@ import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.statement.AScope;

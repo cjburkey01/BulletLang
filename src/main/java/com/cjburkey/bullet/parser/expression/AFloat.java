@@ -2,8 +2,8 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
-import com.cjburkey.bullet.parser.AType;
-import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeFrag;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -48,7 +48,7 @@ public class AFloat extends AExpression {
     }
     
     public Optional<ATypeDec> resolveType() {
-        return Optional.of(new ATypeDec(new AType("Float64", ctx), Optional.empty(), ctx));
+        return Optional.of(ATypeDec.getPlain("Float64", ctx));
     }
     
 }

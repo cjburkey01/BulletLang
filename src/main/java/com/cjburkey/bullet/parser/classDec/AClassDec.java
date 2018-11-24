@@ -4,8 +4,8 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
-import com.cjburkey.bullet.parser.AType;
-import com.cjburkey.bullet.parser.ATypes;
+import com.cjburkey.bullet.parser.type.ATypeFrag;
+import com.cjburkey.bullet.parser.type.ATypes;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
@@ -32,7 +32,7 @@ public class AClassDec extends ABase implements IScopeContainer {
         this.classMembers = classMembers;
     }
     
-    public boolean getMatchesTypeExactly(AType type) {
+    public boolean getMatchesTypeExactly(ATypeFrag type) {
         return type.identifier.equals(name.identifier);
     }
     
@@ -114,12 +114,12 @@ public class AClassDec extends ABase implements IScopeContainer {
     }
     
     private BulletError onDuplicate(AClassDec other) {
-        ObjectArrayList<AType> argTypes1 = new ObjectArrayList<>();
+        ObjectArrayList<ATypeFrag> argTypes1 = new ObjectArrayList<>();
         other.types.ifPresent(aTypes -> argTypes1.addAll(aTypes.types));
-        ObjectArrayList<AType> argTypes2 = new ObjectArrayList<>();
+        ObjectArrayList<ATypeFrag> argTypes2 = new ObjectArrayList<>();
         types.ifPresent(aTypes -> argTypes2.addAll(aTypes.types));
         return BulletError.format(ctx, "Classes with name \"%s\" have differing super classes of types: %s and %s", name,
-                Arrays.toString(argTypes1.toArray(new AType[0])), Arrays.toString(argTypes2.toArray(new AType[0])));
+                Arrays.toString(argTypes1.toArray(new ATypeFrag[0])), Arrays.toString(argTypes2.toArray(new ATypeFrag[0])));
     }
     
 }

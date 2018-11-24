@@ -2,8 +2,8 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.AType;
-import com.cjburkey.bullet.parser.ATypeDec;
+import com.cjburkey.bullet.parser.type.ATypeFrag;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.visitor.ParserVisitor;
@@ -126,7 +126,7 @@ public class AString extends AExpression {
     }
     
     public Optional<ATypeDec> resolveType() {
-        return Optional.of(new ATypeDec(new AType("String", ctx), Optional.empty(), ctx));
+        return Optional.of(ATypeDec.getPlain("String", ctx));
     }
     
 }

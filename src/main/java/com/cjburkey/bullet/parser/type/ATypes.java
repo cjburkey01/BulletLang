@@ -1,7 +1,8 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.type;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.ABase;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ import java.util.Objects;
  */
 public class ATypes extends ABase {
     
-    public final ObjectArrayList<AType> types = new ObjectArrayList<>();
+    public final ObjectArrayList<ATypeFrag> types = new ObjectArrayList<>();
     
     public ATypes(BulletParser.TypesContext ctx) {
         super(ctx);
@@ -22,7 +23,7 @@ public class ATypes extends ABase {
         output.append(getIndent(indent));
         output.append("Types:\n");
         
-        for (AType type : types) {
+        for (ATypeFrag type : types) {
             output.append(getIndent(indent + indent()));
             output.append("Type:\n");
             output.append(getIndent(indent + indent() * 2));
