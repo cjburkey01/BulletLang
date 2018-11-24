@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class ATypes extends ABase {
     
-    public final ObjectArrayList<String> types = new ObjectArrayList<>();
+    public final ObjectArrayList<AType> types = new ObjectArrayList<>();
     
     public ATypes(BulletParser.TypesContext ctx) {
         super(ctx);
@@ -22,7 +22,7 @@ public class ATypes extends ABase {
         output.append(getIndent(indent));
         output.append("Types:\n");
         
-        for (String type : types) {
+        for (AType type : types) {
             output.append(getIndent(indent + indent()));
             output.append("Type:\n");
             output.append(getIndent(indent + indent() * 2));

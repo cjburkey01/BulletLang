@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.AType;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class AInteger extends AExpression {
     }
     
     public ATypeDec resolveType() {
-        return new ATypeDec("Int32", Optional.empty(), ctx);
+        return new ATypeDec(new AType("Int32", ctx), Optional.empty(), ctx);
     }
     
 }

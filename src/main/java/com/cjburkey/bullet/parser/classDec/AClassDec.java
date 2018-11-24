@@ -4,6 +4,7 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
+import com.cjburkey.bullet.parser.AType;
 import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
@@ -109,12 +110,12 @@ public class AClassDec extends ABase implements IScopeContainer {
     }
     
     private BulletError onDuplicate(AClassDec other) {
-        ObjectArrayList<String> argTypes1 = new ObjectArrayList<>();
+        ObjectArrayList<AType> argTypes1 = new ObjectArrayList<>();
         other.types.ifPresent(aTypes -> argTypes1.addAll(aTypes.types));
-        ObjectArrayList<String> argTypes2 = new ObjectArrayList<>();
+        ObjectArrayList<AType> argTypes2 = new ObjectArrayList<>();
         types.ifPresent(aTypes -> argTypes2.addAll(aTypes.types));
         return BulletError.format(ctx, "Classes with name \"%s\" have differing super classes of types: %s and %s", name,
-                Arrays.toString(argTypes1.toArray(new String[0])), Arrays.toString(argTypes2.toArray(new String[0])));
+                Arrays.toString(argTypes1.toArray(new AType[0])), Arrays.toString(argTypes2.toArray(new AType[0])));
     }
     
 }

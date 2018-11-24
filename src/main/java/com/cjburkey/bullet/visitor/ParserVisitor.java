@@ -6,6 +6,7 @@ import com.cjburkey.bullet.parser.AArrayType;
 import com.cjburkey.bullet.parser.AIfStatement;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
+import com.cjburkey.bullet.parser.AType;
 import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.ATypes;
 import com.cjburkey.bullet.parser.AVariableAssign;
@@ -61,6 +62,7 @@ public class ParserVisitor {
     public static final VariableDecVisitor _variableDecVisitor = new VariableDecVisitor();
     public static final VariableRefVisitor _variableRefVisitor = new VariableRefVisitor();
     public static final TypeDecVisitor _typeDecVisitor = new TypeDecVisitor();
+    public static final TypeVisitor _typeVisitor = new TypeVisitor();
     public static final AArrayTypeVisitor _arrayTypeVisitor = new AArrayTypeVisitor();
     public static final ExpressionVisitor _expressionVisitor = new ExpressionVisitor();
     public static final BooleanVisitor _booleanVisitor = new BooleanVisitor();
@@ -188,8 +190,13 @@ public class ParserVisitor {
     
     public static final class TypeDecVisitor extends B<ATypeDec> {
         public Optional<ATypeDec> visitTypeDec(BulletParser.TypeDecContext ctx) {
-            return Optional.ofNullable(ctx.IDENTIFIER()).map(identifier -> new ATypeDec(identifier.getText(),
-                    _arrayTypeVisitor.visit(ctx.arrayType()), ctx));
+            return _typeVisitor.visit(ctx.type()).map(aType -> new ATypeDec(aType, _arrayTypeVisitor.visit(ctx.arrayType()), ctx));
+        }
+    }
+    
+    public static final class TypeVisitor extends B<AType> {
+        public Optional<AType> visitType(BulletParser.TypeContext ctx) {
+            return Optional.of(new AType(ctx.IDENTIFIER().getText(), ctx));
         }
     }
     
@@ -469,7 +476,7 @@ public class ParserVisitor {
     public static final class TypesVisitor extends B<ATypes> {
         public Optional<ATypes> visitTypes(BulletParser.TypesContext ctx) {
             final ATypes types = visit(ctx.types()).orElseGet(() -> new ATypes(ctx));
-            Optional.ofNullable(ctx.IDENTIFIER()).ifPresent(identifier -> types.types.add(identifier.getText()));
+            _typeVisitor.visit(ctx.type()).ifPresent(types.types::add);
             return Optional.of(types);
         }
     }

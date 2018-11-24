@@ -129,7 +129,9 @@ argument        : name typeDec? ;
 
 arrayType       : LBR expression? RBR ;
 
-typeDec         : OF IDENTIFIER arrayType? ;
+type            : IDENTIFIER ;
+
+typeDec         : OF type arrayType? ;
 
 scope           : statement scope
                 |
@@ -211,6 +213,6 @@ classMembers    : variableDec classMembers
                 |
                 ;
 
-types           : IDENTIFIER COM types
-                | IDENTIFIER
+types           : type COM types
+                | type
                 ;

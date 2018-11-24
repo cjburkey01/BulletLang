@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.AType;
 import com.cjburkey.bullet.parser.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class ABoolean extends AExpression {
     }
     
     public ATypeDec resolveType() {
-        return new ATypeDec("Boolean", Optional.empty(), ctx);
+        return new ATypeDec(new AType("Boolean", ctx), Optional.empty(), ctx);
     }
     
 }

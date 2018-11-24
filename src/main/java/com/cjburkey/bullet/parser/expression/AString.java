@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.AType;
 import com.cjburkey.bullet.parser.ATypeDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.BulletError;
@@ -125,7 +126,7 @@ public class AString extends AExpression {
     }
     
     public ATypeDec resolveType() {
-        return new ATypeDec("String", Optional.empty(), ctx);
+        return new ATypeDec(new AType("String", ctx), Optional.empty(), ctx);
     }
     
 }
