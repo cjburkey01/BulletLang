@@ -1,9 +1,11 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.variable;
 
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.BulletError;
-import com.cjburkey.bullet.parser.function.AArgument;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 
@@ -13,42 +15,37 @@ import java.util.Optional;
 @SuppressWarnings("WeakerAccess")
 public class AVariableAssign extends ABase {
     
-    public final AVariableRef variableRef;
+    public final AReference reference;
     public final AExpression expression;
     
-    public AVariableAssign(AVariableRef variableRef, AExpression expression, BulletParser.VariableAssignContext ctx) {
+    public AVariableAssign(AReference reference, AExpression expression, BulletParser.VariableAssignContext ctx) {
         super(ctx);
         
-        this.variableRef = variableRef;
+        this.reference = reference;
         this.expression = expression;
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "VariableAssign:\n" + variableRef.debug(indent + indent()) +
+        return getIndent(indent) + "VariableAssign:\n" + reference.debug(indent + indent()) +
                 expression.debug(indent + indent());
     }
     
     public void settleChildren() {
-        variableRef.setScopeParent(getScope(), this);
+        reference.setScopeParent(getScope(), this);
         expression.setScopeParent(getScope(), this);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        output.addAll(variableRef.searchAndMerge());
+        output.addAll(reference.searchAndMerge());
         output.addAll(expression.searchAndMerge());
         return output;
     }
     
     public ObjectArrayList<BulletError> verify() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        output.addAll(variableRef.verify());
-        output.addAll(expression.verify());
-        
-        AReference reference = new AReference(variableRef, ctx);
-        reference.setScopeParent(variableRef.getScope(), variableRef.getParent());
-        output.addAll(reference.searchAndMerge());
         output.addAll(reference.verify());
+        output.addAll(expression.verify());
         
         Optional<AVariable> variableDec = reference.resolveVariableReference();
         if (!variableDec.isPresent()) return output;
@@ -66,12 +63,13 @@ public class AVariableAssign extends ABase {
     }
     
     public BulletError onArgument() {
-        return BulletError.format(ctx, "Cannot reassign argument value for \"%s\"", variableRef);
+        return BulletError.format(ctx, "Cannot reassign argument value for \"%s\"", reference);
     }
     
     public BulletError onInvalidType(AVariableDec variableDec) {
         return BulletError.format(ctx, "Incorrect variable assignment type; expected: \"%s\" but found \"%s\"",
-                variableDec.resolveType(), expression.resolveType());
+                variableDec.resolveType().map(typeDec -> typeDec.typeWhole.toString()).orElse("?"),
+                expression.resolveType().map(typeDec -> typeDec.typeWhole.toString()).orElse("?"));
     }
     
 }

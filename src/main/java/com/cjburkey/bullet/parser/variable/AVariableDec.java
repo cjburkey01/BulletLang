@@ -1,7 +1,9 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.variable;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.type.ATypeDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -10,7 +12,7 @@ import java.util.Optional;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType"})
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType"})
 public class AVariableDec extends AVariable {
     
     public final AVariableRef variableRef;
@@ -29,12 +31,12 @@ public class AVariableDec extends AVariable {
     public String getFormattedDebug(int indent) {
         StringBuilder output = new StringBuilder();
         
-        output.append(getIndent(indent));
+        output.append(ABase.getIndent(indent));
         output.append("VariableDec:\n");
         
-        output.append(variableRef.debug(indent + indent()));
-        typeDec.ifPresent(aTypeDec -> output.append(aTypeDec.debug(indent + indent())));
-        expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + indent())));
+        output.append(variableRef.debug(indent + ABase.indent()));
+        typeDec.ifPresent(aTypeDec -> output.append(aTypeDec.debug(indent + ABase.indent())));
+        expression.ifPresent(aExpression -> output.append(aExpression.debug(indent + ABase.indent())));
         return output.toString();
     }
     

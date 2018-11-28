@@ -1,6 +1,8 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.variable;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.AName;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,7 +11,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2018/11/20
  */
-@SuppressWarnings("WeakerAccess")
 public class AVariableRef extends ABase {
     
     public final AVariableType variableType;
@@ -36,7 +37,7 @@ public class AVariableRef extends ABase {
     }
     
     public ObjectArrayList<BulletError> verify() {
-        return new ObjectArrayList<>();
+        return name.verify();
     }
     
     public boolean equals(Object o) {

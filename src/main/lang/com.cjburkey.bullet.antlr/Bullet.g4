@@ -164,7 +164,7 @@ variableDec     : variableRef typeDec? DEC expression SEMI          // Declarati
                 | COLON variableRef typeDec SEMI                    // No-value declaration
                 ;
 
-variableAssign  : variableRef EQ expression ;
+variableAssign  : reference EQ expression ;
 
 exprList        : expression COM exprList
                 | expression

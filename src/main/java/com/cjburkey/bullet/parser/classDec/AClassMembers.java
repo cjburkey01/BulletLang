@@ -2,7 +2,7 @@ package com.cjburkey.bullet.parser.classDec;
 
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AVariableDec;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.BulletError;

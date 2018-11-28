@@ -1,7 +1,7 @@
 package com.cjburkey.bullet.parser.statement;
 
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.AVariableAssign;
+import com.cjburkey.bullet.parser.variable.AVariableAssign;
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 

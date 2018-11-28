@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.parser.expression.AParentChild;
@@ -8,6 +9,9 @@ import com.cjburkey.bullet.parser.function.AArgument;
 import com.cjburkey.bullet.parser.function.AArguments;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.type.ATypeDec;
+import com.cjburkey.bullet.parser.variable.AVariable;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
+import com.cjburkey.bullet.parser.variable.AVariableRef;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -25,28 +29,6 @@ public class AReference extends ABase {
     public final Optional<AName> name;
     public final Optional<AVariableRef> variableRef;
     public final Optional<AExprList> exprList;
-    
-    // Create a function reference to <expression>.<operator>()
-    public AReference(AOperator operator, BulletParser.UnaryOpContext ctx) {
-        super(ctx);
-        
-        this.isUnambiguousFunctionRef = true;
-        this.name = Optional.of(new AName(operator, ctx));
-        this.variableRef = Optional.empty();
-        this.exprList = Optional.empty();
-    }
-    
-    // Create a function reference to <expressionA>.<operator>(<expressionB>)
-    public AReference(AExpression expressionB, AOperator operator, BulletParser.BinaryOpContext ctx) {
-        super(ctx);
-        
-        this.isUnambiguousFunctionRef = true;
-        this.name = Optional.of(new AName(operator, ctx));
-        this.variableRef = Optional.empty();
-        this.exprList = Optional.of(new AExprList(ctx));
-        
-        this.exprList.get().expressions.add(expressionB);
-    }
     
     public AReference(AOperator operator, Optional<AExprList> exprList,
                          BulletParser.FunctionReferenceContext ctx) {
@@ -106,6 +88,7 @@ public class AReference extends ABase {
     public void settleChildren() {
         if (getParent() instanceof AParentChild) {
             refParent = Optional.of(((AParentChild) getParent()).expression);
+            refParent.ifPresent(BulletLang::process);
         }
         IScopeContainer.makeChild(getScope(), this, name);
         IScopeContainer.makeChild(getScope(), this, variableRef);
@@ -114,7 +97,6 @@ public class AReference extends ABase {
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        
         name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.searchAndMerge()));
         exprList.ifPresent(aFuncParams -> output.addAll(aFuncParams.searchAndMerge()));

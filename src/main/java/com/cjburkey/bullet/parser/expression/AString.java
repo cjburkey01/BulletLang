@@ -1,11 +1,10 @@
 package com.cjburkey.bullet.parser.expression;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.type.ATypeFrag;
-import com.cjburkey.bullet.parser.type.ATypeDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.type.ATypeDec;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -105,14 +104,14 @@ public class AString extends AExpression {
         return output.toString();
     }
     
+    public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, smartInsertionPoints.values());
+    }
+    
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         smartInsertionPoints.values().forEach(expression -> output.addAll(expression.searchAndMerge()));
         return output;
-    }
-    
-    public void settleChildren() {
-        IScopeContainer.makeChildren(getScope(), this, smartInsertionPoints.values());
     }
     
     public ObjectArrayList<BulletError> verify() {
@@ -126,7 +125,7 @@ public class AString extends AExpression {
     }
     
     public Optional<ATypeDec> resolveType() {
-        return Optional.of(ATypeDec.getPlain("String", ctx));
+        return ATypeDec.getPlain("String", getScope(), this, ctx);
     }
     
 }

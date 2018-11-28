@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
@@ -25,7 +26,9 @@ public class AUnaryOperator extends AOperatorExpression {
     }
     
     protected Optional<AExprList> getParameters() {
-        return Optional.of(new AExprList(ctx));
+        AExprList out = new AExprList(ctx);
+        if (BulletLang.process(out)) return Optional.of(out);
+        return Optional.empty();
     }
     
 }

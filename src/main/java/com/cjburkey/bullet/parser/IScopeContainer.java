@@ -4,6 +4,7 @@ import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.namespace.ANamespace;
 import com.cjburkey.bullet.parser.statement.AStatement;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
 import java.util.Collection;
 import java.util.Optional;
 

@@ -2,6 +2,7 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -130,30 +131,12 @@ public class BulletLang {
         program.get().settleChildren();
         
         info("Merging");
-        final ObjectArrayList<BulletError> errorsa = program.get().searchAndMerge();
-        if (validFromErr(errorsa)) {
-            error("Failed to merge");
-            return;
-        }
+        if (!searchAndMerge(program.get())) return;
         
         info("Verifying");
-        final ObjectArrayList<BulletError> errorsb = program.get().verify();
-        if (validFromErr(errorsb)) {
-            error("Failed to verify");
-            return;
-        }
+        if (!verify(program.get())) return;
         
         info("Compiling");
-    }
-    
-    private boolean validFromErr(ObjectArrayList<BulletError> errors) {
-        if (!errors.isEmpty()) {
-            for (BulletError error : errors) {
-                error.print(Log::error);
-            }
-            return true;
-        }
-        return false;
     }
     
     private void debugPrint(AProgram program) {
@@ -182,6 +165,39 @@ public class BulletLang {
     
     public static BulletParser buildQuickParser(String input) {
         return buildParser(buildLexer(input));
+    }
+    
+    public static boolean process(ABase node) {
+        node.settleChildren();
+        return searchAndMerge(node) && verify(node);
+    }
+    
+    public static boolean searchAndMerge(ABase node) {
+        final ObjectArrayList<BulletError> errors = node.searchAndMerge();
+        if (validFromErr(errors)) {
+            error("Failed to merge");
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean verify(ABase node) {
+        final ObjectArrayList<BulletError> errors = node.verify();
+        if (validFromErr(errors)) {
+            error("Failed to verify");
+            return false;
+        }
+        return true;
+    }
+    
+    private static boolean validFromErr(ObjectArrayList<BulletError> errors) {
+        if (!errors.isEmpty()) {
+            for (BulletError error : errors) {
+                error.print(Log::error);
+            }
+            return true;
+        }
+        return false;
     }
     
 }

@@ -1,6 +1,8 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.BulletLang;
+import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
@@ -23,8 +25,6 @@ public abstract class AOperatorExpression extends AExpression {
     public final AExpression expressionA;
     public final AOperator operator;
     
-    protected AReference functionReference;
-    
     public AOperatorExpression(AExpression expressionA, AOperator operator, BulletParser.UnaryOpContext ctx) {
         super(ctx);
         
@@ -37,14 +37,6 @@ public abstract class AOperatorExpression extends AExpression {
         
         this.expressionA = expressionA;
         this.operator = operator;
-    }
-    
-    @SuppressWarnings("unused")
-    public AReference getFunctionReference() {
-        if (functionReference == null) {
-            functionReference = new AReference(operator, (BulletParser.UnaryOpContext) ctx);
-        }
-        return functionReference;
     }
     
     public void settleChildren() {
@@ -60,6 +52,9 @@ public abstract class AOperatorExpression extends AExpression {
     }
     
     public Optional<ATypeDec> resolveType() {
+        Optional<ATypeDec> tm = expressionA.resolveType();
+        Log.debug(expressionA);
+        
         // Get the type of the first term
         Optional<ATypeDec> typeDec = expressionA.resolveType();
         if (!typeDec.isPresent()) return Optional.empty();
@@ -81,11 +76,16 @@ public abstract class AOperatorExpression extends AExpression {
         }
         if (typeHalfs.size() == 0) return Optional.empty();
         if (typeHalfs.size() == 1) {
-            return Optional.of(new ATypeDec(new ATypeWhole(Optional.of(typeHalfs.get(0)), Optional.empty(), ctx), ctx));
+            ATypeDec out = new ATypeDec(new ATypeWhole(Optional.of(typeHalfs.get(0)), Optional.empty(), ctx), ctx);
+            if (BulletLang.process(out)) return Optional.of(out);
+            return Optional.empty();
         }
+        
         ATypeUnion typeUnion = new ATypeUnion(ctx);
         typeUnion.typeHalfs.addAll(typeHalfs);
-        return Optional.of(new ATypeDec(new ATypeWhole(Optional.empty(), Optional.of(typeUnion), ctx), ctx));
+        ATypeDec out = new ATypeDec(new ATypeWhole(Optional.empty(), Optional.of(typeUnion), ctx), ctx);
+        if (BulletLang.process(out)) return Optional.of(out);
+        return Optional.empty();
     }
     
     protected abstract Optional<AExprList> getParameters();

@@ -1,7 +1,9 @@
 package com.cjburkey.bullet.parser.type;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,7 +14,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class ATypeDec extends ABase {
     
-    // TODO: UNION TYPES
     public final ATypeWhole typeWhole;
     
     public ATypeDec(ATypeWhole typeWhole, ParserRuleContext ctx) {
@@ -48,13 +49,16 @@ public class ATypeDec extends ABase {
         return Objects.hash(typeWhole);
     }
     
-    public static ATypeDec getPlain(String identifier, ParserRuleContext ctx) {
-        return new ATypeDec(new ATypeWhole(Optional.of(new ATypeHalf(new ATypeFrag(identifier, ctx), Optional.empty(), ctx)),
+    public static Optional<ATypeDec> getPlain(String identifier, IScopeContainer scope, ABase parent, ParserRuleContext ctx) {
+        ATypeDec out = new ATypeDec(new ATypeWhole(Optional.of(new ATypeHalf(new ATypeFrag(identifier, ctx), Optional.empty(), ctx)),
                 Optional.empty(), ctx), ctx);
+        out.setScopeParent(scope, parent);
+        if (BulletLang.process(out)) return Optional.of(out);
+        return Optional.empty();
     }
     
-    public static ATypeDec getVoid(ParserRuleContext ctx) {
-        return getPlain("Void", ctx);
+    public static Optional<ATypeDec> getVoid(IScopeContainer scope, ABase parent, ParserRuleContext ctx) {
+        return getPlain("Void", scope, parent, ctx);
     }
     
 }

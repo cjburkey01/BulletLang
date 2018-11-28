@@ -7,7 +7,7 @@ import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.type.ATypeDec;
-import com.cjburkey.bullet.parser.AVariableDec;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.statement.AScope;
 import com.cjburkey.bullet.parser.statement.AStatement;
@@ -39,7 +39,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         this.name = name;
         this.operator = operator;
         this.arguments = arguments;
-        this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(ctx));
+        this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(null, this, ctx).orElse(null));
         this.scope = scope;
     }
     

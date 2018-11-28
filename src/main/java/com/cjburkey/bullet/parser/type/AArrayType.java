@@ -1,6 +1,8 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.type;
 
 import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.expression.AExpression;
 import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

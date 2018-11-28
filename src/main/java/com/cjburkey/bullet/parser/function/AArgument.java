@@ -4,7 +4,7 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.type.ATypeDec;
-import com.cjburkey.bullet.parser.AVariable;
+import com.cjburkey.bullet.parser.variable.AVariable;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;

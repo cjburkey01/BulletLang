@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.BulletLang;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
@@ -46,14 +47,8 @@ public class ABinaryOperator extends AOperatorExpression {
     protected Optional<AExprList> getParameters() {
         AExprList exprList = new AExprList(ctx);
         exprList.expressions.add(expressionB);
-        return Optional.of(exprList);
-    }
-    
-    public AReference getFunctionReference() {
-        if (functionReference == null) {
-            functionReference = new AReference(expressionB, operator, (BulletParser.BinaryOpContext) ctx);
-        }
-        return functionReference;
+        if (BulletLang.process(exprList)) return Optional.of(exprList);
+        return Optional.empty();
     }
     
 }

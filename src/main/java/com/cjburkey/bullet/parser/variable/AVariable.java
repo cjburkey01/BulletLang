@@ -1,5 +1,7 @@
-package com.cjburkey.bullet.parser;
+package com.cjburkey.bullet.parser.variable;
 
+import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.type.ATypeDec;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;

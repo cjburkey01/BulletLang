@@ -6,7 +6,7 @@ import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.type.ATypeFrag;
 import com.cjburkey.bullet.parser.type.ATypes;
-import com.cjburkey.bullet.parser.AVariableDec;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

@@ -75,8 +75,14 @@ arrayTest = { 5, 4, 3, 2, 1 };
 
 #/
 
+class Int32 {
+    def +(other of Int32) of Int32 {}
+}
+
 class Bob {
+    :@@bobs of Int32;
     def _(name of String) {
+        @@bobs = @@bobs + 1;
         @name := name;
     }
     def greet() {

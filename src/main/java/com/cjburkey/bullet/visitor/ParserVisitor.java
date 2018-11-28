@@ -2,7 +2,7 @@ package com.cjburkey.bullet.visitor;
 
 import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.AArrayType;
+import com.cjburkey.bullet.parser.type.AArrayType;
 import com.cjburkey.bullet.parser.AIfStatement;
 import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
@@ -12,9 +12,9 @@ import com.cjburkey.bullet.parser.type.ATypeHalf;
 import com.cjburkey.bullet.parser.type.ATypeUnion;
 import com.cjburkey.bullet.parser.type.ATypeWhole;
 import com.cjburkey.bullet.parser.type.ATypes;
-import com.cjburkey.bullet.parser.AVariableAssign;
-import com.cjburkey.bullet.parser.AVariableDec;
-import com.cjburkey.bullet.parser.AVariableRef;
+import com.cjburkey.bullet.parser.variable.AVariableAssign;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
+import com.cjburkey.bullet.parser.variable.AVariableRef;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.classDec.AClassMembers;
 import com.cjburkey.bullet.parser.expression.AArrayValue;
@@ -444,10 +444,10 @@ public class ParserVisitor {
     
     public static final class VariableAssignVisitor extends B<AVariableAssign> {
         public Optional<AVariableAssign> visitVariableAssign(BulletParser.VariableAssignContext ctx) {
-            final Optional<AVariableRef> variableRef = _variableRefVisitor.visit(ctx.variableRef());
+            final Optional<AReference> reference = _referenceVisitor.visit(ctx.reference());
             final Optional<AExpression> expression = _expressionVisitor.visit(ctx.expression());
-            if (variableRef.isPresent() && expression.isPresent()) {
-                return Optional.of(new AVariableAssign(variableRef.get(), expression.get(), ctx));
+            if (reference.isPresent() && expression.isPresent()) {
+                return Optional.of(new AVariableAssign(reference.get(), expression.get(), ctx));
             }
             return Optional.empty();
         }

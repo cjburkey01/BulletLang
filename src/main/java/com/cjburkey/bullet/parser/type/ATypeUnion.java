@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.type;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Arrays;
@@ -25,14 +26,18 @@ public class ATypeUnion extends ABase {
     }
     
     public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, typeHalfs);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        return new ObjectArrayList<>();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        typeHalfs.forEach(typeHalf -> output.addAll(typeHalf.searchAndMerge()));
+        return output;
     }
     
+    @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletError> verify() {
-        return new ObjectArrayList<>();
+        return verifyLists(typeHalfs);
     }
     
     public boolean equals(Object o) {

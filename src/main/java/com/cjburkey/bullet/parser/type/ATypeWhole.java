@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2018/11/24
  */
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType"})
 public class ATypeWhole extends ABase {
     
     public final Optional<ATypeHalf> typeHalf;
@@ -38,11 +38,6 @@ public class ATypeWhole extends ABase {
             output.add(classDec);
         }
         return output.size() == 0 ? Optional.empty() : Optional.of(output);
-    }
-    
-    @SuppressWarnings("unused")
-    public boolean getIsUnion() {
-        return typeUnion.isPresent();
     }
     
     public String getFormattedDebug(int indent) {
@@ -79,6 +74,21 @@ public class ATypeWhole extends ABase {
     
     public int hashCode() {
         return Objects.hash(typeHalf, typeUnion);
+    }
+    
+    public String toString() {
+        if (!typeUnion.isPresent()) return typeHalf.map(ATypeHalf::toString).orElse("Type");
+        final StringBuilder output = new StringBuilder();
+        typeUnion.ifPresent(aTypeUnion -> {
+            output.append("Union(");
+            for (ATypeHalf typeHalf : aTypeUnion.typeHalfs) {
+                output.append(typeHalf);
+                output.append(" | ");
+            }
+            if (aTypeUnion.typeHalfs.size() > 0) output.delete(output.length() - 3, output.length());
+            output.append(')');
+        });
+        return output.toString();
     }
     
 }

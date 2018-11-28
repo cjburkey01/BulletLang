@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.type;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ABase;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 
@@ -34,14 +35,18 @@ public class ATypes extends ABase {
     }
     
     public void settleChildren() {
+        IScopeContainer.makeChildren(getScope(), this, types);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        return new ObjectArrayList<>();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
+        types.forEach(type -> output.addAll(type.searchAndMerge()));
+        return output;
     }
     
+    @SuppressWarnings("unchecked")
     public ObjectArrayList<BulletError> verify() {
-        return new ObjectArrayList<>();
+        return verifyLists(types);
     }
     
     public boolean equals(Object o) {
