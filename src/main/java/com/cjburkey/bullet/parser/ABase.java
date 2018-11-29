@@ -17,14 +17,16 @@ public abstract class ABase implements IABase {
     public final int id;
     public final ParserRuleContext ctx;
     private IScopeContainer scope;
-    private ABase parent;
+    private IABase parent;
+    public final StackTraceElement[] stackTrace;
     
     public ABase(ParserRuleContext ctx) {
         this.id = nextId ++;
         this.ctx = ctx;
+        stackTrace = new Exception().getStackTrace();
     }
     
-    public void setScopeParent(IScopeContainer scope, ABase parent) {
+    public void setScopeParent(IScopeContainer scope, IABase parent) {
         this.scope = scope;
         this.parent = parent;
         settleChildren();
@@ -34,7 +36,7 @@ public abstract class ABase implements IABase {
         return scope;
     }
     
-    public ABase getParent() {
+    public IABase getParent() {
         return parent;
     }
     

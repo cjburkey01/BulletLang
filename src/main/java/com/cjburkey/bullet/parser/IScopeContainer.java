@@ -36,12 +36,12 @@ public interface IScopeContainer extends IABase {
         getStatements().ifPresent(statements -> statements.remove(statement));
     }
     
-    static void makeChildren(IScopeContainer container, ABase parent, Collection<? extends ABase> elements) {
+    static void makeChildren(IScopeContainer container, IABase parent, Collection<? extends IABase> elements) {
         elements.forEach(e -> e.setScopeParent(container, parent));
     }
     
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    static void makeChild(IScopeContainer container, ABase parent, Optional<? extends ABase> element) {
+    static void makeChild(IScopeContainer container, IABase parent, Optional<? extends IABase> element) {
         element.ifPresent(e -> e.setScopeParent(container, parent));
     }
     

@@ -1,7 +1,6 @@
 package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
-import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.type.ATypeDec;

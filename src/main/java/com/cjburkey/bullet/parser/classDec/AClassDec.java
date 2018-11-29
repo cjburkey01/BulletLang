@@ -50,8 +50,8 @@ public class AClassDec extends ABase implements IScopeContainer {
     
     public void settleChildren() {
         name.setScopeParent(getScope(), this);
-        types.ifPresent(aTypes -> aTypes.setScopeParent(getScope(), this));
-        classMembers.ifPresent(aClassMembers -> aClassMembers.setScopeParent(this, this));
+        IScopeContainer.makeChild(getScope(), this, types);
+        IScopeContainer.makeChild(this, this, classMembers);
     }
     
     public ObjectArrayList<BulletError> verify() {

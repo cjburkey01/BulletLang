@@ -52,12 +52,8 @@ public class AVariableAssign extends ABase {
         
         if (variableDec.get() instanceof AVariableDec) {
             AVariableDec variableDec1 = (AVariableDec) variableDec.get();
-            if (!variableDec1.resolveType().equals(expression.resolveType())) {
-                output.add(onInvalidType(variableDec1));
-            }
-        } else {
-            output.add(onArgument());
-        }
+            if (!variableDec1.resolveType().equals(expression.resolveType())) output.add(onInvalidType(variableDec1));
+        } else output.add(onArgument());
         
         return output;
     }
@@ -67,7 +63,8 @@ public class AVariableAssign extends ABase {
     }
     
     public BulletError onInvalidType(AVariableDec variableDec) {
-        return BulletError.format(ctx, "Incorrect variable assignment type; expected: \"%s\" but found \"%s\"",
+        return BulletError.format(ctx, "Incorrect variable assignment type for variable \"%s\"; expected: \"%s\" but found \"%s\"",
+                variableDec.variableRef,
                 variableDec.resolveType().map(typeDec -> typeDec.typeWhole.toString()).orElse("?"),
                 expression.resolveType().map(typeDec -> typeDec.typeWhole.toString()).orElse("?"));
     }

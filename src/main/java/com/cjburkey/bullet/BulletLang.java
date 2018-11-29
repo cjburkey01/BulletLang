@@ -123,9 +123,6 @@ public class BulletLang {
             error("Failed to parse input");
             return;
         }
-        /*if (debug) {
-            debugPrint(program.get());
-        }*/
         
         info("Settling");
         program.get().settleChildren();
@@ -135,6 +132,10 @@ public class BulletLang {
         
         info("Verifying");
         if (!verify(program.get())) return;
+        
+        /*if (debug) {
+            debugPrint(program.get());
+        }*/
         
         info("Compiling");
     }

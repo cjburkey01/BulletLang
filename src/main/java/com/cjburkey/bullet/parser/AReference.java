@@ -155,7 +155,7 @@ public class AReference extends ABase {
             scope = scope.getScope();
         }
         
-        ABase parent = getParent();
+        IABase parent = getParent();
         while (parent != null) {
             if (parent instanceof AFunctionDec) {
                 AArguments arguments = ((AFunctionDec) parent).arguments.orElse(null);

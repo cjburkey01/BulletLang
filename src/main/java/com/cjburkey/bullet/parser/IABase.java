@@ -9,9 +9,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 @SuppressWarnings("unused")
 public interface IABase {
     
-    void setScopeParent(IScopeContainer scope, ABase parent);
+    void setScopeParent(IScopeContainer scope, IABase parent);
     IScopeContainer getScope();
-    ABase getParent();
+    IABase getParent();
     String debug(int indent);
     String getFormattedDebug(int indent);
     

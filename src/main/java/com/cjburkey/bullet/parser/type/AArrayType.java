@@ -15,6 +15,7 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AArrayType extends ABase {
     
+    // Array size (must be an integer, checked in "verify")
     public final Optional<AExpression> expression;
     
     public AArrayType(Optional<AExpression> expression, BulletParser.ArrayTypeContext ctx) {

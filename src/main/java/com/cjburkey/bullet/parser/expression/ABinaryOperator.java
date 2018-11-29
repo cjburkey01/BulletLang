@@ -29,6 +29,7 @@ public class ABinaryOperator extends AOperatorExpression {
     }
     
     public void settleChildren() {
+        super.settleChildren();
         expressionB.setScopeParent(getScope(), this);
     }
     

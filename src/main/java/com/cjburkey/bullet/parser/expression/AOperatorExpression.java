@@ -2,11 +2,9 @@ package com.cjburkey.bullet.parser.expression;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.BulletLang;
-import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.AExprList;
 import com.cjburkey.bullet.parser.AOperator;
-import com.cjburkey.bullet.parser.AReference;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.type.ATypeDec;
@@ -52,9 +50,6 @@ public abstract class AOperatorExpression extends AExpression {
     }
     
     public Optional<ATypeDec> resolveType() {
-        Optional<ATypeDec> tm = expressionA.resolveType();
-        Log.debug(expressionA);
-        
         // Get the type of the first term
         Optional<ATypeDec> typeDec = expressionA.resolveType();
         if (!typeDec.isPresent()) return Optional.empty();

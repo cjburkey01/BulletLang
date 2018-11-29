@@ -75,10 +75,6 @@ arrayTest = { 5, 4, 3, 2, 1 };
 
 #/
 
-class Int32 {
-    def +(other of Int32) of Int32 {}
-}
-
 class Bob {
     :@@bobs of Int32;
     def _(name of String) {
@@ -99,5 +95,6 @@ class Bob {
     }
 }
 
-# Until the standard library is added, this is required for print calls to be valid
+# Until the standard library is added, this is required for test calls to be valid
+class Int32 { def +(other of Int32) of Int32 {} }
 def print(msg of String) {}
