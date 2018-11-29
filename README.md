@@ -45,10 +45,10 @@ In the cloned repository directory, run `mvn clean package` to include all the n
 
 ## Packaging to EXE from Source
 
-Packing to a `.exe` file is as easy as to a Jar file. You can generate a `.exe` file on any operating system supported by [Launch4j](http://launch4j.sourceforge.net/). The `build.exe` argument can be used to trigger the exe creation: `mvn clean compile inject:inject package -Dbuild.exe=true`
+Packing to a `.exe` file is as easy as to a Jar file. You can generate a `.exe` file on any operating system supported by [Launch4j](http://launch4j.sourceforge.net/). The `build.exe` argument can be used to trigger the exe creation: `mvn clean package -Dbuild.exe=true`
 
 ## Running Source Without Packaging
 
-##### This is probably *not* useful for anyone!!
+**This is probably _not_ useful for anyone!!**
 
 In the cloned repository directoy, run `mvn clean compile inject:inject exec:java -Dexec.args="--YOUR ARGS HERE--"` to execute the compiler without building a jar first
