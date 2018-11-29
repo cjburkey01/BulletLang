@@ -22,6 +22,15 @@ If you set an alias:
 
 `bullet --if /example/main.blt --of /example/output.c`
 
+## How Compilation Works
+
+The compiler runs in discrete steps, each relying on the step(s) prior to it. The steps are as follows:
+* `Parsing` - Reads the program into memory to allow manipulation, verification and compilation.
+* `Settling` - Organizes the memory map of the data more explicitly to maintain structures present in the input source.
+* `Merging and Searching` - Allows certain structures, such as classes and namespaces, to combine with other classes/namespaces of the same name (and for classes, of the same parent classes).
+* `Verifying` - Verifies that there will not likely be any compilation errors; this step is the most complicated of all as it requires full verification of the source, resolution of implicitly defined types and references, and validity checking of the result of the execution.
+* `Compilation` - Converts the memory map of the source into a (hopefully) valid _C_ file, which may then be compiled into binary natives. Though, the _C_ file itself can be shared across platforms to allow for a cross-platform intermediate compilation step.
+
 ## Obtaining Source
 
 You may use the GitHub download repository button to download this repository or clone it using git.
