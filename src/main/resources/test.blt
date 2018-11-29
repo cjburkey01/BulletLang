@@ -76,10 +76,10 @@ arrayTest = { 5, 4, 3, 2, 1 };
 #/
 
 class Bob {
-    :@@bobs of Int32;
+    let @@bobs of Int32;
     def _(name of String) {
         @@bobs = @@bobs + 1;
-        @name := name;
+        let @name = name;
     }
     def greet() {
         print @"Hello, #{@name}!";
@@ -88,7 +88,7 @@ class Bob {
 
 class Bob {
     def _(age of Int32) {
-        @age := age;
+        let @age = age;
     }
     def greet(msg of String) {
         print @"#{msg}, #{@name}, #{@age}!";

@@ -22,6 +22,7 @@ IF          : 'if' ;
 RETURN      : 'return' ;
 COLON       : ':' ;
 DEC         : ':=' ;
+LET         : 'let' ;
 EQ          : '=' ;
 LP          : '(' ;
 RP          : ')' ;
@@ -160,8 +161,11 @@ variableRef     : VAR_TYPE? name ;
 // Possible variable types:
 //      [@[@]]<name> [of <type>] := <value>
 //      :[@[@]]variable of Type
-variableDec     : variableRef typeDec? DEC expression SEMI          // Declaration using ':='
-                | COLON variableRef typeDec SEMI                    // No-value declaration
+variableDec     : LET variableRef typeDec? EQ expression SEMI
+                | LET variableRef typeDec SEMI                  // No-value declaration
+                // Allow short-hand variable declaration
+                | variableRef typeDec? DEC expression SEMI
+                | COLON variableRef typeDec SEMI                // No-value declaration
                 ;
 
 variableAssign  : reference EQ expression ;
