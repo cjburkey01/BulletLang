@@ -26,7 +26,7 @@ public class AReference extends ABase {
     public boolean isUnambiguousFunctionRef;
     
     public Optional<AExpression> refParent = Optional.empty();
-    public final Optional<AName> name;
+    public final Optional<String> identifier;
     public final Optional<AVariableRef> variableRef;
     public final Optional<AExprList> exprList;
     
@@ -35,17 +35,17 @@ public class AReference extends ABase {
         super(ctx);
         
         this.isUnambiguousFunctionRef = true;
-        this.name = Optional.of(new AName(operator, ctx));
+        this.identifier = Optional.of(operator.token);
         this.variableRef = Optional.empty();
         this.exprList = exprList;
     }
     
-    public AReference(AName name, Optional<AExprList> exprList,
+    public AReference(String identifier, Optional<AExprList> exprList,
                          BulletParser.FunctionReferenceContext ctx) {
         super(ctx);
         
         this.isUnambiguousFunctionRef = true;
-        this.name = Optional.of(name);
+        this.identifier = Optional.of(identifier);
         this.variableRef = Optional.empty();
         this.exprList = exprList;
     }
@@ -54,7 +54,7 @@ public class AReference extends ABase {
         super(ctx);
         
         this.isUnambiguousFunctionRef = false;
-        this.name = Optional.empty();
+        this.identifier = Optional.empty();
         this.variableRef = Optional.of(variableRef);
         this.exprList = Optional.empty();
     }
@@ -79,7 +79,7 @@ public class AReference extends ABase {
         output.append(isUnambiguousFunctionRef);
         output.append('\n');
         
-        name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
+        identifier.ifPresent(aName -> output.append(getIndent(indent + indent())).append("Name: \"").append(aName).append('\"'));
         variableRef.ifPresent(aVariableRef -> output.append(aVariableRef.debug(indent + indent())));
         exprList.ifPresent(aExprList -> output.append(aExprList.debug(indent + indent())));
         return output.toString();
@@ -90,14 +90,12 @@ public class AReference extends ABase {
             refParent = Optional.of(((AParentChild) getParent()).expression);
             refParent.ifPresent(BulletLang::process);
         }
-        IScopeContainer.makeChild(getScope(), this, name);
         IScopeContainer.makeChild(getScope(), this, variableRef);
         IScopeContainer.makeChild(getScope(), this, exprList);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.searchAndMerge()));
         exprList.ifPresent(aFuncParams -> output.addAll(aFuncParams.searchAndMerge()));
         return output;
@@ -111,7 +109,6 @@ public class AReference extends ABase {
             output.add(onNoMatch());
         }
         
-        name.ifPresent(aName -> output.addAll(aName.verify()));
         variableRef.ifPresent(aVariableRef -> output.addAll(aVariableRef.verify()));
         exprList.ifPresent(aExprList -> output.addAll(aExprList.verify()));
         return output;
@@ -119,9 +116,9 @@ public class AReference extends ABase {
     
     public Optional<AFunctionDec> resolveFunctionReference() {
         // Get name and ensure this could be a function reference
-        String n = name.map(aName -> aName.identifier).orElse(null);
+        String n = identifier.orElse(null);
         if (n == null) {
-            n = variableRef.map(aVariableRef -> aVariableRef.name.identifier).orElse(null);
+            n = variableRef.map(aVariableRef -> aVariableRef.identifier).orElse(null);
             // VariableRef must not be a member variable reference for it possibly to be a function
             if (n == null || !variableRef.get().variableType.equals(AVariableRef.AVariableType.GLOBAL)) return Optional.empty();
         }
@@ -161,7 +158,7 @@ public class AReference extends ABase {
                 AArguments arguments = ((AFunctionDec) parent).arguments.orElse(null);
                 if (arguments != null) {
                     for (AArgument argument : arguments.arguments) {
-                        if (argument.name.equals(variableRef.get().name)) {
+                        if (argument.identifier.equals(variableRef.get().identifier)) {
                             return Optional.of(argument);
                         }
                     }
@@ -173,7 +170,7 @@ public class AReference extends ABase {
     }
     
     private BulletError onNoMatch() {
-        String n = (name.isPresent() ? name.get().toString() : (variableRef.isPresent() ? variableRef.get().toString() : "?"));
+        String n = (identifier.orElseGet(() -> (variableRef.isPresent() ? variableRef.get().toString() : "?")));
         String msgPt = (isUnambiguousFunctionRef ? "function"
                 : ((variableRef.isPresent() && !variableRef.get().variableType.equals(AVariableRef.AVariableType.GLOBAL)
                 ? "member variable" : "variable/function")));

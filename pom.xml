@@ -27,7 +27,7 @@
         <antlr.plugin.version>${antlr.version}</antlr.plugin.version>
         
         <!-- Command Line Interpretation -->
-        <picocli.version>3.7.0</picocli.version>
+        <picocli.version>3.8.0</picocli.version>
         
         <!-- Data Storage -->
         <fastutil.version>8.2.2</fastutil.version>
@@ -42,6 +42,10 @@
         <!-- Building for specific platforms -->
         <launch4j-maven-plugin.version>1.7.24</launch4j-maven-plugin.version>
         <launch4j.exe.name>bullet</launch4j.exe.name>
+        
+        <!-- Unit tests -->
+        <junit.version>5.3.2</junit.version>
+        <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
     </properties>
     
     <!-- Allow building for specific platforms -->
@@ -118,13 +122,11 @@
     </profiles>
     
     <dependencies>
-        <!-- ANTLR4 Runtime -->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>${antlr.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
@@ -135,15 +137,21 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
             <version>${jansi.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>${fastutil.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     
@@ -266,6 +274,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <!-- Testing! -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
         </plugins>
     </build>

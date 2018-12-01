@@ -1,7 +1,6 @@
 package com.cjburkey.bullet.parser.variable;
 
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.type.ATypeDec;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -11,12 +10,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public abstract class AVariable extends ABase {
     
-    public final AName name;
+    public final String identifier;
     
-    public AVariable(AName name, ParserRuleContext ctx) {
+    public AVariable(String identifier, ParserRuleContext ctx) {
         super(ctx);
         
-        this.name = name;
+        this.identifier = identifier;
     }
     
     public abstract Optional<ATypeDec> resolveType();

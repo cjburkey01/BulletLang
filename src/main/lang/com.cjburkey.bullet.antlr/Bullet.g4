@@ -60,10 +60,7 @@ BOOL        : ('true' | 'false') ;
 FLOAT       : INTEGER? '.' INTEGER ;
 INTEGER     : DIGIT+ ;
 DIGIT       : [0-9] ;
-fragment IDA: [A-Za-z_] ;
-fragment IDB: [A-Za-z0-9_] ;
-fragment ID : IDA IDB* ;
-IDENTIFIER  : ID ;
+IDENTIFIER  : [A-Za-z_]+ [A-Za-z0-9_]* ;
 VAR_TYPE    : ('@' | '@@') ;
 
 // Strings
@@ -73,8 +70,6 @@ STRING      : ('"' | STR_INTER) { iws = false; } STRING_IN? '"' { iws = true; } 
 LIT_STRING  : '"""' { iws = false; } .*? '"""' { iws = true; } ;
 
 // Rules
-name            : IDENTIFIER ;
-
 program         : requirements programIn EOF ;
 
 partialExp      : expression EOF ;      // Used with smart strings in the parser
@@ -92,7 +87,7 @@ programIn       : namespace programIn
                 |
                 ;
 
-namespace       : NAMESPACE name LB namespaceIn RB ;
+namespace       : NAMESPACE IDENTIFIER LB namespaceIn RB ;
 
 namespaceIn     : variableDec namespaceIn
                 | functionDec namespaceIn
@@ -100,7 +95,7 @@ namespaceIn     : variableDec namespaceIn
                 |
                 ;
 
-functionDec     : DEF (name | op) (LP arguments? RP)? typeDec? LB scope RB ;
+functionDec     : DEF (IDENTIFIER | op) (LP arguments? RP)? typeDec? LB scope RB ;
 
 op              : POW
                 | ROOT
@@ -126,7 +121,7 @@ arguments       : argument COM arguments
                 | argument
                 ;
 
-argument        : name typeDec? ;
+argument        : IDENTIFIER typeDec? ;
 
 arrayType       : LBR expression? RBR ;
 
@@ -156,11 +151,13 @@ statement       : variableDec               # StatementVariableDec
                 | expression                # StatementReturn       // Allow raw expression returns (shorthand)
                 ;
 
-variableRef     : VAR_TYPE? name ;
+variableRef     : VAR_TYPE? IDENTIFIER ;
 
 // Possible variable types:
-//      [@[@]]<name> [of <type>] := <value>
-//      :[@[@]]variable of Type
+//      let [@[@]]<name> [of <type>] = <value>;
+//      let [@[@]]variable of Type;
+//      [@[@]]<name> [of <type>] := <value>;
+//      :[@[@]]variable of Type;
 variableDec     : LET variableRef typeDec? EQ expression SEMI
                 | LET variableRef typeDec SEMI                  // No-value declaration
                 // Allow short-hand variable declaration
@@ -174,9 +171,9 @@ exprList        : expression COM exprList
                 | expression
                 ;
 
-reference       : name LP exprList? RP                          # FunctionReference
+reference       : IDENTIFIER LP exprList? RP                    # FunctionReference
                 | variableRef                                   # AmbigReference        // Variable or function
-                | name exprList                                 # FunctionReference
+                | IDENTIFIER exprList                           # FunctionReference
                 | op exprList?                                  # FunctionReference
                 ;
 
@@ -220,7 +217,7 @@ ifStatement     : IF expression LB scope RB
                 | ELSE expression? statement
                 ;
 
-classDec        : CLASS name (OF types)? LB classMembers RB ;
+classDec        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
 
 classMembers    : variableDec classMembers
                 | functionDec classMembers

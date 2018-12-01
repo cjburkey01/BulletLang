@@ -1,13 +1,12 @@
 package com.cjburkey.bullet.parser.namespace;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AName;
-import com.cjburkey.bullet.parser.variable.AVariableDec;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.classDec.AClassDec;
 import com.cjburkey.bullet.parser.function.AFunctionDec;
-import com.cjburkey.bullet.BulletError;
+import com.cjburkey.bullet.parser.variable.AVariableDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -18,34 +17,32 @@ import java.util.Optional;
 @SuppressWarnings("WeakerAccess")
 public class ANamespace extends ABase implements IScopeContainer {
     
-    public final AName name;
+    public final String identifier;
     public final ANamespaceIn namespaceIn;
     
-    public ANamespace(AName name, ANamespaceIn namespaceIn, BulletParser.NamespaceContext ctx) {
+    public ANamespace(String identifier, ANamespaceIn namespaceIn, BulletParser.NamespaceContext ctx) {
         super(ctx);
         
-        this.name = name;
+        this.identifier = identifier;
         this.namespaceIn = namespaceIn;
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "Namespace:\n" + name.debug(indent + indent()) + namespaceIn.debug(indent + indent());
+        return getIndent(indent) + "Namespace \"" + identifier + "\":\n" + namespaceIn.debug(indent + indent());
     }
     
     public void settleChildren() {
-        name.setScopeParent(getScope(), this);
         namespaceIn.setScopeParent(this, this);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        output.addAll(name.searchAndMerge());
         output.addAll(namespaceIn.searchAndMerge());
         return output;
     }
     
     public ObjectArrayList<BulletError> verify() {
-        ObjectArrayList<BulletError> output = name.verify();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         output.addAll(namespaceIn.verify());
         return output;
     }

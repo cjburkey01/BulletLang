@@ -3,12 +3,11 @@ package com.cjburkey.bullet.parser.classDec;
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AName;
+import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.function.AFunctionDec;
 import com.cjburkey.bullet.parser.type.ATypeFrag;
 import com.cjburkey.bullet.parser.type.ATypes;
 import com.cjburkey.bullet.parser.variable.AVariableDec;
-import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.parser.function.AFunctionDec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,23 +16,23 @@ import java.util.Optional;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType"})
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AClassDec extends ABase implements IScopeContainer {
     
-    public final AName name;
+    public final String identifier;
     public final Optional<ATypes> types;
-    public final Optional<AClassMembers> classMembers;
+    public final AClassMembers classMembers;
     
-    public AClassDec(AName name, Optional<ATypes> types, Optional<AClassMembers> classMembers, BulletParser.ClassDecContext ctx) {
+    public AClassDec(String identifier, Optional<ATypes> types, AClassMembers classMembers, BulletParser.ClassDecContext ctx) {
         super(ctx);
         
-        this.name = name;
+        this.identifier = identifier;
         this.types = types;
         this.classMembers = classMembers;
     }
     
     public boolean getMatchesTypeExactly(ATypeFrag type) {
-        return type.identifier.equals(name.identifier);
+        return type.identifier.equals(identifier);
     }
     
     public String getFormattedDebug(int indent) {
@@ -42,69 +41,61 @@ public class AClassDec extends ABase implements IScopeContainer {
         output.append(getIndent(indent));
         output.append("Class:\n");
         
-        output.append(name.getFormattedDebug(indent + indent()));
+        output.append(getIndent(indent + indent())).append("Name:\n").append(getIndent(indent + indent() * 2)).append(identifier);
         types.ifPresent(aTypes -> output.append(aTypes.debug(indent + indent())));
-        classMembers.ifPresent(aClassMembers -> output.append(aClassMembers.debug(indent + indent())));
+        output.append(classMembers.debug(indent + indent()));
         return output.toString();
     }
     
     public void settleChildren() {
-        name.setScopeParent(getScope(), this);
         IScopeContainer.makeChild(getScope(), this, types);
-        IScopeContainer.makeChild(this, this, classMembers);
+        classMembers.setScopeParent(this, this);
     }
     
     public ObjectArrayList<BulletError> verify() {
-        ObjectArrayList<BulletError> output = name.verify();
+        ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         types.ifPresent(aTypes -> output.addAll(aTypes.verify()));
-        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.verify()));
+        output.addAll(classMembers.verify());
         return output;
     }
     
     public Optional<Collection<AVariableDec>> getVariableDecs() {
         ObjectArrayList<AVariableDec> variables = new ObjectArrayList<>();
-        if (classMembers.isPresent()) {
-            variables.addAll(classMembers.get().variableDecs);
-            for (AFunctionDec functionDec : classMembers.get().functionDecs) {
-                if (functionDec.isConstructor) {
-                    functionDec.getVariableDecs().ifPresent(variables::addAll);
-                }
+        variables.addAll(classMembers.variableDecs);
+        for (AFunctionDec functionDec : classMembers.functionDecs) {
+            if (functionDec.isConstructor) {
+                functionDec.getVariableDecs().ifPresent(variables::addAll);
             }
         }
         return Optional.of(variables);
     }
     
     public Optional<Collection<AFunctionDec>> getFunctionDecs() {
-        return classMembers.map(aClassMembers -> aClassMembers.functionDecs);
+        return Optional.ofNullable(classMembers.functionDecs);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        output.addAll(name.searchAndMerge());
         types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
-        classMembers.ifPresent(aClassMembers -> output.addAll(aClassMembers.searchAndMerge()));
+        output.addAll(classMembers.searchAndMerge());
         
         if (getScope() != null && getScope().getClassDecs().isPresent()) {
             for (AClassDec classDec : getScope().getClassDecs().get()) {
                 // Merge classes of the same superclasses and with the same name
-                if (classDec != this && classDec.name.equals(name) && classDec.types.equals(types)) {
-                    classDec.classMembers.ifPresent(aClassMembers -> {
-                        classMembers.ifPresent(aClassMembers1 -> aClassMembers.functionDecs.addAll(aClassMembers1.functionDecs));
-                        classMembers.ifPresent(aClassMembers1 -> aClassMembers.variableDecs.addAll(aClassMembers1.variableDecs));
-                    });
+                if (classDec != this && classDec.identifier.equals(identifier) && classDec.types.equals(types)) {
+                    classDec.classMembers.functionDecs.addAll(classMembers.functionDecs);
+                    classDec.classMembers.variableDecs.addAll(classMembers.variableDecs);
                     
                     // Destroy self and remove from parent
                     getScope().remove(this);
-                    classMembers.ifPresent(aClassMembers -> {
-                        aClassMembers.functionDecs.clear();
-                        aClassMembers.variableDecs.clear();
-                    });
+                    classMembers.functionDecs.clear();
+                    classMembers.variableDecs.clear();
                     setScopeParent(null, null);
                     
                     // Propogate changes through children
                     classDec.settleChildren();
                     return classDec.searchAndMerge();
-                } else if (classDec != this && classDec.name.equals(name)) {
+                } else if (classDec != this && classDec.identifier.equals(identifier)) {
                     output.add(onDuplicate(classDec));
                     break;
                 }
@@ -118,7 +109,7 @@ public class AClassDec extends ABase implements IScopeContainer {
         other.types.ifPresent(aTypes -> argTypes1.addAll(aTypes.types));
         ObjectArrayList<ATypeFrag> argTypes2 = new ObjectArrayList<>();
         types.ifPresent(aTypes -> argTypes2.addAll(aTypes.types));
-        return BulletError.format(ctx, "Classes with name \"%s\" have differing super classes of types: %s and %s", name,
+        return BulletError.format(ctx, "Classes with name \"%s\" have differing super classes of types: %s and %s", identifier,
                 Arrays.toString(argTypes1.toArray(new ATypeFrag[0])), Arrays.toString(argTypes2.toArray(new ATypeFrag[0])));
     }
     

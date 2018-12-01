@@ -21,7 +21,7 @@ public class AVariableDec extends AVariable {
     
     public AVariableDec(AVariableRef variableRef, Optional<ATypeDec> typeDec, Optional<AExpression> expression,
                         BulletParser.VariableDecContext ctx) {
-        super(variableRef.name, ctx);
+        super(variableRef.identifier, ctx);
         
         this.variableRef = variableRef;
         this.typeDec = typeDec;

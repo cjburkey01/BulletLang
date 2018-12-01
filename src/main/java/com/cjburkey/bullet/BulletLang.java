@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 import static com.cjburkey.bullet.Log.*;
 
@@ -112,9 +113,6 @@ public class BulletLang {
     public void compile(InputStream input, OutputStream output) throws IOException {
         // Initialize parser
         BulletParser parser = buildParser(buildLexer(input));
-        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
-        parser.removeErrorListeners();                  // Clear the default error listener
-        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
         
         // Begin parsing
         info("Parsing input");
@@ -123,6 +121,10 @@ public class BulletLang {
             error("Failed to parse input");
             return;
         }
+        
+        /*if (debug) {
+            debugPrint(program.get());
+        }*/
         
         info("Settling");
         program.get().settleChildren();
@@ -133,14 +135,10 @@ public class BulletLang {
         info("Verifying");
         if (!verify(program.get())) return;
         
-        /*if (debug) {
-            debugPrint(program.get());
-        }*/
-        
         info("Compiling");
     }
     
-    private void debugPrint(AProgram program) {
+    public static void debugPrint(AProgram program) {
         debug("Debug print...");
         System.out.println();
         String out = program.debug(0);
@@ -160,12 +158,36 @@ public class BulletLang {
         return new BulletLexer(CharStreams.fromString(input));
     }
     
+    public static BulletLexer buildDumpLexer(String input) {
+        BulletLexer lexer = buildLexer(input);
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        tokenStream.fill();
+        
+        System.out.printf("Tokens of `%s`:\n", input);
+        for (Token token : tokenStream.getTokens()) {
+            if (token.getType() != BulletLexer.EOF) {
+                System.out.printf("  %-20s %s\n", BulletLexer.VOCABULARY.getSymbolicName(token.getType()), token.getText());
+            }
+        }
+        System.out.println();
+        
+        return buildLexer(input);
+    }
+    
     public static BulletParser buildParser(BulletLexer lexer) {
-        return new BulletParser(new CommonTokenStream(lexer));
+        BulletParser parser = new BulletParser(new CommonTokenStream(lexer));
+        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
+        parser.removeErrorListeners();                  // Clear the default error listener
+        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
+        return parser;
     }
     
     public static BulletParser buildQuickParser(String input) {
         return buildParser(buildLexer(input));
+    }
+    
+    public static BulletParser buildQuickDumpParser(String input) {
+        return buildParser(buildDumpLexer(input));
     }
     
     public static boolean process(ABase node) {

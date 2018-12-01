@@ -2,7 +2,6 @@ package com.cjburkey.bullet.parser.variable;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.AName;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,30 +13,29 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class AVariableRef extends ABase {
     
     public final AVariableType variableType;
-    public final AName name;
+    public final String identifier;
     
-    public AVariableRef(int variableType, AName name, ParserRuleContext ctx) {
+    public AVariableRef(int variableType, String identifier, ParserRuleContext ctx) {
         super(ctx);
         
         this.variableType = AVariableType.fromId(variableType).orElse(null);
-        this.name = name;
+        this.identifier = identifier;
     }
     
     public String getFormattedDebug(int indent) {
-        return getIndent(indent) + "VariableRef:\n" + getIndent(indent + indent()) + "VariableType:\n" +
-                getIndent(indent + indent() * 2) +  variableType + '\n' + name.debug(indent + indent());
+        return getIndent(indent) + "VariableRef \"" + identifier+ "\":\n" + getIndent(indent + indent()) + "VariableType:\n" +
+                getIndent(indent + indent() * 2) +  variableType + '\n';
     }
     
     public void settleChildren() {
-        name.setScopeParent(getScope(), this);
     }
     
     public ObjectArrayList<BulletError> searchAndMerge() {
-        return name.searchAndMerge();
+        return new ObjectArrayList<>();
     }
     
     public ObjectArrayList<BulletError> verify() {
-        return name.verify();
+        return new ObjectArrayList<>();
     }
     
     public boolean equals(Object o) {
@@ -45,11 +43,11 @@ public class AVariableRef extends ABase {
         if (o == null || getClass() != o.getClass()) return false;
         AVariableRef that = (AVariableRef) o;
         return variableType == that.variableType &&
-                name.equals(that.name);
+                identifier.equals(that.identifier);
     }
     
     public int hashCode() {
-        return Objects.hash(variableType, name);
+        return Objects.hash(variableType, identifier);
     }
     
     public String toString() {
@@ -59,7 +57,7 @@ public class AVariableRef extends ABase {
         } else if (variableType.equals(AVariableType.STATIC)) {
             type = "@@";
         }
-        return type + name;
+        return type + identifier;
     }
     
     @SuppressWarnings("unused")

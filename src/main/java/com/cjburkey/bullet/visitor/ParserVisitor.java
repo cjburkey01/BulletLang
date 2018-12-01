@@ -4,7 +4,6 @@ import com.cjburkey.bullet.antlr.BulletBaseVisitor;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.type.AArrayType;
 import com.cjburkey.bullet.parser.AIfStatement;
-import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.type.ATypeFrag;
 import com.cjburkey.bullet.parser.type.ATypeDec;
@@ -60,7 +59,6 @@ public class ParserVisitor {
     public static final RequirementVisitor _requirementVisitor = new RequirementVisitor();
     public static final ProgramInVisitor _programInVisitor = new ProgramInVisitor();
     public static final NamespaceVisitor _namespaceVisitor = new NamespaceVisitor();
-    public static final NameVisitor _nameVisitor = new NameVisitor();
     public static final NamespaceInVisitor _namespaceInVisitor = new NamespaceInVisitor();
     public static final VariableDecVisitor _variableDecVisitor = new VariableDecVisitor();
     public static final VariableRefVisitor _variableRefVisitor = new VariableRefVisitor();
@@ -151,18 +149,12 @@ public class ParserVisitor {
     // Visit a namespace declaration and its contents
     public static final class NamespaceVisitor extends B<ANamespace> {
         public Optional<ANamespace> visitNamespace(BulletParser.NamespaceContext ctx) {
-            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<String> identifier = Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText);
             final Optional<ANamespaceIn> namespaceIn = _namespaceInVisitor.visit(ctx.namespaceIn());
-            if (name.isPresent() && namespaceIn.isPresent()) {
-                return Optional.of(new ANamespace(name.get(), namespaceIn.get(), ctx));
+            if (identifier.isPresent() && namespaceIn.isPresent()) {
+                return Optional.of(new ANamespace(identifier.get(), namespaceIn.get(), ctx));
             }
             return Optional.empty();
-        }
-    }
-    
-    public static final class NameVisitor extends B<AName> {
-        public Optional<AName> visitName(BulletParser.NameContext ctx) {
-            return Optional.ofNullable(ctx.IDENTIFIER()).map(identifier -> new AName(identifier.getText(), ctx));
         }
     }
     
@@ -190,7 +182,7 @@ public class ParserVisitor {
     public static final class VariableRefVisitor extends B<AVariableRef> {
         public Optional<AVariableRef> visitVariableRef(BulletParser.VariableRefContext ctx) {
             final int variableType = ctx.VAR_TYPE() == null ? 0 : ctx.VAR_TYPE().getText().length();
-            return _nameVisitor.visit(ctx.name()).map(name -> new AVariableRef(variableType, name, ctx));
+            return Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText).map(name -> new AVariableRef(variableType, name, ctx));
         }
     }
     
@@ -341,11 +333,11 @@ public class ParserVisitor {
             return variableRef.map(variable -> new AReference(variable, ctx));
         }
         public Optional<AReference> visitFunctionReference(BulletParser.FunctionReferenceContext ctx) {
-            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<String> identifier = Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText);
             final Optional<AExprList> funcParams = _exprListVisitor.visit(ctx.exprList());
             final Optional<AOperator> operator = AOperator.from(ctx.op());
             return operator.map(aOperator -> Optional.of(new AReference(aOperator, funcParams, ctx)))
-                    .orElseGet(() -> name.map(aName -> new AReference(aName, funcParams, ctx)));
+                    .orElseGet(() -> identifier.map(aIdentifier -> new AReference(aIdentifier, funcParams, ctx)));
         }
     }
     
@@ -376,13 +368,13 @@ public class ParserVisitor {
     
     public static final class FunctionDecVisitor extends B<AFunctionDec> {
         public Optional<AFunctionDec> visitFunctionDec(BulletParser.FunctionDecContext ctx) {
-            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<String> identifier = Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText);
             final Optional<AOperator> operator = AOperator.from(ctx.op());
             final Optional<AArguments> arguments = _argumentsVisitor.visit(ctx.arguments());
             final Optional<ATypeDec> typeDec = _typeDecVisitor.visit(ctx.typeDec());
             final Optional<AScope> statements = _scopeVisitor.visit(ctx.scope());
-            if ((name.isPresent() || operator.isPresent()) && statements.isPresent()) {
-                return Optional.of(new AFunctionDec(name, operator, arguments, typeDec, statements.get(), ctx));
+            if ((identifier.isPresent() || operator.isPresent()) && statements.isPresent()) {
+                return Optional.of(new AFunctionDec(identifier, operator, arguments, typeDec, statements.get(), ctx));
             }
             return Optional.empty();
         }
@@ -398,9 +390,9 @@ public class ParserVisitor {
     
     public static final class ArgumentVisitor extends B<AArgument> {
         public Optional<AArgument> visitArgument(BulletParser.ArgumentContext ctx) {
-            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<String> identifier = Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText);
             final Optional<ATypeDec> typeDec = _typeDecVisitor.visit(ctx.typeDec());
-            return name.map(aName -> new AArgument(aName, typeDec, ctx));
+            return identifier.map(aIdentifier -> new AArgument(aIdentifier, typeDec, ctx));
         }
     }
     
@@ -493,10 +485,11 @@ public class ParserVisitor {
     
     public static final class ClassDecVisitor extends B<AClassDec> {
         public Optional<AClassDec> visitClassDec(BulletParser.ClassDecContext ctx) {
-            final Optional<AName> name = _nameVisitor.visit(ctx.name());
+            final Optional<String> identifier = Optional.ofNullable(ctx.IDENTIFIER()).map(ParseTree::getText);
             final Optional<ATypes> types = _typesVisitor.visit(ctx.types());
             final Optional<AClassMembers> classMembers = _classMembersVisitor.visit(ctx.classMembers());
-            return name.map(aName -> new AClassDec(aName, types, classMembers, ctx));
+            if (!classMembers.isPresent()) return Optional.empty();
+            return identifier.map(aIdentifier -> new AClassDec(aIdentifier, types, classMembers.get(), ctx));
         }
     }
     

@@ -4,7 +4,6 @@ import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletParser;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.AExprList;
-import com.cjburkey.bullet.parser.AName;
 import com.cjburkey.bullet.parser.AOperator;
 import com.cjburkey.bullet.parser.type.ATypeDec;
 import com.cjburkey.bullet.parser.variable.AVariableDec;
@@ -25,18 +24,18 @@ import java.util.stream.Collectors;
 public class AFunctionDec extends ABase implements IScopeContainer {
     
     public final boolean isConstructor;
-    public final Optional<AName> name;
+    public final Optional<String> identifier;
     public final Optional<AOperator> operator;
     public final Optional<AArguments> arguments;
     public final ATypeDec typeDec;
     public final AScope scope;
     
-    public AFunctionDec(Optional<AName> name, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<ATypeDec> typeDec,
+    public AFunctionDec(Optional<String> identifier, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<ATypeDec> typeDec,
                         AScope scope, BulletParser.FunctionDecContext ctx) {
         super(ctx);
         
-        this.isConstructor = name.map(aName -> aName.identifier.equals("_")).orElse(false);
-        this.name = name;
+        this.isConstructor = identifier.map(aIdentifier -> aIdentifier.equals("_")).orElse(false);
+        this.identifier = identifier;
         this.operator = operator;
         this.arguments = arguments;
         this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(null, this, ctx).orElse(null));
@@ -49,7 +48,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         output.append(getIndent(indent));
         output.append("FunctionDec:\n");
         
-        name.ifPresent(aName -> output.append(aName.debug(indent + indent())));
+        identifier.ifPresent(aName -> output.append(getIndent(indent + indent())).append("Name: \"").append(aName).append('\"'));
         operator.ifPresent(aOperator -> output.append(aOperator.debug(indent + indent())));
         arguments.ifPresent(aArguments -> output.append(aArguments.debug(indent + indent())));
         typeDec.debug(indent + indent());
@@ -58,7 +57,6 @@ public class AFunctionDec extends ABase implements IScopeContainer {
     }
     
     public void settleChildren() {
-        IScopeContainer.makeChild(getScope(), this, name);
         IScopeContainer.makeChild(getScope(), this, arguments);
         typeDec.setScopeParent(getScope(), this);
         scope.setScopeParent(this, this);
@@ -70,18 +68,17 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         final IScopeContainer parentScope = getScope();
         if (parentScope != null && parentScope.getFunctionDecs().isPresent()) {
             for (AFunctionDec functionDec : parentScope.getFunctionDecs().get()) {
-                if (functionDec != this && functionDec.name.equals(name) && functionDec.operator.equals(operator)
+                if (functionDec != this && functionDec.identifier.equals(identifier) && functionDec.operator.equals(operator)
                         && functionDec.arguments.equals(arguments)) {
                     output.add(onDuplicate(functionDec));
                 }
             }
         }
         
-        name.ifPresent(aName -> output.addAll(aName.verify()));
         arguments.ifPresent(aArguments -> output.addAll(aArguments.verify()));
         output.addAll(typeDec.verify());
         output.addAll(scope.verify());
-        if (!name.isPresent() && !operator.isPresent()) {
+        if (!identifier.isPresent() && !operator.isPresent()) {
             output.add(new BulletError("Invalid function: lacking name", ctx));
         }
         return output;
@@ -101,7 +98,6 @@ public class AFunctionDec extends ABase implements IScopeContainer {
     
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
-        name.ifPresent(aName -> output.addAll(aName.searchAndMerge()));
         arguments.ifPresent(aArguments -> output.addAll(aArguments.searchAndMerge()));
         output.addAll(typeDec.searchAndMerge());
         output.addAll(scope.searchAndMerge());
@@ -112,7 +108,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
         if (operator.isPresent() && operator.get().token.equals(name)) {
             return true;
         }
-        return (this.name.isPresent() && this.name.get().identifier.equals(name));
+        return (this.identifier.isPresent() && this.identifier.get().equals(name));
     }
     
     public boolean getArgumentsMatch(Optional<AExprList> exprList) {
@@ -140,7 +136,7 @@ public class AFunctionDec extends ABase implements IScopeContainer {
             }
         }
         return BulletError.format(ctx, "Duplicate function: \"%s\" with args of types: %s",
-                (this.name.isPresent() ? this.name.get().toString() : (this.operator.isPresent() ? this.operator.get().toString() : "")),
+                (this.identifier.orElseGet(() -> (this.operator.isPresent() ? this.operator.get().toString() : ""))),
                 Arrays.toString(argTypes.toArray(new String[0])));
     }
     
