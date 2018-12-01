@@ -1,4 +1,4 @@
-# BulletLang
+# BulletLang [![Build Status](https://travis-ci.com/cjburkey01/BulletLang.svg?branch=master)](https://travis-ci.com/cjburkey01/BulletLang)
 
 A language as easy as Ruby and Java but as efficient as C, Go, C#, and more!
 
