@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class AFunctionDec extends ABase implements IScopeContainer {
     
+    public final boolean isNative;
     public final boolean isConstructor;
     public final Optional<String> identifier;
     public final Optional<AOperator> operator;
@@ -30,16 +31,30 @@ public class AFunctionDec extends ABase implements IScopeContainer {
     public final ATypeDec typeDec;
     public final AScope scope;
     
-    public AFunctionDec(Optional<String> identifier, Optional<AOperator> operator, Optional<AArguments> arguments, Optional<ATypeDec> typeDec,
-                        AScope scope, BulletParser.FunctionDecContext ctx) {
+    public AFunctionDec(Optional<String> identifier, Optional<AOperator> operator, Optional<AArguments> arguments,
+                        Optional<ATypeDec> typeDec, AScope scope, BulletParser.FunctionDecContext ctx) {
         super(ctx);
         
+        this.isNative = true;
         this.isConstructor = identifier.map(aIdentifier -> aIdentifier.equals("_")).orElse(false);
         this.identifier = identifier;
         this.operator = operator;
         this.arguments = arguments;
         this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(null, this, ctx).orElse(null));
         this.scope = scope;
+    }
+    
+    public AFunctionDec(Optional<String> identifier, Optional<AArguments> arguments, Optional<ATypeDec> typeDec,
+                        BulletParser.NativeFunctionContext ctx) {
+        super(ctx);
+        
+        this.isNative = false;
+        this.isConstructor = false;
+        this.identifier = identifier;
+        this.operator = Optional.empty();
+        this.arguments = arguments;
+        this.typeDec = typeDec.orElseGet(() -> ATypeDec.getVoid(null, this, ctx).orElse(null));
+        this.scope = new AScope(ctx);
     }
     
     public String getFormattedDebug(int indent) {

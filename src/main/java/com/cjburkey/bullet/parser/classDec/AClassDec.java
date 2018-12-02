@@ -16,18 +16,20 @@ import java.util.Optional;
 /**
  * Created by CJ Burkey on 2018/11/19
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class AClassDec extends ABase implements IScopeContainer {
     
     public final String identifier;
     public final Optional<ATypes> types;
+    public final Optional<ANativeType> nativeType;
     public final AClassMembers classMembers;
     
-    public AClassDec(String identifier, Optional<ATypes> types, AClassMembers classMembers, BulletParser.ClassDecContext ctx) {
+    public AClassDec(String identifier, Optional<ATypes> types, Optional<ANativeType> nativeType, AClassMembers classMembers, BulletParser.ClassDecContext ctx) {
         super(ctx);
         
         this.identifier = identifier;
         this.types = types;
+        this.nativeType = nativeType;
         this.classMembers = classMembers;
     }
     
@@ -49,12 +51,14 @@ public class AClassDec extends ABase implements IScopeContainer {
     
     public void settleChildren() {
         IScopeContainer.makeChild(getScope(), this, types);
+        IScopeContainer.makeChild(getScope(), this, nativeType);
         classMembers.setScopeParent(this, this);
     }
     
     public ObjectArrayList<BulletError> verify() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         types.ifPresent(aTypes -> output.addAll(aTypes.verify()));
+        nativeType.ifPresent(aNativeType -> output.addAll(aNativeType.verify()));
         output.addAll(classMembers.verify());
         return output;
     }
@@ -77,6 +81,7 @@ public class AClassDec extends ABase implements IScopeContainer {
     public ObjectArrayList<BulletError> searchAndMerge() {
         ObjectArrayList<BulletError> output = new ObjectArrayList<>();
         types.ifPresent(aTypes -> output.addAll(aTypes.searchAndMerge()));
+        nativeType.ifPresent(aNativeType -> output.addAll(aNativeType.searchAndMerge()));
         output.addAll(classMembers.searchAndMerge());
         
         if (getScope() != null && getScope().getClassDecs().isPresent()) {

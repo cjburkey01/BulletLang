@@ -15,6 +15,7 @@ WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 REQUIRE     : 'require' ;
 NAMESPACE   : 'namespace' ;
 CLASS       : 'class' ;
+NATIVE		: 'native' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
 ELSE        : 'else' ;
@@ -61,6 +62,7 @@ FLOAT       : INTEGER? '.' INTEGER ;
 INTEGER     : DIGIT+ ;
 DIGIT       : [0-9] ;
 IDENTIFIER  : [A-Za-z_]+ [A-Za-z0-9_]* ;
+NS_NAME 	: [A-Za-z_.]+ [A-Za-z0-9_.]* ;
 VAR_TYPE    : ('@' | '@@') ;
 
 // Strings
@@ -82,20 +84,24 @@ requirement     : REQUIRE STRING SEMI ;
 
 programIn       : namespace programIn
                 | functionDec programIn
+				| nativeFunction programIn
                 | classDec programIn
                 | statement programIn
                 |
                 ;
 
-namespace       : NAMESPACE IDENTIFIER LB namespaceIn RB ;
+namespace       : NAMESPACE (IDENTIFIER | NS_NAME) LB namespaceIn RB ;
 
 namespaceIn     : variableDec namespaceIn
                 | functionDec namespaceIn
+				| nativeFunction namespaceIn
                 | classDec namespaceIn
                 |
                 ;
 
 functionDec     : DEF (IDENTIFIER | op) (LP arguments? RP)? typeDec? LB scope RB ;
+
+nativeFunction	: DEF NATIVE IDENTIFIER (LP arguments? RP)? typeDec SEMI;
 
 op              : POW
                 | ROOT
@@ -217,7 +223,9 @@ ifStatement     : IF expression LB scope RB
                 | ELSE expression? statement
                 ;
 
-classDec        : CLASS IDENTIFIER (OF types)? LB classMembers RB ;
+classDec        : CLASS IDENTIFIER (OF types)? nativeType? LB classMembers RB ;
+
+nativeType		: NATIVE IDENTIFIER ;
 
 classMembers    : variableDec classMembers
                 | functionDec classMembers

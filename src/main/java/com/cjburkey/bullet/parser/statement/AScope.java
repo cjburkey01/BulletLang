@@ -1,10 +1,10 @@
 package com.cjburkey.bullet.parser.statement;
 
-import com.cjburkey.bullet.antlr.BulletParser;
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.parser.ABase;
 import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.BulletError;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2018/11/20
@@ -13,11 +13,7 @@ public class AScope extends ABase {
     
     public final ObjectArrayList<AStatement> statements = new ObjectArrayList<>();
     
-    public AScope(BulletParser.ScopeContext ctx) {
-        super(ctx);
-    }
-    
-    public AScope(BulletParser.IfStatementContext ctx) {
+    public AScope(ParserRuleContext ctx) {
         super(ctx);
     }
     
