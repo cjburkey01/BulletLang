@@ -19,14 +19,17 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class AClassDec extends ABase implements IScopeContainer {
     
+    public final boolean isValue;
     public final String identifier;
     public final Optional<ATypes> types;
     public final Optional<ANativeType> nativeType;
     public final AClassMembers classMembers;
     
-    public AClassDec(String identifier, Optional<ATypes> types, Optional<ANativeType> nativeType, AClassMembers classMembers, BulletParser.ClassDecContext ctx) {
+    public AClassDec(boolean isValue, String identifier, Optional<ATypes> types, Optional<ANativeType> nativeType, AClassMembers classMembers,
+                     BulletParser.ClassDecContext ctx) {
         super(ctx);
         
+        this.isValue = isValue;
         this.identifier = identifier;
         this.types = types;
         this.nativeType = nativeType;

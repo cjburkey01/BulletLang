@@ -15,6 +15,7 @@ WS          : [ \t\r\n\f]+ { if(iws) skip(); } ;
 REQUIRE     : 'require' ;
 NAMESPACE   : 'namespace' ;
 CLASS       : 'class' ;
+VALUE       : 'value' ;
 NATIVE		: 'native' ;
 DEF         : 'def' ;
 SEMI        : ';' ;
@@ -223,7 +224,7 @@ ifStatement     : IF expression LB scope RB
                 | ELSE expression? statement
                 ;
 
-classDec        : CLASS IDENTIFIER (OF types)? nativeType? LB classMembers RB ;
+classDec        : (CLASS | VALUE) IDENTIFIER (OF types)? nativeType? LB classMembers RB ;
 
 nativeType		: NATIVE IDENTIFIER ;
 

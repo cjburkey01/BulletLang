@@ -172,7 +172,7 @@ namespace StdLib {
     def native lessEqual(a of UInt64, b of UInt64) of Boolean;
     
     # Byte
-    class Int8 native int8_t {
+    value Int8 native int8_t {
         def **(b of Int8) { pow(@this, b) }
         def //(b of Int8) { root(@this, b) }
         def *(b of Int8) { times(@this, b) }
@@ -195,7 +195,7 @@ namespace StdLib {
     }
     
     # UByte
-    class UInt8 native uint8_t {
+    value UInt8 native uint8_t {
         def **(b of UInt8) { pow(@this, b) }
         def //(b of UInt8) { root(@this, b) }
         def *(b of UInt8) { times(@this, b) }
@@ -218,7 +218,7 @@ namespace StdLib {
     }
     
     # Short
-    class Int16 native int16_t {
+    value Int16 native int16_t {
         def **(b of Int16) { pow(@this, b) }
         def //(b of Int16) { root(@this, b) }
         def *(b of Int16) { times(@this, b) }
@@ -241,7 +241,7 @@ namespace StdLib {
     }
     
     # UShort
-    class UInt16 native uint16_t {
+    value UInt16 native uint16_t {
         def **(b of UInt16) { pow(@this, b) }
         def //(b of UInt16) { root(@this, b) }
         def *(b of UInt16) { times(@this, b) }
@@ -264,7 +264,7 @@ namespace StdLib {
     }
     
     # Int
-    class Int32 native int32_t {
+    value Int32 native int32_t {
         def **(b of Int32) { pow(@this, b) }
         def //(b of Int32) { root(@this, b) }
         def *(b of Int32) { times(@this, b) }
@@ -287,7 +287,7 @@ namespace StdLib {
     }
     
     # UInt
-    class UInt32 native uint32_t {
+    value UInt32 native uint32_t {
         def **(b of UInt32) { pow(@this, b) }
         def //(b of UInt32) { root(@this, b) }
         def *(b of UInt32) { times(@this, b) }
@@ -310,7 +310,7 @@ namespace StdLib {
     }
     
     # Long
-    class Int64 native int64_t {
+    value Int64 native int64_t {
         def **(b of Int64) { pow(@this, b) }
         def //(b of Int64) { root(@this, b) }
         def *(b of Int64) { times(@this, b) }
@@ -333,7 +333,7 @@ namespace StdLib {
     }
     
     # ULong
-    class UInt64 native uint64_t {
+    value UInt64 native uint64_t {
         def **(b of UInt64) { pow(@this, b) }
         def //(b of UInt64) { root(@this, b) }
         def *(b of UInt64) { times(@this, b) }

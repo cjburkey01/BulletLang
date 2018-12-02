@@ -510,7 +510,7 @@ public class ParserVisitor {
             final Optional<ANativeType> nativeType = _nativeTypeVisitor.visit(ctx.nativeType());
             final Optional<AClassMembers> classMembers = _classMembersVisitor.visit(ctx.classMembers());
             if (!classMembers.isPresent()) return Optional.empty();
-            return identifier.map(aIdentifier -> new AClassDec(aIdentifier, types, nativeType, classMembers.get(), ctx));
+            return identifier.map(aIdentifier -> new AClassDec(ctx.VALUE() != null, aIdentifier, types, nativeType, classMembers.get(), ctx));
         }
     }
     
