@@ -20,6 +20,7 @@ public class TestAClassDec {
         AProgram program = TestHelper.getProgram(source);
         assert(program.programIn.isPresent());
         assertEquals(program.programIn.get().classes.size(), 1);
+        assertFalse(program.programIn.get().classes.get(0).isValue);
         assertEquals(program.programIn.get().classes.get(0).identifier, identifier);
         assertFalse(program.programIn.get().classes.get(0).types.isPresent());
         assertEquals(program.programIn.get().classes.get(0).classMembers.variableDecs.size(), 0);
@@ -34,6 +35,7 @@ public class TestAClassDec {
         AProgram program = TestHelper.getProgram(source);
         assert(program.programIn.isPresent());
         assertEquals(program.programIn.get().classes.size(), 1);
+        assertFalse(program.programIn.get().classes.get(0).isValue);
         assertEquals(program.programIn.get().classes.get(0).identifier, identifier);
         assertFalse(program.programIn.get().classes.get(0).types.isPresent());
         assertEquals(program.programIn.get().classes.get(0).classMembers.variableDecs.size(), 0);
@@ -52,6 +54,7 @@ public class TestAClassDec {
         AProgram program = TestHelper.getProgram(source);
         assert(program.programIn.isPresent());
         assertEquals(program.programIn.get().classes.size(), 1);
+        assertFalse(program.programIn.get().classes.get(0).isValue);
         assertEquals(program.programIn.get().classes.get(0).identifier, identifier1);
         assertFalse(program.programIn.get().classes.get(0).types.isPresent());
         assertEquals(program.programIn.get().classes.get(0).classMembers.variableDecs.size(), 0);
@@ -72,6 +75,7 @@ public class TestAClassDec {
         AProgram program = TestHelper.getProgram(source);
         assert(program.programIn.isPresent());
         assertEquals(program.programIn.get().classes.size(), 1);
+        assertFalse(program.programIn.get().classes.get(0).isValue);
         assertEquals(program.programIn.get().classes.get(0).identifier, identifier1);
         assertFalse(program.programIn.get().classes.get(0).types.isPresent());
         assertEquals(program.programIn.get().classes.get(0).classMembers.variableDecs.size(), 0);
