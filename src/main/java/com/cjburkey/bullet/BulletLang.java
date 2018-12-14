@@ -2,10 +2,6 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.program.AProgram;
-import com.cjburkey.bullet.visitor.ParserVisitor;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -38,6 +33,18 @@ public class BulletLang {
     
     private static File startDirectory = null;
     private static File sourceDirectory = null;
+    
+    @SuppressWarnings("unused")
+    public void compile(InputStream input, OutputStream output) throws IOException {
+        // Initialize parser
+        BulletParser parser = buildParser(buildLexer(input));
+        
+        // Begin parsing
+        info("Parsing input");
+        // TODO: PARSE
+        
+        info("Compiling");
+    }
     
     public static void main(String[] args) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> exception(e));
@@ -109,47 +116,6 @@ public class BulletLang {
         compiler.compile(new FileInputStream(inputFile), new FileOutputStream(new File(input.outputFile)));
     }
     
-    @SuppressWarnings("unused")
-    public void compile(InputStream input, OutputStream output) throws IOException {
-        // Initialize parser
-        BulletParser parser = buildParser(buildLexer(input));
-        
-        // Begin parsing
-        info("Parsing input");
-        Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
-        if (!program.isPresent() || ErrorHandler.hasErrored()) {
-            error("Failed to parse input");
-            return;
-        }
-        
-        /*if (debug) {
-            debugPrint(program.get());
-        }*/
-        
-        info("Settling");
-        program.get().settleChildren();
-        
-        info("Merging");
-        if (!searchAndMerge(program.get())) return;
-        
-        info("Verifying");
-        if (!verify(program.get())) return;
-        
-        info("Compiling");
-    }
-    
-    public static void debugPrint(AProgram program) {
-        debug("Debug print...");
-        System.out.println();
-        String out = program.debug(0);
-        while (out.endsWith("\n")) {
-            out = out.substring(0, out.length() - 1);
-        }
-        System.out.println(out);
-        System.out.println();
-        debug("Finished print");
-    }
-    
     public static BulletLexer buildLexer(InputStream input) throws IOException {
         return new BulletLexer(CharStreams.fromStream(input, StandardCharsets.UTF_8));
     }
@@ -158,6 +124,15 @@ public class BulletLang {
         return new BulletLexer(CharStreams.fromString(input));
     }
     
+    public static BulletParser buildParser(BulletLexer lexer) {
+        BulletParser parser = new BulletParser(new CommonTokenStream(lexer));
+        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
+        parser.removeErrorListeners();                  // Clear the default error listener
+        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
+        return parser;
+    }
+    
+    @SuppressWarnings("unused")
     public static BulletLexer buildDumpLexer(String input) {
         BulletLexer lexer = buildLexer(input);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -172,55 +147,6 @@ public class BulletLang {
         System.out.println();
         
         return buildLexer(input);
-    }
-    
-    public static BulletParser buildParser(BulletLexer lexer) {
-        BulletParser parser = new BulletParser(new CommonTokenStream(lexer));
-        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
-        parser.removeErrorListeners();                  // Clear the default error listener
-        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
-        return parser;
-    }
-    
-    public static BulletParser buildQuickParser(String input) {
-        return buildParser(buildLexer(input));
-    }
-    
-    public static BulletParser buildQuickDumpParser(String input) {
-        return buildParser(buildDumpLexer(input));
-    }
-    
-    public static boolean process(ABase node) {
-        node.settleChildren();
-        return searchAndMerge(node) && verify(node);
-    }
-    
-    public static boolean searchAndMerge(ABase node) {
-        final ObjectArrayList<BulletError> errors = node.searchAndMerge();
-        if (validFromErr(errors)) {
-            error("Failed to merge");
-            return false;
-        }
-        return true;
-    }
-    
-    public static boolean verify(ABase node) {
-        final ObjectArrayList<BulletError> errors = node.verify();
-        if (validFromErr(errors)) {
-            error("Failed to verify");
-            return false;
-        }
-        return true;
-    }
-    
-    private static boolean validFromErr(ObjectArrayList<BulletError> errors) {
-        if (!errors.isEmpty()) {
-            for (BulletError error : errors) {
-                error.print(Log::error);
-            }
-            return true;
-        }
-        return false;
     }
     
 }
