@@ -128,6 +128,15 @@ public class BulletLang {
         return new BulletLexer(CharStreams.fromString(input));
     }
     
+    public static BulletParser buildParser(BulletLexer lexer) {
+        BulletParser parser = new BulletParser(new CommonTokenStream(lexer));
+        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
+        parser.removeErrorListeners();                  // Clear the default error listener
+        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
+        return parser;
+    }
+    
+    @SuppressWarnings("unused")
     public static BulletLexer buildDumpLexer(String input) {
         BulletLexer lexer = buildLexer(input);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -144,22 +153,17 @@ public class BulletLang {
         return buildLexer(input);
     }
     
-    public static BulletParser buildParser(BulletLexer lexer) {
-        BulletParser parser = new BulletParser(new CommonTokenStream(lexer));
-        parser.setBuildParseTree(true);                 // Allows us to visit the parse tree and build our own program structure
-        parser.removeErrorListeners();                  // Clear the default error listener
-        parser.addErrorListener(new ErrorHandler());    // Register our custom error listener
-        return parser;
-    }
-    
+    @SuppressWarnings("unused")
     public static BulletParser buildQuickParser(String input) {
         return buildParser(buildLexer(input));
     }
     
+    @SuppressWarnings("unused")
     public static BulletParser buildQuickDumpParser(String input) {
         return buildParser(buildDumpLexer(input));
     }
     
+    @SuppressWarnings("unused")
     private static boolean validFromErr(ObjectArrayList<BulletError> errors) {
         if (!errors.isEmpty()) {
             for (BulletError error : errors) {
