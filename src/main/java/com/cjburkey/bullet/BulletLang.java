@@ -2,8 +2,6 @@ package com.cjburkey.bullet;
 
 import com.cjburkey.bullet.antlr.BulletLexer;
 import com.cjburkey.bullet.antlr.BulletParser;
-import com.cjburkey.bullet.parser.ABase;
-import com.cjburkey.bullet.parser.program.AProgram;
 import com.cjburkey.bullet.visitor.ParserVisitor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
@@ -114,40 +112,12 @@ public class BulletLang {
         // Initialize parser
         BulletParser parser = buildParser(buildLexer(input));
         
-        // Begin parsing
+        // Parse the input
         info("Parsing input");
-        Optional<AProgram> program = ParserVisitor.parseProgram(parser.program());
+        Optional<Void> program = ParserVisitor.parseProgram(parser.program());
         if (!program.isPresent() || ErrorHandler.hasErrored()) {
             error("Failed to parse input");
-            return;
         }
-        
-        /*if (debug) {
-            debugPrint(program.get());
-        }*/
-        
-        info("Settling");
-        program.get().settleChildren();
-        
-        info("Merging");
-        if (!searchAndMerge(program.get())) return;
-        
-        info("Verifying");
-        if (!verify(program.get())) return;
-        
-        info("Compiling");
-    }
-    
-    public static void debugPrint(AProgram program) {
-        debug("Debug print...");
-        System.out.println();
-        String out = program.debug(0);
-        while (out.endsWith("\n")) {
-            out = out.substring(0, out.length() - 1);
-        }
-        System.out.println(out);
-        System.out.println();
-        debug("Finished print");
     }
     
     public static BulletLexer buildLexer(InputStream input) throws IOException {
@@ -188,29 +158,6 @@ public class BulletLang {
     
     public static BulletParser buildQuickDumpParser(String input) {
         return buildParser(buildDumpLexer(input));
-    }
-    
-    public static boolean process(ABase node) {
-        node.settleChildren();
-        return searchAndMerge(node) && verify(node);
-    }
-    
-    public static boolean searchAndMerge(ABase node) {
-        final ObjectArrayList<BulletError> errors = node.searchAndMerge();
-        if (validFromErr(errors)) {
-            error("Failed to merge");
-            return false;
-        }
-        return true;
-    }
-    
-    public static boolean verify(ABase node) {
-        final ObjectArrayList<BulletError> errors = node.verify();
-        if (validFromErr(errors)) {
-            error("Failed to verify");
-            return false;
-        }
-        return true;
     }
     
     private static boolean validFromErr(ObjectArrayList<BulletError> errors) {
