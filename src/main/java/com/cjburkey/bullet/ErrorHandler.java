@@ -9,16 +9,16 @@ import org.antlr.v4.runtime.Recognizer;
  */
 @SuppressWarnings("WeakerAccess")
 public class ErrorHandler extends ConsoleErrorListener {
-    
+
     private static boolean errored;
-    
+
+    public static boolean hasErrored() {
+        return errored;
+    }
+
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         errored = true;
         Log.error("Syntax error on line {} at {}: {}", line, charPositionInLine, msg);
     }
-    
-    public static boolean hasErrored() {
-        return errored;
-    }
-    
+
 }

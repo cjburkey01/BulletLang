@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'antlr'
+}
+
+group 'com.cjburkey'
+version '0.0.1'
+
+project.ext.antlrVersion = '4.7.2'
+project.ext.fastUtilVersion = '8.2.2'
+project.ext.log4jVersion = '2.11.1'
+
+sourceCompatibility = 11
+sourceSets.main.java.srcDirs += ['generated-src/main/java', 'src/main/lang']
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:$antlrVersion"
+    implementation "it.unimi.dsi:fastutil:$fastUtilVersion"
+    implementation "org.apache.logging.log4j:log4j-core:$log4jVersion"
+}
+
+generateGrammarSource {
+    source = 'src/main/lang'
+    arguments += '-visitor'
+
+    doLast {
+        println 'Copying generated grammar lexer/parser files to source'
+        mkdir 'generated-src/main/java'
+        copy {
+            from "${buildDir}/generated-src/antlr/lang"
+            into 'generated-src/main/java'
+        }
+    }
+}
+
+compileJava {
+    options.warnings = true
+    options.deprecation = true
+    options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-proc:none']
+}
+
+compileTestJava {
+    options.warnings = true
+    options.deprecation = true
+    options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-proc:none']
+}
+
+task runCompiler(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.cjburkey.bulletlang.BulletCompiler'
+}
