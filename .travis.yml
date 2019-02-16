@@ -2,5 +2,5 @@ language: java
 jdk:
   - oraclejdk11
 script:
-  - gradlew clean test
+  - chmod +x ./gradlew clean test
 sudo: false
