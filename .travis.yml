@@ -1,10 +1,6 @@
 language: java
 jdk:
-  - oraclejdk8
-  - openjdk8
+  - oraclejdk11
 script:
-  - mvn clean test
+  - gradlew clean test
 sudo: false
-cache:
-  directories:
-    - $HOME/.m2

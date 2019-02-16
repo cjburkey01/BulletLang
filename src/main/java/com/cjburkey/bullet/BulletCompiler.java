@@ -6,7 +6,7 @@ package com.cjburkey.bullet;
 public class BulletCompiler {
 
     public static void main(String[] args) {
-
+        System.out.println("Hello world!");
     }
 
 }
