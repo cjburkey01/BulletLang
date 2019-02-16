@@ -1,6 +1,8 @@
 language: java
 jdk:
   - oraclejdk11
+before_install:
+  - chmod +x gradlew
 script:
-  - chmod +x ./gradlew clean test
+  - ./gradlew clean test
 sudo: false
