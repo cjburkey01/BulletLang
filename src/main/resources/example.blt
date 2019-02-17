@@ -1,0 +1,36 @@
+// This is a single line comment
+/* 
+   This is a
+   multiline
+   comment
+*/
+
+// -- VARIABLES AND REFERENCES -- //
+
+let five = 5;
+let eleven = add five, 6;
+let twelve = add(eleven, 1);
+
+sayHi;                  // Console: "Hello!"
+let s = num twelve;     // s = "The number is 12"
+
+let stringWithLineBreaks = @"Next line:
+It's here!
+Or here!";
+
+// -- FUNCTIONS -- //
+
+def add(a of Int32, b of Int32) of Int32 {
+    // Notice no semi-colon.
+    // The first expression encountered is the return value.
+    // Adding a semi-colon would make this expression a statement.
+    a + b
+}
+
+def sayHi {
+    print "Hello!";
+}
+
+def num(number of Int32) of String {
+    @"The number is ${number}"
+}
