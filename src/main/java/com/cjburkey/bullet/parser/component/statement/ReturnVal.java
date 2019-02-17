@@ -5,6 +5,7 @@ import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.expression.Expression;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
@@ -13,12 +14,17 @@ public class ReturnVal extends Statement {
 
     public Expression value;
 
-    private ReturnVal(Expression value) {
+    private ReturnVal(ParserRuleContext ctx, Expression value) {
+        super(ctx);
         this.value = value;
     }
 
     public void execute() {
 
+    }
+
+    public String toString() {
+        return "Return: {" + value + "}";
     }
 
     public static final class Visitor extends BaseV<ReturnVal> {
@@ -28,7 +34,7 @@ public class ReturnVal extends Statement {
         }
 
         public Optional<ReturnVal> visitReturnVal(BulletLangParser.ReturnValContext ctx) {
-            return Optional.of(new ReturnVal(new Expression.Visitor(scope)
+            return Optional.of(new ReturnVal(ctx, new Expression.Visitor(scope)
                     .visit(ctx.expression())
                     .orElse(null)));
         }

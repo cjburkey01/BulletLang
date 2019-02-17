@@ -6,6 +6,7 @@ import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
 import com.cjburkey.bullet.parser.component.expression.Expression;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
@@ -16,7 +17,8 @@ public class VariableDec extends Statement {
     public TypeDec type;
     public Expression value;
 
-    private VariableDec(String name, TypeDec type, Expression value) {
+    private VariableDec(ParserRuleContext ctx, String name, TypeDec type, Expression value) {
+        super(ctx);
         this.name = name;
         this.type = type;
         this.value = value;
@@ -24,6 +26,10 @@ public class VariableDec extends Statement {
 
     public void execute() {
 
+    }
+
+    public String toString() {
+        return String.format("Declare string {%s} of type {%s} with string {%s}", name, type, value);
     }
 
     public static final class Visitor extends BaseV<VariableDec> {
@@ -39,7 +45,7 @@ public class VariableDec extends Statement {
             Expression expression = new Expression.Visitor(scope)
                     .visit(ctx.expression())
                     .orElse(null);
-            VariableDec variableDec = new VariableDec(ctx.IDENTIFIER().getText(), typeDec, expression);
+            VariableDec variableDec = new VariableDec(ctx, ctx.IDENTIFIER().getText(), typeDec, expression);
             variableDec.parentScope = scope;
             scope.addVariable(variableDec);
             return Optional.of(variableDec);

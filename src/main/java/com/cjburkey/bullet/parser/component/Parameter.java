@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
@@ -13,9 +14,14 @@ public class Parameter extends Base {
     public String name;
     public TypeDec type;
 
-    private Parameter(String name, TypeDec type) {
+    private Parameter(ParserRuleContext ctx, String name, TypeDec type) {
+        super(ctx);
         this.name = name;
         this.type = type;
+    }
+
+    public String toString() {
+        return String.format("Parameter {%s}%s", name, ((type == null) ? "" : " of type {" + type + '}'));
     }
 
     public static final class Visitor extends BaseV<Parameter> {
@@ -28,7 +34,7 @@ public class Parameter extends Base {
             TypeDec typeDec = new TypeDec.Visitor(scope)
                     .visit(ctx.typeDec())
                     .orElse(null);
-            Parameter parameter = new Parameter(ctx.IDENTIFIER().getText(), typeDec);
+            Parameter parameter = new Parameter(ctx, ctx.IDENTIFIER().getText(), typeDec);
             parameter.parentScope = scope;
             return Optional.of(parameter);
         }

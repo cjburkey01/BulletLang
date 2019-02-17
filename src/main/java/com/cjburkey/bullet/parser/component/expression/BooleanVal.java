@@ -10,11 +10,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public class FloatVal extends Expression {
+public class BooleanVal extends Expression {
 
-    public double value;
+    public boolean value;
 
-    private FloatVal(ParserRuleContext ctx, double value) {
+    private BooleanVal(ParserRuleContext ctx, boolean value) {
         super(ctx);
         this.value = value;
     }
@@ -23,24 +23,24 @@ public class FloatVal extends Expression {
     }
 
     public RawType getType() {
-        return new RawType("Float64");
+        return new RawType("Boolean");
     }
 
     public String toString() {
-        return "Float: {" + value + "}";
+        return "Boolean: {" + value + "}";
     }
 
-    public static final class Visitor extends BaseV<FloatVal> {
+    public static final class Visitor extends BaseV<BooleanVal> {
 
         public Visitor(Scope scope) {
             super(scope);
         }
 
-        public Optional<FloatVal> visitFloatExpression(BulletLangParser.FloatExpressionContext ctx) {
+        public Optional<BooleanVal> visitBooleanExpression(BulletLangParser.BooleanExpressionContext ctx) {
             try {
-                FloatVal floatVal = new FloatVal(ctx, Double.parseDouble(ctx.FLOAT().getText()));
-                floatVal.parentScope = scope;
-                return Optional.of(floatVal);
+                BooleanVal booleanVal = new BooleanVal(ctx, ctx.TRUE() != null);
+                booleanVal.parentScope = scope;
+                return Optional.of(booleanVal);
             } catch (Exception ignored) {
             }
             return Optional.empty();

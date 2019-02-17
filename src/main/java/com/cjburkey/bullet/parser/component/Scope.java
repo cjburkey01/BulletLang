@@ -9,6 +9,7 @@ import com.cjburkey.bullet.parser.component.statement.VariableDec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Optional;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
@@ -18,6 +19,10 @@ public class Scope extends Base {
     public final ObjectArrayList<Statement> statements = new ObjectArrayList<>();
     public final Object2ObjectOpenHashMap<String, ObjectArrayList<FunctionDec>> functions = new Object2ObjectOpenHashMap<>();
     public final Object2ObjectOpenHashMap<String, ObjectArrayList<VariableDec>> variables = new Object2ObjectOpenHashMap<>();
+
+    public Scope(ParserRuleContext ctx) {
+        super(ctx);
+    }
 
     public void addFunction(FunctionDec functionDec) {
         add(functions, functionDec.name, functionDec);
@@ -38,6 +43,10 @@ public class Scope extends Base {
         }
     }
 
+    public String toString() {
+        return "Statements: " + statements.toString();
+    }
+
     public static final class Visitor extends BaseV<Scope> {
 
         public Visitor(Scope scope) {
@@ -47,7 +56,7 @@ public class Scope extends Base {
         public Optional<Scope> visitScope(BulletLangParser.ScopeContext ctx) {
             Scope scope = new Visitor(this.scope)
                     .visit(ctx.scope())
-                    .orElseGet(Scope::new);
+                    .orElseGet(() -> new Scope(ctx));
             Optional<Statement> statement = new Statement.Visitor(scope)
                     .visit(ctx.statement());
             statement.ifPresent(scope.statements::add);

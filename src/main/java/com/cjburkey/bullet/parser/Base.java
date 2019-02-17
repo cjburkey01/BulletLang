@@ -1,6 +1,7 @@
 package com.cjburkey.bullet.parser;
 
 import com.cjburkey.bullet.parser.component.Scope;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
@@ -8,5 +9,10 @@ import com.cjburkey.bullet.parser.component.Scope;
 public abstract class Base {
 
     public Scope parentScope;
+    public ParserRuleContext ctx;
+
+    public Base(ParserRuleContext ctx) {
+        this.ctx = ctx;
+    }
 
 }

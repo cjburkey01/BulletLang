@@ -24,11 +24,7 @@ public class BulletCompiler {
     }
 
     public Program parse() {
-        BulletLangLexer lexer = new BulletLangLexer(CharStreams.fromString(rawText));
-        BulletLangParser parser = new BulletLangParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-        parser.addErrorListener(new ErrorHandler());
-
+        BulletLangParser parser = createParser(rawText);
         return new Program.Visitor()
                 .visit(parser.program())
                 .orElse(null);
@@ -45,7 +41,13 @@ public class BulletCompiler {
         }
     }
 
-    // -- STATIC -- //
+    public static BulletLangParser createParser(String input) {
+        BulletLangLexer lexer = new BulletLangLexer(CharStreams.fromString(input));
+        BulletLangParser parser = new BulletLangParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ErrorHandler());
+        return parser;
+    }
 
     public static void main(String[] args) {
         Log.debug("Hello world!");
@@ -53,8 +55,9 @@ public class BulletCompiler {
 
         try {
             Program program = create(BulletCompiler.class.getClassLoader().getResourceAsStream("test.blt"));
+            Log.debug(program);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.exception(e);
             System.exit(-1);
         }
     }

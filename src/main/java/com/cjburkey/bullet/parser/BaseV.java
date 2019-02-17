@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public abstract class BaseV<T extends Base> extends BulletLangBaseVisitor<Optional<T>> {
+public abstract class BaseV<T> extends BulletLangBaseVisitor<Optional<T>> {
 
     public final Scope scope;
 

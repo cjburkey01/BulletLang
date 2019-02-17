@@ -7,11 +7,16 @@ import com.cjburkey.bullet.parser.IExecutable;
 import com.cjburkey.bullet.parser.component.Scope;
 import java.util.Optional;
 import java.util.function.Function;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
  */
 public abstract class Statement extends Base implements IExecutable {
+
+    public Statement(ParserRuleContext ctx) {
+        super(ctx);
+    }
 
     public static final class Visitor extends BaseV<Statement> {
 
@@ -38,7 +43,9 @@ public abstract class Statement extends Base implements IExecutable {
         }
 
         public Optional<Statement> visitFunctionDecStatement(BulletLangParser.FunctionDecStatementContext ctx) {
-            return super.visitFunctionDecStatement(ctx);
+            return new FunctionDec.Visitor(scope)
+                    .visit(ctx.functionDec())
+                    .map(Function.identity());
         }
 
     }

@@ -1,16 +1,21 @@
 grammar BulletLang;
 
-// TOKENS
+// IGNORED
 COMMENT         : (('//' .*? '\n')
                 | ('/*' .*? '*/'))
-                -> skip ;
+                -> skip
+                ;
 
-WHITESPACE      : [ \n\t\r]+
-                -> skip;
-
-// LITERALS
-STRING          : '"' (~'\n')*? '"';
+// STRINGS
 SMART_STRING    : '@"' .*? '"' ;
+STRING          : '"' (~'\n')*? '"';
+
+// IGNORED
+WHITESPACE      : [ \n\t\r]+
+                -> skip
+                ;
+
+// NUMBERS
 fragment DIGIT  : [0-9] ;
 INTEGER         : DIGIT+ ;
 FLOAT           : INTEGER? '.' INTEGER+ ;
@@ -20,28 +25,67 @@ SEMI_COLON      : ';' ;
 COMMA           : ',' ;
 LEFT_PAR        : '(' ;
 RIGHT_PAR       : ')' ;
+LEFT_D_BRACE    : '${' ;
 LEFT_BRACE      : '{' ;
 RIGHT_BRACE     : '}' ;
 EQUALS          : '=' ;
+
+// Level 1 operators
+TIMES           : '*' ;
+DIV             : '/' ;
+
+// Level 2 operators
+ADD             : '+' ;
+SUB             : '-' ;
+
+// Level 3 operators
+GT              : '>' ;
+LT              : '<' ;
+GTE             : '>=' ;
+LTE             : '<=' ;
+EQ              : '==' ;
+NEQ             : '!=' ;
+
+// Level 4 operators
+AND             : '&&' ;
+OR              : '||' ;
 
 // KEYWORDS
 RETURN          : 'return' ;
 OF              : 'of' ;
 DEF             : 'def' ;
 LET             : 'let' ;
+TRUE            : 'true' ;
+FALSE           : 'false' ;
 
-// LITERAL
+// NAMES
 IDENTIFIER      : [A-Za-z_] [A-Za-z_0-9]* ;
 
 // RULES
-returnVal   : RETURN expression SEMI_COLON
+arguments   : arguments COMMA expression
             | expression
             ;
 
-expression  : FLOAT                     # FloatExpression
-            | INTEGER                   # IntegerExpression
-            | STRING                    # StringExpression
-            | SMART_STRING              # StringExpression
+reference   : IDENTIFIER LEFT_PAR arguments? RIGHT_PAR  // Function Reference
+            | IDENTIFIER arguments                      // Function Reference
+            | IDENTIFIER                                // Variable/Function Reference
+            ;
+
+expression  : reference                                                     # ReferenceExpression
+            | op=SUB expression                                             # UnOpExpression
+            | expression op=(TIMES | DIV) expression                        # BinOpExpression
+            | expression op=(ADD | SUB) expression                          # BinOpExpression
+            | expression op=(GT | LT | GTE | LTE | EQ | NEQ) expression     # BinOpExpression
+            | expression op=(AND | OR) expression                           # BinOpExpression
+            | INTEGER                                                       # IntegerExpression
+            | (TRUE | FALSE)                                                # BooleanExpression
+            | FLOAT                                                         # FloatExpression
+            | SMART_STRING                                                  # StringExpression
+            | STRING                                                        # StringExpression
+            ;
+
+returnVal   : RETURN expression SEMI_COLON
+            | expression
             ;
 
 typeDec     : OF IDENTIFIER ;
@@ -56,10 +100,10 @@ functionDec : DEF IDENTIFIER (LEFT_PAR parameters RIGHT_PAR)? typeDec? LEFT_BRAC
 
 variableDec : LET IDENTIFIER typeDec? EQUALS expression ;
 
-statement   : returnVal                 # ReturnStatement
-            | expression SEMI_COLON     # ExpressionStatement
+statement   : expression SEMI_COLON     # ExpressionStatement
             | variableDec SEMI_COLON    # VariableDecStatement
             | functionDec               # FunctionDecStatement
+            | returnVal                 # ReturnStatement
             ;
 
 scope       : scope statement
@@ -67,3 +111,5 @@ scope       : scope statement
             ;
 
 program     : scope? ;
+
+rawExpr     : expression EOF ;
