@@ -16,7 +16,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class StringVal extends Expression {
 
     public String[] string;
-    public Expression[] expressions;
+    private Expression[] expressions;
 
     private StringVal(ParserRuleContext ctx, String[] string, Expression[] expressions) {
         super(ctx);
@@ -24,13 +24,16 @@ public class StringVal extends Expression {
         this.expressions = expressions;
     }
 
+    @Override
     public void resolveType() {
     }
 
+    @Override
     public RawType getType() {
         return new RawType("String");
     }
 
+    @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
 
@@ -62,6 +65,8 @@ public class StringVal extends Expression {
             super(scope);
         }
 
+        // Zoo-wee this'n's a tough'n
+        @Override
         public Optional<StringVal> visitStringExpression(BulletLangParser.StringExpressionContext ctx) {
             String raw = ctx.getText();
             boolean smart = raw.startsWith("@");

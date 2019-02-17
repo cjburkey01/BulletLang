@@ -12,20 +12,23 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class IntVal extends Expression {
 
-    public long value;
+    private long value;
 
     private IntVal(ParserRuleContext ctx, long value) {
         super(ctx);
         this.value = value;
     }
 
+    @Override
     public void resolveType() {
     }
 
+    @Override
     public RawType getType() {
         return new RawType("Int64");
     }
 
+    @Override
     public String toString() {
         return "Int: {" + value + "}";
     }
@@ -36,6 +39,7 @@ public class IntVal extends Expression {
             super(scope);
         }
 
+        @Override
         public Optional<IntVal> visitIntegerExpression(BulletLangParser.IntegerExpressionContext ctx) {
             try {
                 IntVal intVal = new IntVal(ctx, Long.parseLong(ctx.INTEGER().getText()));

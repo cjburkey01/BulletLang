@@ -19,10 +19,12 @@ public class Program extends Base implements IScopeContainer {
         this.scope = scope;
     }
 
+    @Override
     public Scope getScope() {
         return scope;
     }
 
+    @Override
     public String toString() {
         return String.format("Program scope: {%s}", scope);
     }
@@ -33,6 +35,7 @@ public class Program extends Base implements IScopeContainer {
             super(null);
         }
 
+        @Override
         public Optional<Program> visitProgram(BulletLangParser.ProgramContext ctx) {
             Scope scope = new Scope.Visitor(null)
                     .visit(ctx.scope())

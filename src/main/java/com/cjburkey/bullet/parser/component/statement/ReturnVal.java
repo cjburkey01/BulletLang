@@ -12,17 +12,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class ReturnVal extends Statement {
 
-    public Expression value;
+    private Expression value;
 
     private ReturnVal(ParserRuleContext ctx, Expression value) {
         super(ctx);
         this.value = value;
     }
 
-    public void execute() {
-
-    }
-
+    @Override
     public String toString() {
         return "Return: {" + value + "}";
     }
@@ -33,6 +30,7 @@ public class ReturnVal extends Statement {
             super(parentScope);
         }
 
+        @Override
         public Optional<ReturnVal> visitReturnVal(BulletLangParser.ReturnValContext ctx) {
             return Optional.of(new ReturnVal(ctx, new Expression.Visitor(scope)
                     .visit(ctx.expression())

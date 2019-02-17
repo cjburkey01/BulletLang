@@ -13,23 +13,26 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class UnaryOperation extends Expression {
 
-    public Operator operator;
-    public Expression expressionA;
+    Operator operator;
+    Expression expressionA;
 
-    protected UnaryOperation(ParserRuleContext ctx, Operator operator, Expression expressionA) {
+    UnaryOperation(ParserRuleContext ctx, Operator operator, Expression expressionA) {
         super(ctx);
         this.operator = operator;
         this.expressionA = expressionA;
     }
 
+    @Override
     public void resolveType() {
 
     }
 
+    @Override
     public RawType getType() {
         return null;
     }
 
+    @Override
     public String toString() {
         return String.format("Unary expression with operator {%s} on {%s}", operator, expressionA);
     }
@@ -40,6 +43,7 @@ public class UnaryOperation extends Expression {
             super(scope);
         }
 
+        @Override
         public Optional<UnaryOperation> visitUnOpExpression(BulletLangParser.UnOpExpressionContext ctx) {
             Operator operator = Operator.resolve(ctx.op.getText().trim());
             Expression expressionA = new Expression.Visitor(scope)

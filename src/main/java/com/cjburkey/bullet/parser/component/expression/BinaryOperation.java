@@ -13,21 +13,24 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class BinaryOperation extends UnaryOperation {
 
-    public Expression expressionB;
+    private Expression expressionB;
 
     private BinaryOperation(ParserRuleContext ctx, Operator operator, Expression expressionA, Expression expressionB) {
         super(ctx, operator, expressionA);
         this.expressionB = expressionB;
     }
 
+    @Override
     public void resolveType() {
 
     }
 
+    @Override
     public RawType getType() {
         return null;
     }
 
+    @Override
     public String toString() {
         return String.format("Binary expression with operator {%s} between {%s} and {%s}", operator, expressionA, expressionB);
     }
@@ -38,6 +41,7 @@ public class BinaryOperation extends UnaryOperation {
             super(scope);
         }
 
+        @Override
         public Optional<BinaryOperation> visitBinOpExpression(BulletLangParser.BinOpExpressionContext ctx) {
             Operator operator = Operator.resolve(ctx.op.getText().trim());
             Expression expressionA = new Expression.Visitor(scope)

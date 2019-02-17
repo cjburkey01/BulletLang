@@ -13,12 +13,13 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Arguments extends Base {
 
-    public final ObjectArrayList<Expression> arguments = new ObjectArrayList<>();
+    private final ObjectArrayList<Expression> arguments = new ObjectArrayList<>();
 
     private Arguments(ParserRuleContext ctx) {
         super(ctx);
     }
 
+    @Override
     public String toString() {
         return arguments.toString();
     }
@@ -29,6 +30,7 @@ public class Arguments extends Base {
             super(scope);
         }
 
+        @Override
         public Optional<Arguments> visitArguments(BulletLangParser.ArgumentsContext ctx) {
             Arguments arguments = visit(ctx.arguments()).orElseGet(() -> new Arguments(ctx));
             Optional<Expression> argument = new Expression.Visitor(scope)

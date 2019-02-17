@@ -1,2 +1,5 @@
-@"5 + 2 =
- ${5 + 2}"
+class Person {
+    
+    def name of String { "Bob" }
+    
+}

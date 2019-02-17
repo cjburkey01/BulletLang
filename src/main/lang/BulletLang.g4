@@ -57,21 +57,34 @@ DEF             : 'def' ;
 LET             : 'let' ;
 TRUE            : 'true' ;
 FALSE           : 'false' ;
+CLASS           : 'class' ;
 
 // NAMES
 IDENTIFIER      : [A-Za-z_] [A-Za-z_0-9]* ;
 
 // RULES
+classInner  : variableDec       # VariableDecClass
+            | functionDec       # FunctionDecClass
+            | classDec          # ClassDecClass
+            ;
+
+classScope  : classScope classInner
+            | classInner
+            ;
+
+classDec    : CLASS IDENTIFIER typeDec? LEFT_BRACE classScope? RIGHT_BRACE ;
+
 arguments   : arguments COMMA expression
             | expression
             ;
 
-reference   : IDENTIFIER LEFT_PAR arguments? RIGHT_PAR  // Function Reference
-            | IDENTIFIER arguments                      // Function Reference
+reference   : IDENTIFIER LEFT_PAR arguments? RIGHT_PAR  // Definitely a Function Reference
+            | IDENTIFIER arguments                      // Definitely a Function Reference
             | IDENTIFIER                                // Variable/Function Reference
             ;
 
 expression  : reference                                                     # ReferenceExpression
+            | LEFT_PAR expression RIGHT_PAR                                 # ParExpression
             | op=SUB expression                                             # UnOpExpression
             | expression op=(TIMES | DIV) expression                        # BinOpExpression
             | expression op=(ADD | SUB) expression                          # BinOpExpression
@@ -96,13 +109,14 @@ parameters  : parameters COMMA parameter
             | parameter
             ;
 
-functionDec : DEF IDENTIFIER (LEFT_PAR parameters RIGHT_PAR)? typeDec? LEFT_BRACE scope? RIGHT_BRACE ;
+functionDec : DEF IDENTIFIER? (LEFT_PAR parameters RIGHT_PAR)? typeDec? LEFT_BRACE scope? RIGHT_BRACE ;
 
 variableDec : LET IDENTIFIER typeDec? EQUALS expression ;
 
 statement   : expression SEMI_COLON     # ExpressionStatement
             | variableDec SEMI_COLON    # VariableDecStatement
             | functionDec               # FunctionDecStatement
+            | classDec                  # ClassDecStatement
             | returnVal                 # ReturnStatement
             ;
 

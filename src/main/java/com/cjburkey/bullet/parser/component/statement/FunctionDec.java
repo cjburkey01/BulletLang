@@ -6,35 +6,36 @@ import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
+import com.cjburkey.bullet.parser.component.classes.ClassInner;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public class FunctionDec extends Statement implements IScopeContainer {
+public class FunctionDec extends ClassInner implements IScopeContainer {
 
+    private boolean isConstructor;
     public String name;
     public Parameters parameters;
-    public TypeDec typeDec;
+    private TypeDec typeDec;
     public Scope scope;
 
     private FunctionDec(ParserRuleContext ctx, String name, Parameters parameters, TypeDec typeDec, Scope scope) {
         super(ctx);
+        isConstructor = (name == null);
         this.name = name;
         this.parameters = parameters;
         this.typeDec = typeDec;
         this.scope = scope;
     }
 
+    @Override
     public Scope getScope() {
         return scope;
     }
 
-    public void execute() {
-
-    }
-
+    @Override
     public String toString() {
         return String.format("Define function {%s} of type {%s} with parameters {%s} and scope {%s}", name, typeDec, parameters, scope);
     }
@@ -45,6 +46,7 @@ public class FunctionDec extends Statement implements IScopeContainer {
             super(scope);
         }
 
+        @Override
         public Optional<FunctionDec> visitFunctionDec(BulletLangParser.FunctionDecContext ctx) {
             Parameters parameters = new Parameters.Visitor(this.scope)
                     .visit(ctx.parameters())
@@ -55,7 +57,8 @@ public class FunctionDec extends Statement implements IScopeContainer {
             Scope scope = new Scope.Visitor(this.scope)
                     .visit(ctx.scope())
                     .orElseGet(() -> new Scope(null));
-            FunctionDec functionDec = new FunctionDec(ctx, ctx.IDENTIFIER().getText(), parameters, typeDec, scope);
+            String name = ((ctx.IDENTIFIER() == null) ? null : ctx.IDENTIFIER().getText());
+            FunctionDec functionDec = new FunctionDec(ctx, name, parameters, typeDec, scope);
             functionDec.parentScope = this.scope;
             this.scope.addFunction(functionDec);
             return Optional.of(functionDec);

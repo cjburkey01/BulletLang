@@ -12,20 +12,23 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class BooleanVal extends Expression {
 
-    public boolean value;
+    private boolean value;
 
     private BooleanVal(ParserRuleContext ctx, boolean value) {
         super(ctx);
         this.value = value;
     }
 
+    @Override
     public void resolveType() {
     }
 
+    @Override
     public RawType getType() {
         return new RawType("Boolean");
     }
 
+    @Override
     public String toString() {
         return "Boolean: {" + value + "}";
     }
@@ -36,6 +39,7 @@ public class BooleanVal extends Expression {
             super(scope);
         }
 
+        @Override
         public Optional<BooleanVal> visitBooleanExpression(BulletLangParser.BooleanExpressionContext ctx) {
             try {
                 BooleanVal booleanVal = new BooleanVal(ctx, ctx.TRUE() != null);

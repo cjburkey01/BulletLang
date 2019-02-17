@@ -14,9 +14,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Reference extends Expression {
 
-    public String name;
-    public Arguments arguments;
-    public boolean ambiguous;
+    private String name;
+    private Arguments arguments;
+    private boolean ambiguous;
 
     private Reference(ParserRuleContext ctx, String name, Arguments arguments) {
         super(ctx);
@@ -31,13 +31,16 @@ public class Reference extends Expression {
         this.ambiguous = ambiguous;
     }
 
+    @Override
     public void resolveType() {
     }
 
+    @Override
     public RawType getType() {
         return null;
     }
 
+    @Override
     public String toString() {
         if (ambiguous) {
             return String.format("Variable/Function reference to {%s}", name);
@@ -51,6 +54,7 @@ public class Reference extends Expression {
             super(scope);
         }
 
+        @Override
         public Optional<Reference> visitReference(BulletLangParser.ReferenceContext ctx) {
             Arguments arguments = new Arguments.Visitor(scope)
                     .visit(ctx.arguments())

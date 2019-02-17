@@ -24,46 +24,58 @@ public abstract class Expression extends Base implements ITyped {
             super(scope);
         }
 
+        @Override
         public Optional<Expression> visitFloatExpression(BulletLangParser.FloatExpressionContext ctx) {
             return new FloatVal.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitIntegerExpression(BulletLangParser.IntegerExpressionContext ctx) {
             return new IntVal.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitStringExpression(BulletLangParser.StringExpressionContext ctx) {
             return new StringVal.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitUnOpExpression(BulletLangParser.UnOpExpressionContext ctx) {
             return new UnaryOperation.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitBinOpExpression(BulletLangParser.BinOpExpressionContext ctx) {
             return new BinaryOperation.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitBooleanExpression(BulletLangParser.BooleanExpressionContext ctx) {
             return new BooleanVal.Visitor(scope)
                     .visit(ctx)
                     .map(Function.identity());
         }
 
+        @Override
         public Optional<Expression> visitReferenceExpression(BulletLangParser.ReferenceExpressionContext ctx) {
             return new Reference.Visitor(scope)
                     .visit(ctx.reference())
                     .map(Function.identity());
+        }
+
+        @Override
+        public Optional<Expression> visitParExpression(BulletLangParser.ParExpressionContext ctx) {
+            return visit(ctx.expression());
         }
 
     }

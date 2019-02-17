@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -12,14 +13,28 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Parameters extends Base {
 
-    public final ObjectArrayList<Parameter> parameters = new ObjectArrayList<>();
+    private final ObjectArrayList<Parameter> parameters = new ObjectArrayList<>();
 
     public Parameters(ParserRuleContext ctx) {
         super(ctx);
     }
 
+    @Override
     public String toString() {
         return parameters.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Parameters that = (Parameters) o;
+        return Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parameters);
     }
 
     public static final class Visitor extends BaseV<Parameters> {
@@ -28,6 +43,7 @@ public class Parameters extends Base {
             super(scope);
         }
 
+        @Override
         public Optional<Parameters> visitParameters(BulletLangParser.ParametersContext ctx) {
             Parameters parameters = visit(ctx.parameters()).orElseGet(() -> new Parameters(ctx));
             Optional<Parameter> parameter = new Parameter.Visitor(scope)

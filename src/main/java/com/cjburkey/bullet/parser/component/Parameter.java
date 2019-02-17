@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.component;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
+import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -11,8 +12,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Parameter extends Base {
 
-    public String name;
-    public TypeDec type;
+    private String name;
+    private TypeDec type;
 
     private Parameter(ParserRuleContext ctx, String name, TypeDec type) {
         super(ctx);
@@ -20,8 +21,23 @@ public class Parameter extends Base {
         this.type = type;
     }
 
+    @Override
     public String toString() {
         return String.format("Parameter {%s}%s", name, ((type == null) ? "" : " of type {" + type + '}'));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Parameter parameter = (Parameter) o;
+        return Objects.equals(name, parameter.name) &&
+                Objects.equals(type, parameter.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
     }
 
     public static final class Visitor extends BaseV<Parameter> {
@@ -30,6 +46,7 @@ public class Parameter extends Base {
             super(scope);
         }
 
+        @Override
         public Optional<Parameter> visitParameter(BulletLangParser.ParameterContext ctx) {
             TypeDec typeDec = new TypeDec.Visitor(scope)
                     .visit(ctx.typeDec())

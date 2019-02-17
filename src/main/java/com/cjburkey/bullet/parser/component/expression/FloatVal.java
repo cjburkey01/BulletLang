@@ -12,20 +12,23 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class FloatVal extends Expression {
 
-    public double value;
+    private double value;
 
     private FloatVal(ParserRuleContext ctx, double value) {
         super(ctx);
         this.value = value;
     }
 
+    @Override
     public void resolveType() {
     }
 
+    @Override
     public RawType getType() {
         return new RawType("Float64");
     }
 
+    @Override
     public String toString() {
         return "Float: {" + value + "}";
     }
@@ -36,6 +39,7 @@ public class FloatVal extends Expression {
             super(scope);
         }
 
+        @Override
         public Optional<FloatVal> visitFloatExpression(BulletLangParser.FloatExpressionContext ctx) {
             try {
                 FloatVal floatVal = new FloatVal(ctx, Double.parseDouble(ctx.FLOAT().getText()));

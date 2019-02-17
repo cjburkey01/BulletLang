@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
+import com.cjburkey.bullet.parser.component.classes.ClassInner;
 import com.cjburkey.bullet.parser.component.expression.Expression;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -11,11 +12,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public class VariableDec extends Statement {
+public class VariableDec extends ClassInner {
 
     public String name;
-    public TypeDec type;
-    public Expression value;
+    private TypeDec type;
+    private Expression value;
 
     private VariableDec(ParserRuleContext ctx, String name, TypeDec type, Expression value) {
         super(ctx);
@@ -24,12 +25,9 @@ public class VariableDec extends Statement {
         this.value = value;
     }
 
-    public void execute() {
-
-    }
-
+    @Override
     public String toString() {
-        return String.format("Declare string {%s} of type {%s} with string {%s}", name, type, value);
+        return String.format("Declare variable {%s} of type {%s} with value {%s}", name, type, value);
     }
 
     public static final class Visitor extends BaseV<VariableDec> {
@@ -38,6 +36,7 @@ public class VariableDec extends Statement {
             super(scope);
         }
 
+        @Override
         public Optional<VariableDec> visitVariableDec(BulletLangParser.VariableDecContext ctx) {
             TypeDec typeDec = new TypeDec.Visitor(scope)
                     .visit(ctx.typeDec())

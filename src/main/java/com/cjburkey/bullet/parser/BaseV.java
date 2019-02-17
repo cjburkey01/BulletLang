@@ -1,5 +1,6 @@
 package com.cjburkey.bullet.parser;
 
+import com.cjburkey.bullet.ErrorHandler;
 import com.cjburkey.bullet.antlr.BulletLangBaseVisitor;
 import com.cjburkey.bullet.parser.component.Scope;
 import java.util.Optional;
@@ -16,8 +17,9 @@ public abstract class BaseV<T> extends BulletLangBaseVisitor<Optional<T>> {
         this.scope = scope;
     }
 
+    @Override
     public Optional<T> visit(ParseTree tree) {
-        if (tree == null) return Optional.empty();
+        if (ErrorHandler.hasErrored() || tree == null) return Optional.empty();
 
         // This could be null because it might be unimplemented
         Optional<T> output = super.visit(tree);

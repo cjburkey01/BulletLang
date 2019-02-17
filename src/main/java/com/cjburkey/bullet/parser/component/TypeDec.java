@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.RawType;
+import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -12,15 +13,29 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class TypeDec extends Base {
 
-    public RawType type;
+    private RawType type;
 
     private TypeDec(ParserRuleContext ctx, RawType type) {
         super(ctx);
         this.type = type;
     }
 
+    @Override
     public String toString() {
         return type.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeDec typeDec = (TypeDec) o;
+        return Objects.equals(type, typeDec.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
     }
 
     public static final class Visitor extends BaseV<TypeDec> {
@@ -29,6 +44,7 @@ public class TypeDec extends Base {
             super(scope);
         }
 
+        @Override
         public Optional<TypeDec> visitTypeDec(BulletLangParser.TypeDecContext ctx) {
             TypeDec typeDec = new TypeDec(ctx, new RawType(ctx.IDENTIFIER().getText()));
             typeDec.parentScope = scope;
