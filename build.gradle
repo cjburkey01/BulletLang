@@ -31,7 +31,7 @@ dependencies {
 
 generateGrammarSource {
     source = 'src/main/lang'
-    arguments += '-visitor'
+    arguments += ['-visitor', '-Xexact-output-dir']
 
     doLast {
         println 'Copying generated grammar lexer/parser files to source'
