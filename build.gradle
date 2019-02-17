@@ -12,6 +12,8 @@ project.ext.fastUtilVersion = '8.2.2'
 project.ext.log4jVersion = '2.11.1'
 project.ext.junitVersion = '5.4.0'
 
+project.ext.parserPackage = 'com.cjburkey.bullet.antlr'
+
 sourceCompatibility = 11
 sourceSets.main.java.srcDirs += ['generated-src/main/java', 'src/main/lang']
 
@@ -31,7 +33,7 @@ dependencies {
 
 generateGrammarSource {
     source = 'src/main/lang'
-    arguments += ['-visitor', '-Xexact-output-dir']
+    arguments += ['-visitor', '-package', parserPackage, '-Xexact-output-dir']
 
     doLast {
         println 'Copying generated grammar lexer/parser files to source'

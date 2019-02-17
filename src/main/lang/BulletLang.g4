@@ -1,9 +1,5 @@
 grammar BulletLang;
 
-@header {
-    package com.cjburkey.bullet.antlr;
-}
-
 // TOKENS
 COMMENT         : (('//' .*? '\n')
                 | ('/*' .*? '*/'))
