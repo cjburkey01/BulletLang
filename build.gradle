@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'antlr'
-    id 'idea'
 }
 
 group 'com.cjburkey'
@@ -32,22 +31,19 @@ dependencies {
 }
 
 generateGrammarSource {
+    outputs.cacheIf { true }
     source = 'src/main/lang'
-    arguments += ['-visitor', '-package', parserPackage, '-Xexact-output-dir']
+    arguments += ['-visitor', '-no-listener', '-package', parserPackage, '-Xexact-output-dir']
 
     doLast {
         println 'Copying generated grammar lexer/parser files to source'
         mkdir 'generated-src/main/java'
         copy {
-            from "${buildDir}/generated-src/antlr/lang"
-            into 'generated-src/main/java'
+            from generateGrammarSource.outputDirectory.canonicalPath
+            into "generated-src/main/java/${parserPackage.replace('.', '/')}"
         }
+        delete "$buildDir/generated-src/antlr"
     }
-}
-
-clean.doFirst {
-    delete 'generated-src/main/java'
-    println 'Deleted \"generated-src/main/java\"'
 }
 
 compileJava {
@@ -69,10 +65,4 @@ task runCompiler(type: JavaExec) {
 
 test {
     useJUnitPlatform()
-}
-
-idea {
-    module {
-        testSourceDirs += file('src/test/java')
-    }
 }
