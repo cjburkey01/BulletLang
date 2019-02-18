@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public abstract class Base {
+public abstract class Base implements IReferenceResolver, ITypeResolver {
 
     public Scope parentScope;
     public ParserRuleContext ctx;

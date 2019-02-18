@@ -24,6 +24,16 @@ public class ExpressionStatement extends Statement {
         return "Expression: {" + value + "}";
     }
 
+    @Override
+    public void resolveTypes() {
+        value.resolveTypes();
+    }
+
+    @Override
+    public void resolveReferences() {
+        value.resolveReferences();
+    }
+
     public static final class Visitor extends BaseV<ExpressionStatement> {
 
         public Visitor(Scope parentScope) {

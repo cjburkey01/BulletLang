@@ -20,17 +20,15 @@ public class BooleanVal extends Expression {
     }
 
     @Override
-    public void resolveType() {
-    }
-
-    @Override
-    public RawType getType() {
-        return new RawType("Boolean");
-    }
-
-    @Override
     public String toString() {
         return "Boolean: {" + value + "}";
+    }
+
+    public void resolveReferences() {
+    }
+
+    public void resolveTypes() {
+        outputType = new RawType("Boolean");
     }
 
     public static final class Visitor extends BaseV<BooleanVal> {

@@ -25,15 +25,6 @@ public class StringVal extends Expression {
     }
 
     @Override
-    public void resolveType() {
-    }
-
-    @Override
-    public RawType getType() {
-        return new RawType("String");
-    }
-
-    @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
 
@@ -57,6 +48,15 @@ public class StringVal extends Expression {
         }
 
         return output.append("\"}").toString();
+    }
+
+    @Override
+    public void resolveReferences() {
+    }
+
+    @Override
+    public void resolveTypes() {
+        outputType = new RawType("String");
     }
 
     public static final class Visitor extends BaseV<StringVal> {

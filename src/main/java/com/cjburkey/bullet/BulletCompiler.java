@@ -23,19 +23,19 @@ public class BulletCompiler {
         this.rawText = Objects.requireNonNull(rawText);
     }
 
-    public Program parse() {
+    private Program parse() {
         BulletLangParser parser = createParser(rawText);
         return new Program.Visitor()
                 .visit(parser.program())
                 .orElse(null);
     }
 
-    public static Program create(String rawText) {
+    private static Program create(String rawText) {
         BulletCompiler compiler = new BulletCompiler(rawText);
         return compiler.parse();
     }
 
-    public static Program create(InputStream inputStream) throws IOException {
+    private static Program create(InputStream inputStream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
             return create(reader.lines().collect(Collectors.joining(System.lineSeparator())));
         }
@@ -54,8 +54,20 @@ public class BulletCompiler {
         Log.debug("Testing on: \"test.blt\"");
 
         try {
+            Log.debug("Parsing");
             Program program = create(BulletCompiler.class.getClassLoader().getResourceAsStream("test.blt"));
             Log.debug(program);
+            if (BulletError.dumpAndClearErrors() || program == null) return;
+
+            Log.debug("Resolving types");
+            program.resolveTypes();
+            Log.debug(program);
+            if (BulletError.dumpAndClearErrors()) return;
+
+            Log.debug("Resolving references");
+            program.resolveReferences();
+            Log.debug(program);
+            BulletError.dumpAndClearErrors();
         } catch (Exception e) {
             Log.exception(e);
             System.exit(-1);

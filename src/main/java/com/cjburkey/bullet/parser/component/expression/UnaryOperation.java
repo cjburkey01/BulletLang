@@ -3,7 +3,6 @@ package com.cjburkey.bullet.parser.component.expression;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.Operator;
-import com.cjburkey.bullet.parser.RawType;
 import com.cjburkey.bullet.parser.component.Scope;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -23,18 +22,19 @@ public class UnaryOperation extends Expression {
     }
 
     @Override
-    public void resolveType() {
-
-    }
-
-    @Override
-    public RawType getType() {
-        return null;
-    }
-
-    @Override
     public String toString() {
         return String.format("Unary expression with operator {%s} on {%s}", operator, expressionA);
+    }
+
+    @Override
+    public void resolveTypes() {
+        expressionA.resolveTypes();
+        outputType = expressionA.outputType;
+    }
+
+    @Override
+    public void resolveReferences() {
+        expressionA.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<UnaryOperation> {

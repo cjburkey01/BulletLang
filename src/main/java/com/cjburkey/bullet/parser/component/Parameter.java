@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class Parameter extends Base {
 
     private String name;
-    private TypeDec type;
+    public TypeDec type;
 
     private Parameter(ParserRuleContext ctx, String name, TypeDec type) {
         super(ctx);
@@ -23,7 +23,7 @@ public class Parameter extends Base {
 
     @Override
     public String toString() {
-        return String.format("Parameter {%s}%s", name, ((type == null) ? "" : " of type {" + type + '}'));
+        return String.format("Parameter {%s}%s", name, ((type == null) ? "" : (" of type {" + type + '}')));
     }
 
     @Override
@@ -38,6 +38,16 @@ public class Parameter extends Base {
     @Override
     public int hashCode() {
         return Objects.hash(name, type);
+    }
+
+    @Override
+    public void resolveTypes() {
+        type.resolveTypes();
+    }
+
+    @Override
+    public void resolveReferences() {
+        type.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<Parameter> {

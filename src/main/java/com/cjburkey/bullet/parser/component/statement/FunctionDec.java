@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.component.statement;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.RawType;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
@@ -18,15 +19,15 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
     private boolean isConstructor;
     public String name;
     public Parameters parameters;
-    private TypeDec typeDec;
+    public TypeDec type;
     public Scope scope;
 
-    private FunctionDec(ParserRuleContext ctx, String name, Parameters parameters, TypeDec typeDec, Scope scope) {
+    private FunctionDec(ParserRuleContext ctx, String name, Parameters parameters, TypeDec type, Scope scope) {
         super(ctx);
         isConstructor = (name == null);
         this.name = name;
         this.parameters = parameters;
-        this.typeDec = typeDec;
+        this.type = type;
         this.scope = scope;
     }
 
@@ -37,7 +38,30 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
 
     @Override
     public String toString() {
-        return String.format("Define function {%s} of type {%s} with parameters {%s} and scope {%s}", name, typeDec, parameters, scope);
+        return String.format("Define function {%s} of type {%s} with parameters {%s} and scope {%s}", name, type, parameters, scope);
+    }
+
+    @Override
+    public void resolveTypes() {
+        parameters.resolveTypes();
+        if (type != null) type.resolveReferences();
+        scope.resolveTypes();
+
+        if (type == null) {
+            type = new TypeDec(null, new RawType("Void"));
+            type.resolveTypes();
+        }
+        if (type.type == null) {
+            type.type = new RawType("Void");
+            type.resolveTypes();
+        }
+    }
+
+    @Override
+    public void resolveReferences() {
+        parameters.resolveReferences();
+        if (type != null) type.resolveReferences();
+        scope.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<FunctionDec> {
@@ -56,10 +80,11 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
                     .orElse(null);
             Scope scope = new Scope.Visitor(this.scope)
                     .visit(ctx.scope())
-                    .orElseGet(() -> new Scope(null));
+                    .orElseGet(() -> new Scope(null, null));
             String name = ((ctx.IDENTIFIER() == null) ? null : ctx.IDENTIFIER().getText());
             FunctionDec functionDec = new FunctionDec(ctx, name, parameters, typeDec, scope);
             functionDec.parentScope = this.scope;
+            scope.parentContainer = functionDec;
             this.scope.addFunction(functionDec);
             return Optional.of(functionDec);
         }

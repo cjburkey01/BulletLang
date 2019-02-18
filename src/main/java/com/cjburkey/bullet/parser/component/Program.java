@@ -29,6 +29,17 @@ public class Program extends Base implements IScopeContainer {
         return String.format("Program scope: {%s}", scope);
     }
 
+    @Override
+    public void resolveTypes() {
+        resolveReferences();    // Resolve partial references before types can be resolved
+        scope.resolveTypes();
+    }
+
+    @Override
+    public void resolveReferences() {
+        scope.resolveReferences();
+    }
+
     public static final class Visitor extends BaseV<Program> {
 
         public Visitor() {
@@ -39,8 +50,9 @@ public class Program extends Base implements IScopeContainer {
         public Optional<Program> visitProgram(BulletLangParser.ProgramContext ctx) {
             Scope scope = new Scope.Visitor(null)
                     .visit(ctx.scope())
-                    .orElseGet(() -> new Scope(null));
+                    .orElseGet(() -> new Scope(null, null));
             Program program = new Program(ctx, scope);
+            scope.parentContainer = program;
             return Optional.of(program);
         }
 

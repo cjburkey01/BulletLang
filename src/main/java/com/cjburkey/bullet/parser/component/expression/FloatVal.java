@@ -20,17 +20,17 @@ public class FloatVal extends Expression {
     }
 
     @Override
-    public void resolveType() {
-    }
-
-    @Override
-    public RawType getType() {
-        return new RawType("Float64");
-    }
-
-    @Override
     public String toString() {
         return "Float: {" + value + "}";
+    }
+
+    @Override
+    public void resolveReferences() {
+    }
+
+    @Override
+    public void resolveTypes() {
+        outputType = new RawType("Float64");
     }
 
     public static final class Visitor extends BaseV<FloatVal> {

@@ -1,9 +1,9 @@
 package com.cjburkey.bullet.parser.component.expression;
 
+import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.Operator;
-import com.cjburkey.bullet.parser.RawType;
 import com.cjburkey.bullet.parser.component.Scope;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -13,6 +13,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class BinaryOperation extends UnaryOperation {
 
+    private static final String TYPES_DIFFER_ERROR = "Types %s and %s differ in binary operation %s";
+
     private Expression expressionB;
 
     private BinaryOperation(ParserRuleContext ctx, Operator operator, Expression expressionA, Expression expressionB) {
@@ -21,13 +23,25 @@ public class BinaryOperation extends UnaryOperation {
     }
 
     @Override
-    public void resolveType() {
+    public void resolveTypes() {
+        super.resolveTypes();
+        expressionB.resolveTypes();
 
+        if (expressionA.outputType == null || expressionB.outputType == null) {
+            return;
+        }
+
+        // TODO: RESOLVE OPERATORS TO METHODS ON THE TYPES.
+        //       FOR NOW, IT WILL JUST ERROR IF THEY'RE DIFFERENT TYPES
+        if (!expressionA.outputType.equals(expressionB.outputType)) {
+            BulletError.queueError(ctx, TYPES_DIFFER_ERROR, expressionA.outputType, expressionB.outputType, operator);
+        }
     }
 
     @Override
-    public RawType getType() {
-        return null;
+    public void resolveReferences() {
+        super.resolveReferences();
+        expressionB.resolveReferences();
     }
 
     @Override

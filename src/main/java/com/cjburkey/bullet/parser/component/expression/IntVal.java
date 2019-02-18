@@ -20,17 +20,17 @@ public class IntVal extends Expression {
     }
 
     @Override
-    public void resolveType() {
-    }
-
-    @Override
-    public RawType getType() {
-        return new RawType("Int64");
-    }
-
-    @Override
     public String toString() {
         return "Int: {" + value + "}";
+    }
+
+    @Override
+    public void resolveReferences() {
+    }
+
+    @Override
+    public void resolveTypes() {
+        outputType = new RawType("Int64");
     }
 
     public static final class Visitor extends BaseV<IntVal> {

@@ -13,16 +13,16 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class TypeDec extends Base {
 
-    private RawType type;
+    public RawType type;
 
-    private TypeDec(ParserRuleContext ctx, RawType type) {
+    public TypeDec(ParserRuleContext ctx, RawType type) {
         super(ctx);
         this.type = type;
     }
 
     @Override
     public String toString() {
-        return type.toString();
+        return type + "";
     }
 
     @Override
@@ -36,6 +36,16 @@ public class TypeDec extends Base {
     @Override
     public int hashCode() {
         return Objects.hash(type);
+    }
+
+    @Override
+    public void resolveTypes() {
+        if (type != null) type.resolveTypes();
+    }
+
+    @Override
+    public void resolveReferences() {
+        if (type != null) type.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<TypeDec> {

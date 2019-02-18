@@ -2,6 +2,7 @@ package com.cjburkey.bullet.parser.component.classes;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.component.Scope;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -11,8 +12,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class ClassScope extends Scope {
 
-    ClassScope(ParserRuleContext ctx) {
-        super(ctx);
+    ClassScope(ParserRuleContext ctx, IScopeContainer parentContainer) {
+        super(ctx, parentContainer);
     }
 
     @Override
@@ -29,12 +30,13 @@ public class ClassScope extends Scope {
         @Override
         public Optional<ClassScope> visitClassScope(BulletLangParser.ClassScopeContext ctx) {
             ClassScope scope = visit(ctx.classScope())
-                    .orElseGet(() -> new ClassScope(ctx));
+                    .orElseGet(() -> new ClassScope(ctx, null));
             Optional<ClassInner> classInner = new ClassInner.Visitor(scope)
                     .visit(ctx.classInner());
             classInner.ifPresent(scope.statements::add);
 
             scope.parentScope = this.scope;
+            scope.parentContainer = this.scope.parentContainer;
             return Optional.of(scope);
         }
 

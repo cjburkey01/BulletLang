@@ -29,6 +29,8 @@ LEFT_D_BRACE    : '${' ;
 LEFT_BRACE      : '{' ;
 RIGHT_BRACE     : '}' ;
 EQUALS          : '=' ;
+STATIC          : '@@' ;
+LOCAL           : '@' ;
 
 // Level 1 operators
 TIMES           : '*' ;
@@ -80,6 +82,7 @@ arguments   : arguments COMMA expression
 
 reference   : IDENTIFIER LEFT_PAR arguments? RIGHT_PAR  // Definitely a Function Reference
             | IDENTIFIER arguments                      // Definitely a Function Reference
+            | instType IDENTIFIER                       // Definitely a Variable Reference
             | IDENTIFIER                                // Variable/Function Reference
             ;
 
@@ -109,9 +112,11 @@ parameters  : parameters COMMA parameter
             | parameter
             ;
 
-functionDec : DEF IDENTIFIER? (LEFT_PAR parameters RIGHT_PAR)? typeDec? LEFT_BRACE scope? RIGHT_BRACE ;
+functionDec : DEF IDENTIFIER? (LEFT_PAR parameters? RIGHT_PAR)? typeDec? LEFT_BRACE scope? RIGHT_BRACE ;
 
-variableDec : LET IDENTIFIER typeDec? EQUALS expression ;
+instType    : STATIC | LOCAL ;
+
+variableDec : LET instType? IDENTIFIER typeDec? EQUALS expression ;
 
 statement   : expression SEMI_COLON     # ExpressionStatement
             | variableDec SEMI_COLON    # VariableDecStatement

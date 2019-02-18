@@ -13,10 +13,20 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Arguments extends Base {
 
-    private final ObjectArrayList<Expression> arguments = new ObjectArrayList<>();
+    public final ObjectArrayList<Expression> arguments = new ObjectArrayList<>();
 
     private Arguments(ParserRuleContext ctx) {
         super(ctx);
+    }
+
+    @Override
+    public void resolveTypes() {
+        arguments.forEach(Expression::resolveTypes);
+    }
+
+    @Override
+    public void resolveReferences() {
+        arguments.forEach(Expression::resolveReferences);
     }
 
     @Override

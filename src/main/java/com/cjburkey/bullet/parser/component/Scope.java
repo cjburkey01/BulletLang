@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.component;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
+import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.component.classes.ClassDec;
 import com.cjburkey.bullet.parser.component.statement.FunctionDec;
 import com.cjburkey.bullet.parser.component.statement.Statement;
@@ -19,13 +20,25 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Scope extends Base {
 
+    public IScopeContainer parentContainer;
     public final ObjectArrayList<Statement> statements = new ObjectArrayList<>();
     private final Object2ObjectOpenHashMap<String, ObjectArrayList<FunctionDec>> functions = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectOpenHashMap<String, ObjectArrayList<VariableDec>> variables = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectOpenHashMap<String, ObjectArrayList<ClassDec>> classes = new Object2ObjectOpenHashMap<>();
 
-    public Scope(ParserRuleContext ctx) {
+    public Scope(ParserRuleContext ctx, IScopeContainer parentContainer) {
         super(ctx);
+        this.parentContainer = parentContainer;
+    }
+
+    @Override
+    public void resolveTypes() {
+        statements.forEach(Statement::resolveTypes);
+    }
+
+    @Override
+    public void resolveReferences() {
+        statements.forEach(Statement::resolveReferences);
     }
 
     public void addFunction(FunctionDec functionDec) {
@@ -51,7 +64,7 @@ public class Scope extends Base {
         }
     }
 
-    private List<FunctionDec> getFunctions(String name, boolean scanParents) {
+    public List<FunctionDec> getFunctions(String name, boolean scanParents) {
         if (!functions.containsKey(name)) return Collections.emptyList();
         ObjectArrayList<FunctionDec> output = new ObjectArrayList<>(functions.get(name));
         if (scanParents && parentScope != null) {
@@ -60,33 +73,13 @@ public class Scope extends Base {
         return output;
     }
 
-    public Optional<FunctionDec> getFunction(String name, Parameters parameters, boolean scanParents) {
-        List<FunctionDec> functions = getFunctions(name, scanParents);
-        for (FunctionDec functionDec : functions) {
-            if (functionDec != null && functionDec.parameters != null && functionDec.parameters.equals(parameters)) {
-                return Optional.of(functionDec);
-            }
-        }
-        return Optional.empty();
-    }
-
-    private List<VariableDec> getVariables(String name, boolean scanParents) {
+    public List<VariableDec> getVariables(String name, boolean scanParents) {
         if (!variables.containsKey(name)) return Collections.emptyList();
         ObjectArrayList<VariableDec> output = new ObjectArrayList<>(variables.get(name));
         if (scanParents && parentScope != null) {
             output.addAll(parentScope.getVariables(name, true));
         }
         return output;
-    }
-
-    public Optional<VariableDec> getVariable(String name, boolean scanParents) {
-        List<VariableDec> variables = getVariables(name, scanParents);
-        for (VariableDec variableDec : variables) {
-            if (variableDec != null) {
-                return Optional.of(variableDec);
-            }
-        }
-        return Optional.empty();
     }
 
     private List<ClassDec> getClasses(String name, boolean scanParents) {
@@ -96,16 +89,6 @@ public class Scope extends Base {
             output.addAll(parentScope.getClasses(name, true));
         }
         return output;
-    }
-
-    public Optional<ClassDec> getClass(String name, boolean scanParents) {
-        List<ClassDec> classes = getClasses(name, scanParents);
-        for (ClassDec classDec : classes) {
-            if (classDec != null) {
-                return Optional.of(classDec);
-            }
-        }
-        return Optional.empty();
     }
 
     @Override
@@ -123,12 +106,13 @@ public class Scope extends Base {
         public Optional<Scope> visitScope(BulletLangParser.ScopeContext ctx) {
             Scope scope = new Visitor(this.scope)
                     .visit(ctx.scope())
-                    .orElseGet(() -> new Scope(ctx));
+                    .orElseGet(() -> new Scope(ctx, null));
             Optional<Statement> statement = new Statement.Visitor(scope)
                     .visit(ctx.statement());
             statement.ifPresent(scope.statements::add);
 
             scope.parentScope = this.scope;
+            if (this.scope != null) scope.parentContainer = this.scope.parentContainer;
             return Optional.of(scope);
         }
 

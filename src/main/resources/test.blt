@@ -1,5 +1,28 @@
-class Person {
+/*class Person {
+
+    def (name of String) {
+        let @name = name;
+    }
+
+    def name { @name }
     
-    def name of String { "Bob" }
-    
+    def greet { @"Hello, ${name}" }
+
+}*/
+
+def nine {
+    6 + 3
 }
+
+def five {
+    2 + 3
+}
+
+let number1 = nine;
+let number2 = five + 1;
+let number3 = number1 + number2;
+
+def add(a of Int64, b of Int64) {
+}
+
+let number4 = add 3, 2;
