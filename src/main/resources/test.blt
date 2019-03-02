@@ -1,0 +1,16 @@
+// Automatic type resolution is dank
+def transformString(input of String) {
+    reverseString   // Note: the function returns here, but the function DOES resolve; this is valid.
+
+    // Embedded functions
+    def reverseString {
+        input       // TODO: CURRENTLY RETURNS THE INPUT
+    }
+}
+
+def printRev(msg of String) {
+    print transformString(msg);
+}
+
+// TODO: STANDARD LIB
+def print(msg of String) {}

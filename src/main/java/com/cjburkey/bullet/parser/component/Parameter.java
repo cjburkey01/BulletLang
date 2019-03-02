@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Parameter extends Base {
 
-    private String name;
+    public String name;
     public TypeDec type;
 
     private Parameter(ParserRuleContext ctx, String name, TypeDec type) {

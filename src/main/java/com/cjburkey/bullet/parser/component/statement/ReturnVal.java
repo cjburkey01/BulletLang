@@ -45,7 +45,9 @@ public class ReturnVal extends Statement {
                     if (p.type.type == null) {
                         p.type.type = value.outputType;
                     } else {
-                        BulletError.queueError(ctx, ERROR_RETURN_TYPE_MISMATCH, p.name, p.type, value.outputType);
+                        if (!p.type.type.equals(value.outputType)) {
+                            BulletError.queueError(ctx, ERROR_RETURN_TYPE_MISMATCH, p.name, p.type, value.outputType);
+                        }
                     }
                 }
 

@@ -23,7 +23,7 @@ public class VariableDec extends ClassInner {
     public TypeDec type;
     private Expression value;
 
-    private VariableDec(ParserRuleContext ctx, InstanceType level, String name, TypeDec type, Expression value) {
+    public VariableDec(ParserRuleContext ctx, InstanceType level, String name, TypeDec type, Expression value) {
         super(ctx);
         this.level = level;
         this.name = name;
@@ -39,7 +39,7 @@ public class VariableDec extends ClassInner {
     @Override
     public void resolveTypes() {
         if (type != null) type.resolveTypes();
-        value.resolveTypes();
+        if (value != null) value.resolveTypes();
 
         if (type == null) {
             type = new TypeDec(null, value.outputType);
@@ -53,7 +53,7 @@ public class VariableDec extends ClassInner {
     @Override
     public void resolveReferences() {
         if (type != null) type.resolveReferences();
-        value.resolveReferences();
+        if (value != null) value.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<VariableDec> {

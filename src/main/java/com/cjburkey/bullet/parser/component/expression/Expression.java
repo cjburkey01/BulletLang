@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public abstract class Expression extends Base {
 
     public RawType outputType;
-    
+
     public Expression(ParserRuleContext ctx) {
         super(ctx);
     }

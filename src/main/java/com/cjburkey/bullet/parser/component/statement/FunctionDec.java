@@ -3,7 +3,9 @@ package com.cjburkey.bullet.parser.component.statement;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.InstanceType;
 import com.cjburkey.bullet.parser.RawType;
+import com.cjburkey.bullet.parser.component.Parameter;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
@@ -29,6 +31,13 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
         this.parameters = parameters;
         this.type = type;
         this.scope = scope;
+    }
+
+    private VariableDec createParameterVariable(Parameter parameter) {
+        VariableDec variableDec = new VariableDec(parameter.ctx, InstanceType.DEFAULT, parameter.name, parameter.type, null);
+        variableDec.resolveTypes();
+        variableDec.resolveReferences();
+        return variableDec;
     }
 
     @Override
@@ -61,6 +70,11 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
     public void resolveReferences() {
         parameters.resolveReferences();
         if (type != null) type.resolveReferences();
+
+        for (Parameter parameter : parameters.parameters) {
+            scope.addVariable(createParameterVariable(parameter));
+        }
+
         scope.resolveReferences();
     }
 

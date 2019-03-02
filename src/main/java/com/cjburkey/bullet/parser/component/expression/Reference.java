@@ -28,7 +28,6 @@ public class Reference extends Expression {
 
     private VariableDec variableReference;
     private FunctionDec functionReference;
-    private boolean secondResolve = false;
 
     private Reference(ParserRuleContext ctx, String name, Arguments arguments, ReferenceType referenceType, InstanceType instanceType) {
         super(ctx);
@@ -56,6 +55,8 @@ public class Reference extends Expression {
 
     @Override
     public void resolveTypes() {
+        if (arguments != null) arguments.resolveTypes();
+
         if (variableReference != null && variableReference.type != null) {
             outputType = variableReference.type.type;
         }
@@ -66,9 +67,11 @@ public class Reference extends Expression {
 
     @Override
     public void resolveReferences() {
+        if (arguments != null) arguments.resolveReferences();
+
         switch (referenceType) {
             case FUNCTION:
-                if (resolveFunctionReference()/* && secondResolve*/) {
+                if (resolveFunctionReference()) {
                     BulletError.queueError(ctx, ERROR_INVALID_FUNCTION_REFERENCE, name);
                 }
                 break;
@@ -77,16 +80,15 @@ public class Reference extends Expression {
                     BulletError.queueError(ctx, ERROR_INVALID_VARIABLE_REFERENCE, name);
                 }
                 break;
+            default:
             case AMBIGUOUS:
-                if (resolveVariableReference()) {
-                    if (resolveFunctionReference()) {
-                        BulletError.queueError(ctx, ERROR_INVALID_REFERENCE, name);
-                    }
+                if (resolveVariableReference() && resolveFunctionReference()) {
+                    BulletError.queueError(ctx, ERROR_INVALID_REFERENCE, name);
                 }
         }
-        secondResolve = true;
     }
 
+    // True = error
     private boolean resolveFunctionReference() {
         List<FunctionDec> functionDecs = parentScope.getFunctions(name, true);
         for (FunctionDec functionDec : functionDecs) {
@@ -98,7 +100,7 @@ public class Reference extends Expression {
                 int i = 0;
                 for (Expression expression : arguments.arguments) {
                     expression.resolveTypes();
-                    if (!expression.outputType.equals(functionDec.parameters.parameters.get(i).type.type)) {
+                    if (expression.outputType != null && !expression.outputType.equals(functionDec.parameters.parameters.get(i).type.type)) {
                         break;
                     }
                     i++;

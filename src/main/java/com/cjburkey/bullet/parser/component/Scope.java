@@ -65,29 +65,26 @@ public class Scope extends Base {
     }
 
     public List<FunctionDec> getFunctions(String name, boolean scanParents) {
-        if (!functions.containsKey(name)) return Collections.emptyList();
-        ObjectArrayList<FunctionDec> output = new ObjectArrayList<>(functions.get(name));
-        if (scanParents && parentScope != null) {
-            output.addAll(parentScope.getFunctions(name, true));
-        }
+        if (!functions.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
+        ObjectArrayList<FunctionDec> output = new ObjectArrayList<>();
+        if (functions.containsKey(name)) output.addAll(new ObjectArrayList<>(functions.get(name)));
+        if (parentScope != null) output.addAll(parentScope.getFunctions(name, true));
         return output;
     }
 
     public List<VariableDec> getVariables(String name, boolean scanParents) {
-        if (!variables.containsKey(name)) return Collections.emptyList();
-        ObjectArrayList<VariableDec> output = new ObjectArrayList<>(variables.get(name));
-        if (scanParents && parentScope != null) {
-            output.addAll(parentScope.getVariables(name, true));
-        }
+        if (!variables.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
+        ObjectArrayList<VariableDec> output = new ObjectArrayList<>();
+        if (variables.containsKey(name)) output.addAll(new ObjectArrayList<>(variables.get(name)));
+        if (parentScope != null) output.addAll(parentScope.getVariables(name, true));
         return output;
     }
 
     private List<ClassDec> getClasses(String name, boolean scanParents) {
-        if (!classes.containsKey(name)) return Collections.emptyList();
-        ObjectArrayList<ClassDec> output = new ObjectArrayList<>(classes.get(name));
-        if (scanParents && parentScope != null) {
-            output.addAll(parentScope.getClasses(name, true));
-        }
+        if (!classes.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
+        ObjectArrayList<ClassDec> output = new ObjectArrayList<>();
+        if (classes.containsKey(name)) output.addAll(new ObjectArrayList<>(classes.get(name)));
+        if (parentScope != null) output.addAll(parentScope.getClasses(name, true));
         return output;
     }
 
@@ -110,7 +107,6 @@ public class Scope extends Base {
             Optional<Statement> statement = new Statement.Visitor(scope)
                     .visit(ctx.statement());
             statement.ifPresent(scope.statements::add);
-
             scope.parentScope = this.scope;
             if (this.scope != null) scope.parentContainer = this.scope.parentContainer;
             return Optional.of(scope);
