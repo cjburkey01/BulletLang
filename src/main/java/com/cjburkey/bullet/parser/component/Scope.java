@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
+@SuppressWarnings("SameParameterValue")
 public class Scope extends Base {
 
     public IScopeContainer parentContainer;
@@ -33,9 +34,9 @@ public class Scope extends Base {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
         statements.forEach(s -> {
-            if (!exclude.contains(s)) s.resolve(exclude);
+            if (!exclude.contains(s)) s.resolve(this, exclude);
         });
     }
 
@@ -66,7 +67,7 @@ public class Scope extends Base {
         if (!functions.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
         ObjectArrayList<FunctionDec> output = new ObjectArrayList<>();
         if (functions.containsKey(name)) output.addAll(new ObjectArrayList<>(functions.get(name)));
-        if (parentScope != null) output.addAll(parentScope.getFunctions(name, true));
+        if (scanParents && parentScope != null) output.addAll(parentScope.getFunctions(name, true));
         return output;
     }
 
@@ -74,15 +75,16 @@ public class Scope extends Base {
         if (!variables.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
         ObjectArrayList<VariableDec> output = new ObjectArrayList<>();
         if (variables.containsKey(name)) output.addAll(new ObjectArrayList<>(variables.get(name)));
-        if (parentScope != null) output.addAll(parentScope.getVariables(name, true));
+        if (scanParents && parentScope != null) output.addAll(parentScope.getVariables(name, true));
         return output;
     }
 
+    @SuppressWarnings("unused")
     private List<ClassDec> getClasses(String name, boolean scanParents) {
         if (!classes.containsKey(name) && (!scanParents || parentContainer == null)) return Collections.emptyList();
         ObjectArrayList<ClassDec> output = new ObjectArrayList<>();
         if (classes.containsKey(name)) output.addAll(new ObjectArrayList<>(classes.get(name)));
-        if (parentScope != null) output.addAll(parentScope.getClasses(name, true));
+        if (scanParents && parentScope != null) output.addAll(parentScope.getClasses(name, true));
         return output;
     }
 

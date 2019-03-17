@@ -29,8 +29,9 @@ public class UnaryOperation extends Expression {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (!exclude.contains(expressionA)) expressionA.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(expressionA)) expressionA.resolve(this, exclude);
+
         outputType = expressionA.outputType;
     }
 

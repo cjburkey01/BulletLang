@@ -3,6 +3,7 @@ package com.cjburkey.bullet;
 import com.cjburkey.bullet.antlr.BulletLangLexer;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.component.Program;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,13 +60,8 @@ public class BulletCompiler {
             Log.debug(program);
             if (BulletError.dumpAndClearErrors() || program == null) return;
 
-            Log.debug("Resolving types");
-            program.resolveTypes();
-            Log.debug(program);
-            if (BulletError.dumpAndClearErrors()) return;
-
-            Log.debug("Resolving references");
-            program.resolveReferences();
+            Log.debug("Resolving");
+            program.resolve(null, new ObjectOpenHashSet<>());
             Log.debug(program);
             BulletError.dumpAndClearErrors();
         } catch (Exception e) {

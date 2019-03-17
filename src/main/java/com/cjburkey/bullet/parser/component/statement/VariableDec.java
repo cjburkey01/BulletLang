@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class VariableDec extends ClassInner {
 
     private static final String ERROR_TYPE_NOT_RESOLVED = "Failed to resolve type for variable \"%s\" declaration based on value";
+    private static final String ERROR_NO_TYPE_NO_VALUE = "Variable \"%s\" requires a type declaration";
 
     private InstanceType level;
     public String name;
@@ -39,15 +40,19 @@ public class VariableDec extends ClassInner {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (type != null && !exclude.contains(type)) type.resolve(exclude);
-        if (value != null && !exclude.contains(value)) value.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (type != null && !exclude.contains(type)) type.resolve(this, exclude);
+        if (value != null && !exclude.contains(value)) value.resolve(this, exclude);
 
         if (type == null) {
-            type = new TypeDec(null, value.outputType);
-            type.resolve(exclude);
+            if (value == null) {
+                BulletError.queueError(ctx, ERROR_NO_TYPE_NO_VALUE, name);
+            } else {
+                type = new TypeDec(null, value.outputType);
+                type.resolve(this, exclude);
+            }
         }
-        if (type.type == null) {
+        if (type != null && type.type == null) {
             BulletError.queueError(ctx, ERROR_TYPE_NOT_RESOLVED, name);
         }
     }

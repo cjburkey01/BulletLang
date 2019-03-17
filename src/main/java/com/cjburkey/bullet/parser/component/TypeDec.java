@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.RawType;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -18,6 +19,10 @@ public class TypeDec extends Base {
     public TypeDec(ParserRuleContext ctx, RawType type) {
         super(ctx);
         this.type = type;
+    }
+
+    @Override
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
     }
 
     @Override
@@ -36,16 +41,6 @@ public class TypeDec extends Base {
     @Override
     public int hashCode() {
         return Objects.hash(type);
-    }
-
-    @Override
-    public void resolveTypes() {
-        if (type != null) type.resolveTypes();
-    }
-
-    @Override
-    public void resolveReferences() {
-        if (type != null) type.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<TypeDec> {

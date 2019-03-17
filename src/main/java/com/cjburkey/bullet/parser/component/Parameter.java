@@ -3,6 +3,7 @@ package com.cjburkey.bullet.parser.component;
 import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -41,13 +42,8 @@ public class Parameter extends Base {
     }
 
     @Override
-    public void resolveTypes() {
-        type.resolveTypes();
-    }
-
-    @Override
-    public void resolveReferences() {
-        type.resolveReferences();
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(type)) type.resolve(this, exclude);
     }
 
     public static final class Visitor extends BaseV<Parameter> {

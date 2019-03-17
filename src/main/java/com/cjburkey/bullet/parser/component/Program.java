@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.IScopeContainer;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -20,6 +21,11 @@ public class Program extends Base implements IScopeContainer {
     }
 
     @Override
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        scope.resolve(this, exclude);
+    }
+
+    @Override
     public Scope getScope() {
         return scope;
     }
@@ -27,17 +33,6 @@ public class Program extends Base implements IScopeContainer {
     @Override
     public String toString() {
         return String.format("Program scope: {%s}", scope);
-    }
-
-    @Override
-    public void resolveTypes() {
-        resolveReferences();    // Resolve partial references before types can be resolved
-        scope.resolveTypes();
-    }
-
-    @Override
-    public void resolveReferences() {
-        scope.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<Program> {

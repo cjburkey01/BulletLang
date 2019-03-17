@@ -5,6 +5,7 @@ import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.component.expression.Expression;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -20,13 +21,10 @@ public class Arguments extends Base {
     }
 
     @Override
-    public void resolveTypes() {
-        arguments.forEach(Expression::resolveTypes);
-    }
-
-    @Override
-    public void resolveReferences() {
-        arguments.forEach(Expression::resolveReferences);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        arguments.forEach(argument -> {
+            if (!exclude.contains(argument)) argument.resolve(this, exclude);
+        });
     }
 
     @Override

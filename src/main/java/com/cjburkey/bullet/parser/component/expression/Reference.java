@@ -10,6 +10,7 @@ import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.statement.FunctionDec;
 import com.cjburkey.bullet.parser.component.statement.VariableDec;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -19,7 +20,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class Reference extends Expression {
 
-    private static final String ERROR_INVALID_FUNCTION_REFERENCE = "Failed to resolve function reference for function \"%s\"";
+    private static final String ERROR_INVALID_FUNCTION_REFERENCE = "Failed to resolve function reference for function \"%s\" with parameters of types: %s";
     private static final String ERROR_INVALID_VARIABLE_REFERENCE = "Failed to resolve variable reference for function \"%s\"";
     private static final String ERROR_INVALID_REFERENCE = "Failed to resolve variable/function reference for \"%s\"";
 
@@ -56,20 +57,15 @@ public class Reference extends Expression {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (arguments != null) arguments.resolveTypes();
-
-        if (variableReference != null && variableReference.type != null) {
-            outputType = variableReference.type.type;
-        }
-        if (functionReference != null && functionReference.type != null) {
-            outputType = functionReference.type.type;
-        }
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (arguments != null && !exclude.contains(arguments)) arguments.resolve(this, exclude);
 
         switch (referenceType) {
             case FUNCTION:
                 if (resolveFunctionReference(exclude)) {
-                    BulletError.queueError(ctx, ERROR_INVALID_FUNCTION_REFERENCE, name);
+                    BulletError.queueError(ctx, ERROR_INVALID_FUNCTION_REFERENCE, name, Arrays.toString(arguments.arguments.stream()
+                            .map(arg -> arg.outputType.toString())
+                            .toArray()));
                 }
                 break;
             case VARIABLE:
@@ -83,12 +79,24 @@ public class Reference extends Expression {
                     BulletError.queueError(ctx, ERROR_INVALID_REFERENCE, name);
                 }
         }
+
+        if (variableReference != null && !exclude.contains(variableReference)) variableReference.resolve(this, exclude);
+        if (functionReference != null && !exclude.contains(functionReference)) functionReference.resolve(this, exclude);
+
+        if (variableReference != null && variableReference.type != null) {
+            outputType = variableReference.type.type;
+        } else if (functionReference != null && functionReference.type != null) {
+            outputType = functionReference.type.type;
+        }
     }
 
     // True = error
     private boolean resolveFunctionReference(ObjectOpenHashSet<Base> exclude) {
         List<FunctionDec> functionDecs = parentScope.getFunctions(name, true);
         for (FunctionDec functionDec : functionDecs) {
+            if (!exclude.contains(functionDec)) {
+                functionDec.resolve(this, exclude);
+            }
             if (functionDec.parameters.parameters.size() == 0 && arguments == null) {
                 functionReference = functionDec;
                 return false;
@@ -96,14 +104,15 @@ public class Reference extends Expression {
             if (arguments != null && functionDec.parameters.parameters.size() == arguments.arguments.size()) {
                 int i = 0;
                 for (Expression expression : arguments.arguments) {
-                    expression.resolve(exclude);
                     if (expression.outputType != null && !expression.outputType.equals(functionDec.parameters.parameters.get(i).type.type)) {
                         break;
                     }
                     i++;
                 }
-                functionReference = functionDec;
-                return false;
+                if (i == arguments.arguments.size()) {
+                    functionReference = functionDec;
+                    return false;
+                }
             }
         }
         return true;

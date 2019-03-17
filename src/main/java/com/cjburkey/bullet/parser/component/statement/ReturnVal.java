@@ -33,17 +33,14 @@ public class ReturnVal extends Statement {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (!exclude.contains(value)) value.resolve(exclude);
-        exclude = new ObjectOpenHashSet<>(exclude);
-        exclude.add(this);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(value)) value.resolve(this, exclude);
 
         IScopeContainer parent = parentScope.parentContainer;
         boolean foundParentFunction = false;
         do {
             if (parent instanceof FunctionDec) {
                 FunctionDec p = (FunctionDec) parent;
-                p.resolve(exclude);
                 if (p.type == null) {
                     p.type = new TypeDec(ctx, value.outputType);
                 } else {
@@ -52,6 +49,7 @@ public class ReturnVal extends Statement {
                     } else {
                         if (!p.type.type.equals(value.outputType)) {
                             BulletError.queueError(ctx, ERROR_RETURN_TYPE_MISMATCH, p.name, p.type, value.outputType);
+                            return;
                         }
                     }
                 }

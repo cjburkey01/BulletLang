@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class BinaryOperation extends UnaryOperation {
 
     private static final String TYPES_DIFFER_ERROR = "Types %s and %s differ in binary operation %s";
+    private static final String TYPE_MISSING_ERROR = "%s expression has an invalid type";
 
     private Expression expressionB;
 
@@ -25,18 +26,24 @@ public class BinaryOperation extends UnaryOperation {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        super.resolve(exclude);
-        if (!exclude.contains(expressionB)) expressionB.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        super.resolve(this, exclude);
+        if (!exclude.contains(expressionB)) expressionB.resolve(this, exclude);
 
-        if (expressionA.outputType == null || expressionB.outputType == null) {
+        if (expressionA.outputType == null) {
+            BulletError.queueError(ctx, TYPE_MISSING_ERROR, "First");
+            return;
+        }
+        if (expressionB.outputType == null) {
+            BulletError.queueError(ctx, TYPE_MISSING_ERROR, "Second");
             return;
         }
 
-        // TODO: RESOLVE OPERATORS TO METHODS ON THE TYPES.
+        // TODO: RESOLVE OPERATORS TO METHODS ON THE LEFT TYPE
         //       FOR NOW, IT WILL JUST ERROR IF THEY'RE DIFFERENT TYPES
         if (!expressionA.outputType.equals(expressionB.outputType)) {
             BulletError.queueError(ctx, TYPES_DIFFER_ERROR, expressionA.outputType, expressionB.outputType, operator);
+            return;
         }
 
         this.outputType = expressionA.outputType;

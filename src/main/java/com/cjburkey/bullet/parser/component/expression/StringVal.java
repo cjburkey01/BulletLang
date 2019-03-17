@@ -27,7 +27,10 @@ public class StringVal extends Expression {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        for (Expression expression : expressions) {
+            if (!exclude.contains(expression)) expression.resolve(this, exclude);
+        }
         outputType = new RawType("String");
     }
 

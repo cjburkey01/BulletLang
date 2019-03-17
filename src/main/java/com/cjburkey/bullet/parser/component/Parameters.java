@@ -4,6 +4,7 @@ import com.cjburkey.bullet.antlr.BulletLangParser;
 import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Objects;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -20,13 +21,10 @@ public class Parameters extends Base {
     }
 
     @Override
-    public void resolveTypes() {
-        parameters.forEach(Parameter::resolveTypes);
-    }
-
-    @Override
-    public void resolveReferences() {
-        parameters.forEach(Parameter::resolveReferences);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        parameters.forEach(parameter -> {
+            if (!exclude.contains(parameter)) parameter.resolve(this, exclude);
+        });
     }
 
     @Override

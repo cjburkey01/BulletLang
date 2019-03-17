@@ -27,8 +27,8 @@ public class ExpressionStatement extends Statement {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (!exclude.contains(value)) value.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(value)) value.resolve(this, exclude);
     }
 
     public static final class Visitor extends BaseV<ExpressionStatement> {

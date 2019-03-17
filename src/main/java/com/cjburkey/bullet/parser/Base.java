@@ -14,12 +14,21 @@ public abstract class Base {
     public Scope parentScope;
     public ParserRuleContext ctx;
     private final UUID uuid = UUID.randomUUID();
+    private boolean resolved = false;
 
     public Base(ParserRuleContext ctx) {
         this.ctx = ctx;
     }
 
-    public abstract void resolve(ObjectOpenHashSet<Base> exclude);
+    public final void resolve(Base self, ObjectOpenHashSet<Base> exclude) {
+        if (resolved) return;
+        resolved = true;
+        final var set = new ObjectOpenHashSet<>(exclude);
+        if (self != null) set.add(self);
+        doResolve(set);
+    }
+
+    protected abstract void doResolve(ObjectOpenHashSet<Base> exclude);
 
     @Override
     public boolean equals(Object o) {

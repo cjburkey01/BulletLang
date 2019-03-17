@@ -32,9 +32,9 @@ public class ClassDec extends ClassInner implements IScopeContainer {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (type != null && !exclude.contains(type)) type.resolve(exclude);
-        if (!exclude.contains(scope)) scope.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (type != null && !exclude.contains(type)) type.resolve(this, exclude);
+        if (!exclude.contains(scope)) scope.resolve(this, exclude);
     }
 
     @Override

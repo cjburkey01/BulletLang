@@ -1,7 +1,11 @@
 package com.cjburkey.bullet.parser.component.statement;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
-import com.cjburkey.bullet.parser.*;
+import com.cjburkey.bullet.parser.Base;
+import com.cjburkey.bullet.parser.BaseV;
+import com.cjburkey.bullet.parser.IScopeContainer;
+import com.cjburkey.bullet.parser.InstanceType;
+import com.cjburkey.bullet.parser.RawType;
 import com.cjburkey.bullet.parser.component.Parameter;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
@@ -16,6 +20,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class FunctionDec extends ClassInner implements IScopeContainer {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private boolean isConstructor;
     public String name;
     public Parameters parameters;
@@ -33,8 +38,7 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
 
     private VariableDec createParameterVariable(Parameter parameter) {
         VariableDec variableDec = new VariableDec(parameter.ctx, InstanceType.DEFAULT, parameter.name, parameter.type, null);
-        variableDec.resolveTypes();
-        variableDec.resolveReferences();
+        variableDec.resolve(this, new ObjectOpenHashSet<>());
         return variableDec;
     }
 
@@ -49,23 +53,26 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
     }
 
     @Override
-    public void resolve(ObjectOpenHashSet<Base> exclude) {
-        if (!exclude.contains(parameters)) parameters.resolveTypes();
-        if (type != null && !exclude.contains(type)) type.resolveReferences();
-        if (!exclude.contains(scope)) scope.resolve(exclude);
+    public void doResolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(parameters)) parameters.resolve(this, exclude);
+        if (type != null && !exclude.contains(type)) type.resolve(this, exclude);
 
-        if (type == null) {
-            type = new TypeDec(null, new RawType("Void"));
-            type.resolve(exclude);
-        }
-        if (type.type == null) {
-            type.type = new RawType("Void");
-            type.resolve(exclude);
-        }
-
+        // Parameters must be resolved before scope so that the function scope may access them as variables
         for (Parameter parameter : parameters.parameters) {
             scope.addVariable(createParameterVariable(parameter));
         }
+
+        if (!exclude.contains(scope)) scope.resolve(this, exclude);
+
+        if (type == null) {
+            type = new TypeDec(null, new RawType("Void"));
+            type.resolve(this, exclude);
+        }
+        if (type.type == null) {
+            type.type = new RawType("Void");
+            type.resolve(this, exclude);
+        }
+
     }
 
     public static final class Visitor extends BaseV<FunctionDec> {
