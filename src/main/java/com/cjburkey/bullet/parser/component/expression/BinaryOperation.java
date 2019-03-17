@@ -2,9 +2,11 @@ package com.cjburkey.bullet.parser.component.expression;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.Operator;
 import com.cjburkey.bullet.parser.component.Scope;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -23,9 +25,9 @@ public class BinaryOperation extends UnaryOperation {
     }
 
     @Override
-    public void resolveTypes() {
-        super.resolveTypes();
-        expressionB.resolveTypes();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        super.resolve(exclude);
+        if (!exclude.contains(expressionB)) expressionB.resolve(exclude);
 
         if (expressionA.outputType == null || expressionB.outputType == null) {
             return;
@@ -36,12 +38,8 @@ public class BinaryOperation extends UnaryOperation {
         if (!expressionA.outputType.equals(expressionB.outputType)) {
             BulletError.queueError(ctx, TYPES_DIFFER_ERROR, expressionA.outputType, expressionB.outputType, operator);
         }
-    }
 
-    @Override
-    public void resolveReferences() {
-        super.resolveReferences();
-        expressionB.resolveReferences();
+        this.outputType = expressionA.outputType;
     }
 
     @Override

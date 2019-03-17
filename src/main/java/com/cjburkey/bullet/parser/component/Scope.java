@@ -10,6 +10,7 @@ import com.cjburkey.bullet.parser.component.statement.Statement;
 import com.cjburkey.bullet.parser.component.statement.VariableDec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,13 +33,10 @@ public class Scope extends Base {
     }
 
     @Override
-    public void resolveTypes() {
-        statements.forEach(Statement::resolveTypes);
-    }
-
-    @Override
-    public void resolveReferences() {
-        statements.forEach(Statement::resolveReferences);
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        statements.forEach(s -> {
+            if (!exclude.contains(s)) s.resolve(exclude);
+        });
     }
 
     public void addFunction(FunctionDec functionDec) {

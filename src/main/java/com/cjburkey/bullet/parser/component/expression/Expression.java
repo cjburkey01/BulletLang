@@ -20,9 +20,6 @@ public abstract class Expression extends Base {
         super(ctx);
     }
 
-    @Override
-    public abstract void resolveTypes();
-
     public static final class Visitor extends BaseV<Expression> {
 
         public Visitor(Scope scope) {

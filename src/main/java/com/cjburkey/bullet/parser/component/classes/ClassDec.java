@@ -1,10 +1,12 @@
 package com.cjburkey.bullet.parser.component.classes;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -30,15 +32,9 @@ public class ClassDec extends ClassInner implements IScopeContainer {
     }
 
     @Override
-    public void resolveTypes() {
-        if (type != null) type.resolveTypes();
-        scope.resolveTypes();
-    }
-
-    @Override
-    public void resolveReferences() {
-        if (type != null) type.resolveReferences();
-        scope.resolveReferences();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        if (type != null && !exclude.contains(type)) type.resolve(exclude);
+        if (!exclude.contains(scope)) scope.resolve(exclude);
     }
 
     @Override

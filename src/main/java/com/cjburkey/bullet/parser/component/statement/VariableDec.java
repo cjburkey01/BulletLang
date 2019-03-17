@@ -2,12 +2,14 @@ package com.cjburkey.bullet.parser.component.statement;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.InstanceType;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
 import com.cjburkey.bullet.parser.component.classes.ClassInner;
 import com.cjburkey.bullet.parser.component.expression.Expression;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -37,23 +39,17 @@ public class VariableDec extends ClassInner {
     }
 
     @Override
-    public void resolveTypes() {
-        if (type != null) type.resolveTypes();
-        if (value != null) value.resolveTypes();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        if (type != null && !exclude.contains(type)) type.resolve(exclude);
+        if (value != null && !exclude.contains(value)) value.resolve(exclude);
 
         if (type == null) {
             type = new TypeDec(null, value.outputType);
-            type.resolveTypes();
+            type.resolve(exclude);
         }
         if (type.type == null) {
             BulletError.queueError(ctx, ERROR_TYPE_NOT_RESOLVED, name);
         }
-    }
-
-    @Override
-    public void resolveReferences() {
-        if (type != null) type.resolveReferences();
-        if (value != null) value.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<VariableDec> {

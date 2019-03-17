@@ -2,12 +2,14 @@ package com.cjburkey.bullet.parser.component.expression;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.InstanceType;
 import com.cjburkey.bullet.parser.component.Arguments;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.statement.FunctionDec;
 import com.cjburkey.bullet.parser.component.statement.VariableDec;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.List;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -54,7 +56,7 @@ public class Reference extends Expression {
     }
 
     @Override
-    public void resolveTypes() {
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
         if (arguments != null) arguments.resolveTypes();
 
         if (variableReference != null && variableReference.type != null) {
@@ -63,15 +65,10 @@ public class Reference extends Expression {
         if (functionReference != null && functionReference.type != null) {
             outputType = functionReference.type.type;
         }
-    }
-
-    @Override
-    public void resolveReferences() {
-        if (arguments != null) arguments.resolveReferences();
 
         switch (referenceType) {
             case FUNCTION:
-                if (resolveFunctionReference()) {
+                if (resolveFunctionReference(exclude)) {
                     BulletError.queueError(ctx, ERROR_INVALID_FUNCTION_REFERENCE, name);
                 }
                 break;
@@ -82,14 +79,14 @@ public class Reference extends Expression {
                 break;
             default:
             case AMBIGUOUS:
-                if (resolveVariableReference() && resolveFunctionReference()) {
+                if (resolveVariableReference() && resolveFunctionReference(exclude)) {
                     BulletError.queueError(ctx, ERROR_INVALID_REFERENCE, name);
                 }
         }
     }
 
     // True = error
-    private boolean resolveFunctionReference() {
+    private boolean resolveFunctionReference(ObjectOpenHashSet<Base> exclude) {
         List<FunctionDec> functionDecs = parentScope.getFunctions(name, true);
         for (FunctionDec functionDec : functionDecs) {
             if (functionDec.parameters.parameters.size() == 0 && arguments == null) {
@@ -99,7 +96,7 @@ public class Reference extends Expression {
             if (arguments != null && functionDec.parameters.parameters.size() == arguments.arguments.size()) {
                 int i = 0;
                 for (Expression expression : arguments.arguments) {
-                    expression.resolveTypes();
+                    expression.resolve(exclude);
                     if (expression.outputType != null && !expression.outputType.equals(functionDec.parameters.parameters.get(i).type.type)) {
                         break;
                     }

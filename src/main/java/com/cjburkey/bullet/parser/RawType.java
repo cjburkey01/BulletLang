@@ -5,20 +5,12 @@ import java.util.Objects;
 /**
  * Created by CJ Burkey on 2019/02/16
  */
-public class RawType implements IReferenceResolver, ITypeResolver {
+public class RawType {
 
     private String type;
 
     public RawType(String type) {
         this.type = type;
-    }
-
-    @Override
-    public void resolveReferences() {
-    }
-
-    @Override
-    public void resolveTypes() {
     }
 
     @Override

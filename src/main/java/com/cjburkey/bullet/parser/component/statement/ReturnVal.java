@@ -2,11 +2,13 @@ package com.cjburkey.bullet.parser.component.statement;
 
 import com.cjburkey.bullet.BulletError;
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.IScopeContainer;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
 import com.cjburkey.bullet.parser.component.expression.Expression;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -31,14 +33,17 @@ public class ReturnVal extends Statement {
     }
 
     @Override
-    public void resolveTypes() {
-        value.resolveTypes();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(value)) value.resolve(exclude);
+        exclude = new ObjectOpenHashSet<>(exclude);
+        exclude.add(this);
 
         IScopeContainer parent = parentScope.parentContainer;
         boolean foundParentFunction = false;
         do {
             if (parent instanceof FunctionDec) {
                 FunctionDec p = (FunctionDec) parent;
+                p.resolve(exclude);
                 if (p.type == null) {
                     p.type = new TypeDec(ctx, value.outputType);
                 } else {
@@ -61,11 +66,6 @@ public class ReturnVal extends Statement {
         if (!foundParentFunction) {
             BulletError.queueError(ctx, ERROR_NO_FUNCTION);
         }
-    }
-
-    @Override
-    public void resolveReferences() {
-        value.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<ReturnVal> {

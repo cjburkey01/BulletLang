@@ -1,9 +1,11 @@
 package com.cjburkey.bullet.parser.component.expression;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.Operator;
 import com.cjburkey.bullet.parser.component.Scope;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -27,14 +29,9 @@ public class UnaryOperation extends Expression {
     }
 
     @Override
-    public void resolveTypes() {
-        expressionA.resolveTypes();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(expressionA)) expressionA.resolve(exclude);
         outputType = expressionA.outputType;
-    }
-
-    @Override
-    public void resolveReferences() {
-        expressionA.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<UnaryOperation> {

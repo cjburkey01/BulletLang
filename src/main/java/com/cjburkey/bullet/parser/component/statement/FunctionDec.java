@@ -1,15 +1,13 @@
 package com.cjburkey.bullet.parser.component.statement;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
-import com.cjburkey.bullet.parser.BaseV;
-import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.parser.InstanceType;
-import com.cjburkey.bullet.parser.RawType;
+import com.cjburkey.bullet.parser.*;
 import com.cjburkey.bullet.parser.component.Parameter;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
 import com.cjburkey.bullet.parser.component.TypeDec;
 import com.cjburkey.bullet.parser.component.classes.ClassInner;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -51,31 +49,23 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
     }
 
     @Override
-    public void resolveTypes() {
-        parameters.resolveTypes();
-        if (type != null) type.resolveReferences();
-        scope.resolveTypes();
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        if (!exclude.contains(parameters)) parameters.resolveTypes();
+        if (type != null && !exclude.contains(type)) type.resolveReferences();
+        if (!exclude.contains(scope)) scope.resolve(exclude);
 
         if (type == null) {
             type = new TypeDec(null, new RawType("Void"));
-            type.resolveTypes();
+            type.resolve(exclude);
         }
         if (type.type == null) {
             type.type = new RawType("Void");
-            type.resolveTypes();
+            type.resolve(exclude);
         }
-    }
-
-    @Override
-    public void resolveReferences() {
-        parameters.resolveReferences();
-        if (type != null) type.resolveReferences();
 
         for (Parameter parameter : parameters.parameters) {
             scope.addVariable(createParameterVariable(parameter));
         }
-
-        scope.resolveReferences();
     }
 
     public static final class Visitor extends BaseV<FunctionDec> {

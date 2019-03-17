@@ -3,10 +3,12 @@ package com.cjburkey.bullet.parser.component.expression;
 import com.cjburkey.bullet.BulletCompiler;
 import com.cjburkey.bullet.Log;
 import com.cjburkey.bullet.antlr.BulletLangParser;
+import com.cjburkey.bullet.parser.Base;
 import com.cjburkey.bullet.parser.BaseV;
 import com.cjburkey.bullet.parser.RawType;
 import com.cjburkey.bullet.parser.component.Scope;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -25,15 +27,20 @@ public class StringVal extends Expression {
     }
 
     @Override
+    public void resolve(ObjectOpenHashSet<Base> exclude) {
+        outputType = new RawType("String");
+    }
+
+    @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
 
         if (expressions.length > 0) {
-            output.append("Smart s");
+            output.append("Smart string");
         } else {
             output.append('S');
         }
-        output.append("tring: {\"");
+        output.append("String: {\"");
 
         for (int i = 0; i < string.length || i < expressions.length; i++) {
             if (i < string.length) output.append(string[i]
@@ -48,15 +55,6 @@ public class StringVal extends Expression {
         }
 
         return output.append("\"}").toString();
-    }
-
-    @Override
-    public void resolveReferences() {
-    }
-
-    @Override
-    public void resolveTypes() {
-        outputType = new RawType("String");
     }
 
     public static final class Visitor extends BaseV<StringVal> {
