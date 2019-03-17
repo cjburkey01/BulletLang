@@ -1,6 +1,6 @@
 # BulletLang [![Build Status](https://travis-ci.com/cjburkey01/BulletLang.svg?branch=master)](https://travis-ci.com/cjburkey01/BulletLang)
 
-A language as easy as Ruby and Java but as efficient as C, Go, C#, and more!
+A language as easy as Ruby and Java but as efficient as C!
 
 #### Versions
 
@@ -10,7 +10,7 @@ A language as easy as Ruby and Java but as efficient as C, Go, C#, and more!
 
 ## About
 
-A fast, efficient programming language with syntax as comfortable as Ruby and Java that compiles down to the ultra-fast and pretty-efficient [C language](https://en.wikipedia.org/wiki/C_(programming_language)).
+A fast, efficient programming language with syntax as comfortable as [Ruby](https://www.ruby-lang.org/en/) and [Java](https://www.java.com/en/) that compiles down to the ultra-fast, low-level, and efficient [C language](https://en.wikipedia.org/wiki/C_(programming_language)).
 
 ## Obtaining Source
 
@@ -20,4 +20,5 @@ You may use the GitHub download repository button to download this repository or
 
 ## Building
 
-##### TODO
+* Obtain the source (_see above_)
+* **TODO**
