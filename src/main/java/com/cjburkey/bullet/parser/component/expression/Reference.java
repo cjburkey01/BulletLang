@@ -64,7 +64,10 @@ public class Reference extends Expression {
             case FUNCTION:
                 if (resolveFunctionReference(exclude)) {
                     BulletError.queueError(ctx, ERROR_INVALID_FUNCTION_REFERENCE, name, Arrays.toString(arguments.arguments.stream()
-                            .map(arg -> arg.outputType.toString())
+                            .map(arg -> {
+                                if (arg == null || arg.outputType == null) return "Error";
+                                return arg.outputType.toString();
+                            })
                             .toArray()));
                 }
                 break;

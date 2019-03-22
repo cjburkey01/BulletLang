@@ -59,7 +59,7 @@ public class ReturnVal extends Statement {
             }
 
             parent = parent.getScope().parentContainer;
-        } while (parent != null);
+        } while (parent != null && parent != parent.getScope().parentContainer);
 
         if (!foundParentFunction) {
             BulletError.queueError(ctx, ERROR_NO_FUNCTION);

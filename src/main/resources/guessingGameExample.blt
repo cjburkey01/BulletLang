@@ -1,0 +1,37 @@
+include "std/io.blt";               // Allows usage of the "stdin" function
+include "std/rand.blt";             // Allows usage of the "Random" class
+
+let realNumber = Random.int 1, 11;  // Random integer from 1 to (including) 10
+
+loop {
+    let input = Stdin.poll;         // Pulls an input string from the console
+
+    // The type of input is a union of Null and String
+    if input is Null {
+        print "Please enter a guess";
+        continue;
+    }
+
+    // The type must not be Null at this point
+    if input == "exit" {
+        print "Exiting the game";
+        break;
+    }
+
+    // Try to parse to an integer
+    let inputVal = Int32.parseString input;
+
+    // parseString returns Null if the parsing failed
+    if inputVal is Null {
+        print "Please enter a valid guess or \"exit\" to quit the game";
+        continue;
+    }
+
+    if inputVal == realNumber {
+        print @"Well done! You guessed the correct number to be {inputVal}";
+        break;
+    }
+
+    // The inputVal must not equal realNumber if this point is reached
+    print "Incorrect, please guess again.";
+}
