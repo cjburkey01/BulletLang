@@ -23,7 +23,7 @@ public class BooleanVal extends Expression {
 
     @Override
     public void doResolve(ObjectOpenHashSet<Base> exclude) {
-        outputType = new RawType("Boolean");
+        outputType = RawType.BasicTypes.BOOLEAN;
     }
 
     @Override

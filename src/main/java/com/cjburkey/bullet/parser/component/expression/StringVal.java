@@ -31,7 +31,7 @@ public class StringVal extends Expression {
         for (Expression expression : expressions) {
             if (!exclude.contains(expression)) expression.resolve(this, exclude);
         }
-        outputType = new RawType("String");
+        outputType = RawType.BasicTypes.STRING;
     }
 
     @Override

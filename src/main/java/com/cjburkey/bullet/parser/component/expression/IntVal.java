@@ -23,7 +23,7 @@ public class IntVal extends Expression {
 
     @Override
     public void doResolve(ObjectOpenHashSet<Base> exclude) {
-        outputType = new RawType("Int64");
+        outputType = RawType.BasicTypes.INT64;
     }
 
     @Override

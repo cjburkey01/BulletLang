@@ -43,6 +43,10 @@ public class TypeDec extends Base {
         return Objects.hash(type);
     }
 
+    public static TypeDec of(RawType type) {
+        return new TypeDec(null, type);
+    }
+
     public static final class Visitor extends BaseV<TypeDec> {
 
         public Visitor(Scope scope) {

@@ -21,11 +21,14 @@ public abstract class Base {
     }
 
     public final void resolve(Base self, ObjectOpenHashSet<Base> exclude) {
-        if (resolved) return;
-        resolved = true;
+        if (!resolved) resolveRaw(self, this, exclude);
+    }
+
+    private static void resolveRaw(Base self, Base resolvee, ObjectOpenHashSet<Base> exclude) {
+        resolvee.resolved = true;
         final var set = new ObjectOpenHashSet<>(exclude);
         if (self != null) set.add(self);
-        doResolve(set);
+        resolvee.doResolve(set);
     }
 
     protected abstract void doResolve(ObjectOpenHashSet<Base> exclude);

@@ -1,18 +1,7 @@
-// Automatic type resolution is dank
-def transformString(input of String) {
-    // Note: the function returns here, but the embedded function DOES resolve; this is valid.
-    reverseString
-
-    // Embedded functions!
-    def reverseString {
-        input       // TODO: CURRENTLY RETURNS THE INPUT
-    }
+if true {
+    print "Hello world!";
+} else {
+    print "Goodbye world";
 }
 
-def printRev(msg of String) {
-    print transformString(msg);
-}
-
-// TODO: STANDARD LIB
-// This is a placeholder so there's no error lol
 def print(msg of String) {}

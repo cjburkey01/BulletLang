@@ -59,6 +59,13 @@ public abstract class Statement extends Base {
                     .map(Function.identity());
         }
 
+        @Override
+        public Optional<Statement> visitIfStatement(BulletLangParser.IfStatementContext ctx) {
+            return new IfStatement.Visitor(scope)
+                    .visit(ctx)
+                    .map(Function.identity());
+        }
+
     }
 
 }

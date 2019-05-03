@@ -23,7 +23,7 @@ public class FloatVal extends Expression {
 
     @Override
     public void doResolve(ObjectOpenHashSet<Base> exclude) {
-        outputType = new RawType("Float64");
+        outputType = RawType.BasicTypes.FLOAT64;
     }
 
     @Override

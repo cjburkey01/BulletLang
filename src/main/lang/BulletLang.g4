@@ -60,6 +60,8 @@ LET             : 'let' ;
 TRUE            : 'true' ;
 FALSE           : 'false' ;
 CLASS           : 'class' ;
+IF              : 'if' ;
+ELSE            : 'else' ;
 
 // NAMES
 IDENTIFIER      : [A-Za-z_] [A-Za-z_0-9]* ;
@@ -118,11 +120,16 @@ instType    : STATIC | LOCAL ;
 
 variableDec : LET instType? IDENTIFIER typeDec? EQUALS expression ;
 
+elseRaw     : ELSE expression? LEFT_BRACE scope? RIGHT_BRACE ;
+
+ifRaw       : IF expression LEFT_BRACE scope? RIGHT_BRACE elseRaw* ;
+
 statement   : expression SEMI_COLON     # ExpressionStatement
             | variableDec SEMI_COLON    # VariableDecStatement
             | functionDec               # FunctionDecStatement
             | classDec                  # ClassDecStatement
             | returnVal                 # ReturnStatement
+            | ifRaw                     # IfStatement
             ;
 
 scope       : scope statement

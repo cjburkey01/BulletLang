@@ -1,11 +1,7 @@
 package com.cjburkey.bullet.parser.component.statement;
 
 import com.cjburkey.bullet.antlr.BulletLangParser;
-import com.cjburkey.bullet.parser.Base;
-import com.cjburkey.bullet.parser.BaseV;
-import com.cjburkey.bullet.parser.IScopeContainer;
-import com.cjburkey.bullet.parser.InstanceType;
-import com.cjburkey.bullet.parser.RawType;
+import com.cjburkey.bullet.parser.*;
 import com.cjburkey.bullet.parser.component.Parameter;
 import com.cjburkey.bullet.parser.component.Parameters;
 import com.cjburkey.bullet.parser.component.Scope;
@@ -65,11 +61,11 @@ public class FunctionDec extends ClassInner implements IScopeContainer {
         if (!exclude.contains(scope)) scope.resolve(this, exclude);
 
         if (type == null) {
-            type = new TypeDec(null, new RawType("Void"));
+            type = TypeDec.of(RawType.BasicTypes.VOID);
             type.resolve(this, exclude);
         }
         if (type.type == null) {
-            type.type = new RawType("Void");
+            type.type = RawType.BasicTypes.VOID;
             type.resolve(this, exclude);
         }
 
